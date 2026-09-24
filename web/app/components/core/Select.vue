@@ -21,6 +21,9 @@ defineOptions({
 withDefaults(
   defineProps<{
     label: string;
+    name: string;
+    required?: boolean;
+    disabled?: boolean;
     hideLabel?: boolean;
     orientation?: "vertical" | "horizontal";
   }>(),

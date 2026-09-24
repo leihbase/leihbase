@@ -1,7 +1,7 @@
 <template>
   <div class="root">
     <FormLabel v-if="label" :for="id" :required="required">
-      {{ label }}
+      {{ label }}<template #suffix><slot name="label-suffix" /></template>
     </FormLabel>
     <div class="wrapper">
       <div v-if="!!$slots.prefix" class="prefix">

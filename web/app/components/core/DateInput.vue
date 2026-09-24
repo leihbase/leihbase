@@ -1,6 +1,8 @@
 <template>
   <div class="root">
-    <FormLabel :for="id" :required="required">{{ label }}</FormLabel>
+    <FormLabel :for="id" :required="required">
+      {{ label }}<template #suffix><slot name="label-suffix" /></template>
+    </FormLabel>
     <Popup v-model:open="showPopup">
       <input
         :id="id"

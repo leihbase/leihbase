@@ -16,7 +16,9 @@
       <span class="switch">
         <Check class="check" />
       </span>
-      <FormLabel is="span" hide-required>{{ label }}</FormLabel>
+      <FormLabel is="span" hide-required>
+        {{ label }}<template #suffix><slot name="label-suffix" /></template>
+      </FormLabel>
     </label>
     <p v-if="description" :id="`${id}-description`" class="descrption">
       <small>{{ description }}</small>
