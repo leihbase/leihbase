@@ -102,6 +102,10 @@ if (!location.value || !location.value.id) {
   });
 }
 
+useHead({
+  title: `${t("title")} | ${location.value.name}`,
+});
+
 const emailTemplateDrawerOpen = ref(false);
 const success = ref(false);
 const editingTemplate = ref<EmailTemplate>();
