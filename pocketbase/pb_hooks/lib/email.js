@@ -64,6 +64,15 @@ const ReservationCancellationLocationVars = /** @type {const} */ ([
   "RESERVATION_END",
 ]);
 
+const emailTemplateVars = {
+  reservation_confirmation: ReservationConfirmationVars,
+  reservation_confirmation_location: ReservationConfirmationLocationVars,
+  reservation_start_reminder: ReservationStartReminderVars,
+  reservation_end_reminder: ReservationEndReminderVars,
+  cancellation_confirmation: CancellationConfirmationVars,
+  reservation_cancellation_location: ReservationCancellationLocationVars,
+};
+
 /**
  * @typedef {{
  *  reservation_confirmation: (typeof ReservationConfirmationVars)[number];
@@ -71,8 +80,8 @@ const ReservationCancellationLocationVars = /** @type {const} */ ([
  *  reservation_start_reminder: (typeof ReservationStartReminderVars)[number];
  *  reservation_end_reminder: (typeof ReservationEndReminderVars)[number];
  *  cancellation_confirmation: (typeof CancellationConfirmationVars)[number];
- *  reservation_cancellation_location: (typeof ReservationCancellationLocationVars)[number];}
- * } EmailTemplateVars
+ *  reservation_cancellation_location: (typeof ReservationCancellationLocationVars)[number];
+ * }} EmailTemplateVars
  **/
 
 /**
@@ -251,16 +260,84 @@ function sendLocationTemplateEmail(
   $app.newMailClient().send(email);
 }
 
+/**
+ * Generates default preview values for all email template variables
+ * @returns {Record<string, string>}
+ */
+function generatePreviewVars() {
+  return {
+    APP_URL: "https://example.com",
+    USER_NAME: "John Doe",
+    USER_EMAIL: "john@example.com",
+    LOCATION_NAME: "Main Location",
+    PRODUCT_URL: "https://example.com/product/123",
+    PRODUCT_NAME: "Drill Machine",
+    PRODUCT_LINK: '<a href="https://example.com/product/123">Drill Machine</a>',
+    PRODUCT_DEPOSIT: "50€",
+    RESERVATION_START: "2024-01-15",
+    RESERVATION_END: "2024-01-22",
+    START_HOUR: "10:00",
+    END_HOUR: "18:00",
+    MESSAGE: "This is a test message from the user.",
+  };
+}
+
+/**
+ * Filters variables to only include those relevant for a specific template
+ * @param {TemplateName} templateName
+ * @param {Record<string, string>} allVars
+ * @returns {Record<string, string>}
+ */
+function filterTemplateVars(templateName, allVars) {
+  const templateVars = emailTemplateVars[templateName];
+  if (!templateVars) return {};
+  
+  const filtered = {};
+  for (const varName of templateVars) {
+    if (allVars[varName] !== undefined) {
+      filtered[varName] = allVars[varName];
+    }
+  }
+  return filtered;
+}
+
+/**
+ * Gets a preview template (custom or default) and renders it with preview variables
+ * @param {TemplateName} templateName
+ * @param {string} locale
+ * @param {string|null} locationId
+ * @param {boolean} useDefault
+ * @returns {{subject: string, html: string, templateName: TemplateName}|null}
+ */
+function getPreviewTemplate(templateName, locale, locationId = null, useDefault = false) {
+  const allPreviewVars = generatePreviewVars();
+  const templateVars = filterTemplateVars(templateName, allPreviewVars);
+  
+  let template = null;
+  
+  if (!useDefault && locationId) {
+    template = getEmailTemplate(locationId, templateName, locale);
+  }
+  
+  if (!template) {
+    template = getDefaultTemplate(templateName, locale);
+  }
+  
+  if (!template) {
+    return null;
+  }
+  
+  return {
+    templateName,
+    subject: renderTemplate(template.subject, templateVars),
+    html: renderTemplate(template.html, templateVars),
+  };
+}
+
 module.exports = {
   sendLocationTemplateEmail,
   getSenderInfo,
   formatCurrency,
-  emailTemplateVars: {
-   reservation_confirmation: ReservationConfirmationVars,
-   reservation_confirmation_location: ReservationConfirmationLocationVars,
-   reservation_start_reminder: ReservationStartReminderVars,
-   reservation_end_reminder: ReservationEndReminderVars,
-   cancellation_confirmation: CancellationConfirmationVars,
-   reservation_cancellation_location: ReservationCancellationLocationVars,
-  }
+  getPreviewTemplate,
+  emailTemplateVars,
 };
