@@ -155,7 +155,7 @@ function handleEdit(template: any) {
 
 function handleTemplateSaved(savedTemplate: any) {
   success.value = true;
-  editingTemplate.value = null;
+  editingTemplate.value = undefined;
   refresh();
 
   // Hide success message after 3 seconds
@@ -166,7 +166,7 @@ function handleTemplateSaved(savedTemplate: any) {
 
 function handleTemplateDeleted() {
   success.value = true;
-  editingTemplate.value = null;
+  editingTemplate.value = undefined;
   refresh();
 
   setTimeout(() => {
@@ -175,7 +175,7 @@ function handleTemplateDeleted() {
 }
 
 function handleEditorCancelled() {
-  editingTemplate.value = null;
+  editingTemplate.value = undefined;
 }
 
 // Watch for location changes
