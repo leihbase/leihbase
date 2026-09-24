@@ -302,20 +302,16 @@ function filterTemplateVars(templateName, allVars) {
 }
 
 /**
- * Gets a preview template (custom or default) and renders it with preview variables
+ * Gets a template (custom or default) without rendering
  * @param {TemplateName} templateName
  * @param {string} locale
  * @param {string|null} locationId
- * @param {boolean} useDefault
- * @returns {{subject: string, html: string, templateName: TemplateName}|null}
+ * @returns {{subject: string, html: string}|null}
  */
-function getPreviewTemplate(templateName, locale, locationId = null, useDefault = false) {
-  const allPreviewVars = generatePreviewVars();
-  const templateVars = filterTemplateVars(templateName, allPreviewVars);
-  
+function getPreviewTemplate(templateName, locale, locationId = null) {
   let template = null;
   
-  if (!useDefault && locationId) {
+  if (locationId) {
     template = getEmailTemplate(locationId, templateName, locale);
   }
   
@@ -328,9 +324,25 @@ function getPreviewTemplate(templateName, locale, locationId = null, useDefault 
   }
   
   return {
-    templateName,
-    subject: renderTemplate(template.subject, templateVars),
-    html: renderTemplate(template.html, templateVars),
+    subject: template.subject,
+    html: template.html,
+  };
+}
+
+/**
+ * Renders a template with preview variables
+ * @param {string} templateSubject
+ * @param {string} templateHtml
+ * @param {TemplateName} templateName
+ * @returns {{subject: string, html: string}}
+ */
+function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
+  const allPreviewVars = generatePreviewVars();
+  const templateVars = filterTemplateVars(templateName, allPreviewVars);
+  
+  return {
+    subject: renderTemplate(templateSubject, templateVars),
+    html: renderTemplate(templateHtml, templateVars),
   };
 }
 
@@ -339,5 +351,6 @@ module.exports = {
   getSenderInfo,
   formatCurrency,
   getPreviewTemplate,
+  renderPreviewTemplate,
   emailTemplateVars,
 };

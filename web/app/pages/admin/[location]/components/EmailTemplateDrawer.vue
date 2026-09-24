@@ -70,7 +70,14 @@
         :disabled="fetchingTemplateSettings"
         :rows="12"
         code
-      />
+      >
+        <template #label-suffix>
+          <Button variant="secondary" size="sm" @click="handlePreview">
+            <Eye />
+            {{ t("preview") }}
+          </Button>
+        </template>
+      </Textarea>
 
       <div v-if="name" class="template-variables">
         <Heading is="h3" size="sm">{{ t("available_variables") }}</Heading>
@@ -93,6 +100,14 @@
       </footer>
     </form>
   </Drawer>
+
+  <!-- Preview Dialog -->
+  <EmailTemplatePreviewDialog
+    v-model:open="previewDialogOpen"
+    :subject="subject"
+    :html="html"
+    :templateName="name"
+  />
 </template>
 
 <script setup lang="ts">
@@ -105,8 +120,9 @@ import Input from "@/components/core/Input.vue";
 import Select from "@/components/core/Select.vue";
 import Switch from "@/components/core/Switch.vue";
 import Textarea from "@/components/core/Textarea.vue";
-import { Trash, Xmark } from "@iconoir/vue";
+import { Eye, Trash, Xmark } from "@iconoir/vue";
 import { useI18n } from "vue-i18n";
+import EmailTemplatePreviewDialog from "./EmailTemplatePreviewDialog.vue";
 
 const { t, locale } = useI18n({ useScope: "local" });
 const { t: g } = useI18n({ useScope: "global" });
@@ -128,7 +144,10 @@ const name = ref("");
 const subject = ref("");
 const html = ref("");
 const templateVariables = ref([]);
-const enabled = ref(true);
+const enabled = ref<boolean | undefined>(true);
+
+// Preview dialog state
+const previewDialogOpen = ref<boolean | undefined>(false);
 
 const { pb } = usePocketbase();
 
@@ -216,6 +235,10 @@ async function handleDelete() {
 function handleCancel() {
   emit("cancelled");
 }
+
+function handlePreview() {
+  previewDialogOpen.value = true;
+}
 </script>
 
 <style scoped>
@@ -235,13 +258,6 @@ header .buttons {
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
-}
-
-.actions {
-  display: flex;
-  gap: 1rem;
-  align-self: flex-start;
-  margin-top: 1rem;
 }
 
 select {
@@ -281,6 +297,7 @@ footer {
     "cancel": "Cancel",
     "loading_default_template": "Loading default template...",
     "choose_a_template": "Choose a template type",
+    "preview": "Preview",
     "reservation_confirmation": "Reservation Confirmation (User)",
     "reservation_confirmation_location": "Reservation Confirmation (Location)",
     "reservation_start_reminder": "Pickup Reminder",
@@ -302,7 +319,8 @@ footer {
     "delete": "Löschen",
     "cancel": "Abbrechen",
     "loading_default_template": "Lade Standard-Vorlage...",
-    "choose_a_template": "Wähle einen Vorlagentyp"
+    "choose_a_template": "Wähle einen Vorlagentyp",
+    "preview": "Vorschau"
   }
 }
 </i18n>

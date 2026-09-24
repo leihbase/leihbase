@@ -32,24 +32,43 @@ routerAdd("GET", "/api/email-templates/defaults/{locale}/{templateName}", (e) =>
  */
 routerAdd("GET", "/api/email-templates/preview", (e) => {
   /** @type {typeof import('./lib/email')} */
-  const { getPreviewTemplate } = require(`${__hooks}/lib/email`);
+  const { getPreviewTemplate, renderPreviewTemplate } = require(`${__hooks}/lib/email`);
 
   if (!e.request) return
 
   const templateName = /** @type {TemplateName} */ (e.request.url?.query().get('templateName'));
   const locale = e.request.url?.query().get('locale');
   const locationId = e.request.url?.query().get('locationId');
-  const useDefault = e.request.url?.query().get('useDefault') === "true";
+  const customSubject = e.request.url?.query().get('customSubject');
+  const customHtml = e.request.url?.query().get('customHtml');
 
   if (!templateName || !locale) {
     return e.json(400, { error: "templateName and locale query params are required" });
   }
 
-  const preview = getPreviewTemplate(templateName, locale, locationId || null, useDefault);
-  
-  if (!preview) {
-    return e.json(404, { error: "Template not found" });
+  let subject, html;
+
+  // If custom subject/html provided, use those
+  if (customSubject || customHtml) {
+    subject = customSubject || "";
+    html = customHtml || "";
+  } else {
+    // Otherwise fetch the template
+    const template = getPreviewTemplate(templateName, locale, locationId || null);
+    
+    if (!template) {
+      return e.json(404, { error: "Template not found" });
+    }
+    
+    subject = template.subject;
+    html = template.html;
   }
+
+  // Render with preview variables
+  const rendered = renderPreviewTemplate(subject, html, templateName);
   
-  return e.json(200, preview);
+  return e.json(200, {
+    templateName,
+    ...rendered,
+  });
 });
