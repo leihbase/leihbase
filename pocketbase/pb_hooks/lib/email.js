@@ -72,6 +72,16 @@ const ReservationCancellationLocationVars = /** @type {const} */ ([
  **/
 
 /**
+ * Formats currency for use in email templates
+ * @param {number} n
+ * @returns {string}
+ */
+function formatCurrency(n) {
+  if (!n) return "";
+  return `${Math.round(n)}€`;
+}
+
+/**
  * Gets default template for a given name and locale
  * @param {TemplateName} templateName
  * @param {string} locale
@@ -94,7 +104,7 @@ function getDefaultTemplate(templateName, locale) {
 }
 
 /**
- * Renders a template with variables (supports {{varName}} and {{#if varName}}...{{/if}} syntax)
+ * Renders a template with variables (supports {VAR_NAME} and {#if VAR_NAME}...{/if} syntax)
  * @param {string} template
  * @param {Record<string, string | null>} variables
  * @returns {string}
@@ -106,7 +116,7 @@ function renderTemplate(template, variables) {
 
   let result = template;
 
-  // First, process {{#if variable}}...{{/if}} conditionals
+  // First, process {#if VARIABLE}...{/if} conditionals
   // Uses non-greedy matching ([\s\S]*?) to handle content across multiple lines
   result = result.replace(
     /\{#if (\w+)\}([\s\S]*?)\{\/if\}/g,
@@ -115,7 +125,7 @@ function renderTemplate(template, variables) {
     }
   );
 
-  // Then replace {{variableName}} placeholders
+  // Then replace {VARIABLE_NAME} placeholders
   result = result.replace(/\{(\w+)\}/g, (match, varName) => {
     return !!variables[varName] ? variables[varName] : match;
   });
@@ -209,16 +219,6 @@ function getRenderedTemplate(location, templateName, templateVars, locale) {
 
   // Fallback to empty template (should not happen with proper defaults)
   return { subject: templateName, html: "" };
-}
-
-/**
- * Formats currency for use in email templates
- * @param {number} n
- * @returns {string}
- */
-function formatCurrency(n) {
-  if (!n) return "";
-  return `${Math.round(n)}€`;
 }
 
 /**
