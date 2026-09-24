@@ -14,7 +14,13 @@
     </header>
 
     <form @submit.prevent="handleSubmit" class="lb-stack">
-      <Select :label="t('template_type')" name="name" v-model="name" required>
+      <Select
+        :label="t('template_type')"
+        name="name"
+        v-model="name"
+        required
+        :disabled="editing"
+      >
         <option value="">
           {{ t("choose_a_template") }}
         </option>
@@ -61,7 +67,7 @@
         v-model="html"
         required
         :description="t('html_body_description', { variable: '{VARIABLE}' })"
-        :disabled="fetchingDefault"
+        :disabled="fetchingTemplateSettings"
         :rows="12"
         code
       />
@@ -116,7 +122,7 @@ const emit = defineEmits(["saved", "deleted", "cancelled"]);
 
 const loading = ref(false);
 const deleting = ref(false);
-const fetchingDefault = ref(false);
+const fetchingTemplateSettings = ref(false);
 
 const name = ref("");
 const subject = ref("");
@@ -137,31 +143,33 @@ watch(open, (isOpening) => {
   html.value = props.template?.html || "";
 });
 
-watch(name, () => {
-  fetchDefaultTemplate();
+// Update template data when template type or locale changes (for new templates)
+watch(name, async () => {
+  const templateSettings = await fetchTemplateSettings();
+  templateVariables.value = templateSettings?.variables;
+  if (!props.template) {
+    subject.value = templateSettings?.subject;
+    html.value = templateSettings?.html;
+  }
 });
 
-// Fetch default template when template type or locale changes (for new templates)
-async function fetchDefaultTemplate() {
-  if (props.template) {
-    return;
-  }
-
-  fetchingDefault.value = true;
+// Fetches template settings
+async function fetchTemplateSettings() {
+  fetchingTemplateSettings.value = true;
   try {
     const result = await pb.send(
       `/api/email-templates/defaults/${locale.value}/${name.value}`,
       {}
     );
-    templateVariables.value = result.vars || [];
-    if (result && result.template && result.template.subject) {
-      subject.value = result.template.subject;
-      html.value = result.template.html;
-    }
+    return {
+      subject: result.template?.subject,
+      html: result.template?.html,
+      variables: result.vars || [],
+    };
   } catch (error) {
     console.error("Failed to fetch default template:", error);
   } finally {
-    fetchingDefault.value = false;
+    fetchingTemplateSettings.value = false;
   }
 }
 
