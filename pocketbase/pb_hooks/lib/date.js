@@ -31,24 +31,9 @@ function formatPocketbaseDate(date) {
   return new Date(date).toISOString().replace('T', ' ');
 }
 
-/**
- * Formats a date for use in email templates
- * @param {Date} date
- * @param {string} locale
- * @returns {string}
- */
-function formatDate(date, locale) {
-  if (!date) return "";
-  if (locale === 'de') {
-    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-  }
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-}
-
 module.exports = {
   addDays,
   startOfDate,
   endOfDate,
   formatPocketbaseDate,
-  formatDate,
 };

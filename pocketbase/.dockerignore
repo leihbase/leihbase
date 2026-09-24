@@ -3,3 +3,4 @@
 **/pb_data/data*
 **/pb_data/logs*
 fly.toml
+.env

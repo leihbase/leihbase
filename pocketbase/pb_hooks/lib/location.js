@@ -28,11 +28,11 @@ function getNotificationEmailAddresses(locationRecord) {
  */
 function sendReminders(location, type) {
   /** @type {typeof import('./date')} */
-  const { addDays, startOfDate, endOfDate, formatPocketbaseDate, formatDate } = require(`${__hooks}/lib/date`);
+  const { addDays, startOfDate, endOfDate, formatPocketbaseDate } = require(`${__hooks}/lib/date`);
   /** @type {typeof import('./reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./email')} */
-  const { sendLocationTemplateEmail } = require(`${__hooks}/lib/email`);
+  const { sendLocationTemplateEmail, formatDate } = require(`${__hooks}/lib/email`);
   /** @type {typeof import('./openingHours')} */
   const { getOpeningHoursDay } = require(`${__hooks}/lib/openingHours`);
 

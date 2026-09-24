@@ -85,13 +85,32 @@ const emailTemplateVars = {
  **/
 
 /**
- * Formats currency for use in email templates
- * @param {number} n
+ * Formats a date for use in email templates
+ * @param {Date} date
+ * @param {string} locale
  * @returns {string}
  */
-function formatCurrency(n) {
+function formatDate(date, locale) {
+  if (!date) return "";
+  if (locale === 'de') {
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+  }
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+}
+
+/**
+ * Formats currency for use in email templates
+ * @param {number} n
+ * @param {string} locale
+ * @returns {string}
+ */
+function formatCurrency(n, locale) {
   if (!n) return "";
-  return `${Math.round(n)}€`;
+  if (locale === 'de') {
+    return `${Math.round(n)}€`;
+  } else {
+    return `€${Math.round(n)}`;
+  }
 }
 
 /**
@@ -262,20 +281,21 @@ function sendLocationTemplateEmail(
 
 /**
  * Generates default preview values for all email template variables
+ * @param {string} locale
  * @returns {Record<string, string>}
  */
-function generatePreviewVars() {
+function generatePreviewVars(locale) {
   return {
     APP_URL: "https://example.com",
     USER_NAME: "John Doe",
     USER_EMAIL: "john@example.com",
-    LOCATION_NAME: "Main Location",
+    LOCATION_NAME: "Borrow-Store",
     PRODUCT_URL: "https://example.com/product/123",
     PRODUCT_NAME: "Drill Machine",
     PRODUCT_LINK: '<a href="https://example.com/product/123">Drill Machine</a>',
-    PRODUCT_DEPOSIT: "50€",
-    RESERVATION_START: "2024-01-15",
-    RESERVATION_END: "2024-01-22",
+    PRODUCT_DEPOSIT: formatCurrency(50, locale),
+    RESERVATION_START: formatDate(new Date("2024-01-15"), locale),
+    RESERVATION_END: formatDate(new Date("2024-01-22"), locale),
     START_HOUR: "10:00",
     END_HOUR: "18:00",
     MESSAGE: "This is a test message from the user.",
@@ -337,7 +357,8 @@ function getPreviewTemplate(templateName, locale, locationId = null) {
  * @returns {{subject: string, html: string}}
  */
 function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
-  const allPreviewVars = generatePreviewVars();
+  const locale = $os.getenv("CONFIG_LOCALE") || "en";
+  const allPreviewVars = generatePreviewVars(locale);
   const templateVars = filterTemplateVars(templateName, allPreviewVars);
   
   return {
@@ -349,6 +370,7 @@ function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
 module.exports = {
   sendLocationTemplateEmail,
   getSenderInfo,
+  formatDate,
   formatCurrency,
   getPreviewTemplate,
   renderPreviewTemplate,

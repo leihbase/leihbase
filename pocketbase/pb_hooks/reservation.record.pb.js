@@ -212,12 +212,10 @@ onRecordCreateRequest((e) => {
 
   const locale = $os.getenv("CONFIG_LOCALE") || "en";
 
-  /** @type {typeof import('./lib/date')} */
-  const { formatDate } = require(`${__hooks}/lib/date`);
   /** @type {typeof import('./lib/reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail, formatCurrency } = require(`${__hooks}/lib/email`);
+  const { sendLocationTemplateEmail, formatCurrency, formatDate } = require(`${__hooks}/lib/email`);
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
@@ -298,7 +296,7 @@ onRecordCreateRequest((e) => {
         PRODUCT_NAME: productName,
         RESERVATION_START: formatDate(start, locale),
         RESERVATION_END: formatDate(end, locale),
-        PRODUCT_DEPOSIT: product.get("deposit") ? formatCurrency(product.get("deposit")) : null,
+        PRODUCT_DEPOSIT: product.get("deposit") ? formatCurrency(product.get("deposit"), locale) : null,
       }
     );
     // Store that email has been sent
@@ -309,12 +307,10 @@ onRecordCreateRequest((e) => {
 onRecordUpdateRequest((e) => {
   e.next();
 
-  /** @type {typeof import('./lib/date')} */
-  const { formatDate } = require(`${__hooks}/lib/date`);
   /** @type {typeof import('./lib/reservation')} */
   const { removeSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail } = require(`${__hooks}/lib/email`);
+  const { sendLocationTemplateEmail, formatDate } = require(`${__hooks}/lib/email`);
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
