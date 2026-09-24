@@ -61,7 +61,10 @@ select {
   border-radius: var(--border-radius);
   cursor: pointer;
 }
-select:hover,
+select[disabled] {
+  cursor: default;
+}
+select:not([disabled]):hover,
 select:focus-visible {
   outline: 2px solid var(--text-color);
 }
