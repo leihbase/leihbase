@@ -50,6 +50,16 @@ export default defineI18nConfig(() => {
         validation_required: "This field is required.",
         validation_invalid_old_password: "Wrong password.",
         validation_values_mismatch: "The two fields do not match.",
+        email_templates: {
+          reservation_confirmation: "Reservation Confirmation (User)",
+          reservation_confirmation_location:
+            "Reservation Confirmation (Location)",
+          reservation_start_reminder: "Pickup Reminder",
+          reservation_end_reminder: "Return Reminder",
+          cancellation_confirmation: "Cancellation Confirmation (User)",
+          reservation_cancellation_location:
+            "Cancellation Confirmation (Location)",
+        },
       },
       de: {
         week_days: {
@@ -97,6 +107,16 @@ export default defineI18nConfig(() => {
         validation_required: "Dieses Feld ist erforderlich.",
         validation_invalid_old_password: "Falsches Passwort.",
         validation_values_mismatch: "Die zwei Felder stimmen nicht überein.",
+        email_templates: {
+          reservation_confirmation: "Reservierungsbestätigung (Nutzer)",
+          reservation_confirmation_location:
+            "Reservierungsbestätigung (Standort)",
+          reservation_start_reminder: "Abhol-Erinnerung",
+          reservation_end_reminder: "Rückgabe-Erinnerung",
+          cancellation_confirmation: "Stornierungsbestätigung (Nutzer)",
+          reservation_cancellation_location:
+            "Stornierungsbestätigung (Standort)",
+        },
       },
     },
   };

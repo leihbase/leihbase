@@ -19,22 +19,22 @@
           {{ t("choose_a_template") }}
         </option>
         <option value="reservation_confirmation">
-          {{ t("reservation_confirmation") }}
+          {{ g("email_templates.reservation_confirmation") }}
         </option>
         <option value="reservation_confirmation_location">
-          {{ t("reservation_confirmation_location") }}
+          {{ g("email_templates.reservation_confirmation_location") }}
         </option>
         <option value="reservation_start_reminder">
-          {{ t("reservation_start_reminder") }}
+          {{ g("email_templates.reservation_start_reminder") }}
         </option>
         <option value="reservation_end_reminder">
-          {{ t("reservation_end_reminder") }}
+          {{ g("email_templates.reservation_end_reminder") }}
         </option>
         <option value="cancellation_confirmation">
-          {{ t("cancellation_confirmation") }}
+          {{ g("email_templates.cancellation_confirmation") }}
         </option>
         <option value="reservation_cancellation_location">
-          {{ t("reservation_cancellation_location") }}
+          {{ g("email_templates.reservation_cancellation_location") }}
         </option>
       </Select>
 
@@ -96,15 +96,14 @@ import Button from "@/components/core/Button.vue";
 import Drawer from "@/components/core/Drawer.vue";
 import Heading from "@/components/core/Heading.vue";
 import Input from "@/components/core/Input.vue";
-import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import Select from "@/components/core/Select.vue";
 import Switch from "@/components/core/Switch.vue";
 import Textarea from "@/components/core/Textarea.vue";
 import { Trash, Xmark } from "@iconoir/vue";
-import { resolveModuleWithOptions } from "nuxt/kit";
 import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n({ useScope: "local" });
+const { t: g } = useI18n({ useScope: "global" });
 
 const props = defineProps<{
   location: any;
@@ -295,13 +294,7 @@ footer {
     "delete": "Löschen",
     "cancel": "Abbrechen",
     "loading_default_template": "Lade Standard-Vorlage...",
-    "choose_a_template": "Wähle einen Vorlagentyp",
-    "reservation_confirmation": "Reservierungsbestätigung (Nutzer)",
-    "reservation_confirmation_location": "Reservierungsbestätigung (Standort)",
-    "reservation_start_reminder": "Abhol-Erinnerung",
-    "reservation_end_reminder": "Rückgabe-Erinnerung",
-    "cancellation_confirmation": "Stornierungsbestätigung (Nutzer)",
-    "reservation_cancellation_location": "Stornierungsbestätigung (Standort)"
+    "choose_a_template": "Wähle einen Vorlagentyp"
   }
 }
 </i18n>

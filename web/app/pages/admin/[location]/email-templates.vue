@@ -31,7 +31,7 @@
           :padding="false"
         >
           <div class="template-header">
-            <strong>{{ getTemplateName(template.name) }}</strong>
+            <strong>{{ g(`email_templates.${template.name}`) }}</strong>
             <Badge v-if="template.enabled" variant="success">
               {{ t("enabled") }}
             </Badge>
@@ -77,6 +77,7 @@ import EmailTemplateDrawer from "./components/EmailTemplateDrawer.vue";
 
 const route = useRoute();
 const { t } = useI18n({ useScope: "local" });
+const { t: g } = useI18n({ useScope: "global" });
 const { pb } = usePocketbase();
 
 const slug = Array.isArray(route.params.location)
@@ -104,31 +105,6 @@ if (!location.value || !location.value.id) {
 const emailTemplateDrawerOpen = ref(false);
 const success = ref(false);
 const editingTemplate = ref<EmailTemplate>();
-
-const templateNames: Record<string, Record<string, string>> = {
-  en: {
-    reservation_confirmation: "Reservation Confirmation (User)",
-    reservation_confirmation_location: "Reservation Confirmation (Location)",
-    reservation_start_reminder: "Pickup Reminder",
-    reservation_end_reminder: "Return Reminder",
-    cancellation_confirmation: "Cancellation Confirmation (User)",
-    reservation_cancellation_location: "Cancellation Confirmation (Location)",
-  },
-  de: {
-    reservation_confirmation: "Reservierungsbestätigung (Nutzer)",
-    reservation_confirmation_location: "Reservierungsbestätigung (Standort)",
-    reservation_start_reminder: "Abhol-Erinnerung",
-    reservation_end_reminder: "Rückgabe-Erinnerung",
-    cancellation_confirmation: "Stornierungsbestätigung (Nutzer)",
-    reservation_cancellation_location: "Stornierungsbestätigung (Standort)",
-  },
-};
-
-function getTemplateName(name: string): string {
-  const { locale } = useI18n();
-  const names = templateNames[locale.value] || templateNames.en;
-  return names[name] || name;
-}
 
 const {
   data: templates,
