@@ -1,5 +1,5 @@
 <template>
-  <Container width="lg" centered>
+  <Container width="lg" centered class="settings-page">
     <PageAlert class="banner" />
 
     <AdminNav v-if="location" :location="location" />
@@ -27,15 +27,6 @@
           errors.fields['address'] ? t(errors.fields['address']) : undefined
         "
         required
-        class="max-w"
-      />
-      <Input
-        :label="t('email')"
-        name="email"
-        :value="location.email"
-        :error="errors.fields['email'] ? t(errors.fields['email']) : undefined"
-        required
-        autocomplete="off"
         class="max-w"
       />
 
@@ -119,13 +110,31 @@
         :value="location.allow_same_day_reservations"
       />
 
+      <Heading is="h2" size="md">{{ t("email_settings") }}</Heading>
+
+      <div>
+        <Link :to="`/admin/${location?.slug}/email-templates`">
+          {{ t("manage_email_templates") }}
+        </Link>
+      </div>
+
+      <Input
+        :label="t('email')"
+        name="email"
+        :value="location.email"
+        :error="errors.fields['email'] ? t(errors.fields['email']) : undefined"
+        required
+        autocomplete="off"
+        class="max-w"
+      />
+
       <Alert v-if="success" variant="success">
         {{ t("success") }}
       </Alert>
 
-      <Button type="submit" :loading="loading" class="button">{{
-        t("save")
-      }}</Button>
+      <Button type="submit" :loading="loading" class="button">
+        {{ t("save") }}
+      </Button>
     </form>
   </Container>
 </template>
@@ -136,10 +145,10 @@ import Button from "@/components/core/Button.vue";
 import Container from "@/components/core/Container.vue";
 import Heading from "@/components/core/Heading.vue";
 import Input from "@/components/core/Input.vue";
+import Link from "@/components/core/Link.vue";
 import RadioBox from "@/components/core/RadioBox.vue";
 import RichTextarea from "@/components/core/RichTextarea.vue";
 import Switch from "@/components/core/Switch.vue";
-import Textarea from "@/components/core/Textarea.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import { ClientResponseError } from "pocketbase";
 import AdminHeader from "./components/AdminHeader.vue";
@@ -192,6 +201,10 @@ async function handleSubmit(e: SubmitEvent) {
 .button {
   align-self: flex-start;
 }
+.settings-page :deep(h2) {
+  margin-top: var(--fluid-spacing-8);
+  margin-bottom: var(--fluid-spacing-4);
+}
 </style>
 
 <i18n lang="json">
@@ -201,6 +214,7 @@ async function handleSubmit(e: SubmitEvent) {
     "name": "Name",
     "address": "Address",
     "email": "E-mail",
+    "description": "Description",
     "reservation-system": "Reservation System",
     "disabled": {
       "title": "Disabled",
@@ -226,6 +240,8 @@ async function handleSubmit(e: SubmitEvent) {
       "label": "Same day reservations",
       "description": "Allow a new reservation to start on the same day as the previous reservation ends"
     },
+    "email_settings": "Email Settings",
+    "manage_email_templates": "Configure email templates",
     "success": "Settings successfuly saved.",
     "save": "Save"
   },
@@ -234,6 +250,7 @@ async function handleSubmit(e: SubmitEvent) {
     "name": "Name",
     "address": "Adresse",
     "email": "E-Mail",
+    "description": "Beschreibung",
     "reservation-system": "Reservierungssystem",
     "disabled": {
       "title": "Deaktiviert",
@@ -259,6 +276,8 @@ async function handleSubmit(e: SubmitEvent) {
       "label": "Reservierungen am selben Tag",
       "description": "Ermöglicht den Beginn einer neuen Reservierung am selben Tag, an dem die vorherige Reservierung endet."
     },
+    "email_settings": "E-Mail-Einstellungen",
+    "manage_email_templates": "E-Mail Vorlage verwalten",
     "success": "Einstellungen erfolgreich gespeichert.",
     "save": "Speichern"
   }
