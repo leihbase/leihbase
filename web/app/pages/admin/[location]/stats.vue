@@ -85,6 +85,10 @@ if (!location.value || !location.value.id) {
   });
 }
 
+useHead({
+  title: `${t("title")} | ${location.value.name}`,
+});
+
 const { data: reservations, refresh } = await useAsyncData(() => {
   if (!dateStart.value || !dateEnd.value) {
     throw new Error("No start or end date defined.");

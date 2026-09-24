@@ -94,6 +94,10 @@ if (!location.value || !location.value.id) {
   });
 }
 
+useHead({
+  title: `${t("title")} | ${location.value.name}`,
+});
+
 function handleFilterInput() {
   nextTick(() => {
     refresh();

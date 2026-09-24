@@ -173,6 +173,10 @@ if (!location.value || !location.value.id) {
   });
 }
 
+useHead({
+  title: `${t("title")} | ${location.value.name}`,
+});
+
 async function handleSubmit(e: SubmitEvent) {
   const data = new FormData(e.target as HTMLFormElement);
   data.set(

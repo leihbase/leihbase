@@ -116,6 +116,10 @@ if (!location.value || !location.value.id) {
   });
 }
 
+useHead({
+  title: `${t("title")} | ${location.value.name}`,
+});
+
 const overdueReservations = ref<RecordModel[]>([]);
 overdueReservations.value = await getOverdueReservations(location.value?.id);
 
