@@ -222,7 +222,7 @@ watch(
     "edit": "Bearbeiten",
     "success": "Änderungen erfolgreich gespeichert.",
     "no_templates": "Keine benutzerdefinierten E-Mail-Vorlagen",
-    "no_templates_description": "Erstellen Sie benutzerdefinierte Vorlagen, um die Standard-E-Mails für diesen Standort zu überschreiben."
+    "no_templates_description": "Erstelle benutzerdefinierte Vorlagen, um die Standard-E-Mails für diesen Standort zu überschreiben."
   }
 }
 </i18n>

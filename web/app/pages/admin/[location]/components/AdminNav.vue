@@ -16,13 +16,6 @@
     >
       {{ t("settings") }}
     </Button>
-    <Button
-      :disabled="!userStore.isAdmin"
-      variant="secondary"
-      :to="`/admin/${location?.slug}/email-templates`"
-    >
-      {{ t("email_templates") }}
-    </Button>
   </HorizontalScroll>
 </template>
 

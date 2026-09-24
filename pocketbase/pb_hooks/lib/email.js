@@ -139,21 +139,9 @@ function renderTemplate(template, variables) {
  * @returns {{address: string, name: string}}
  */
 function getSenderInfo(location) {
-  if (
-    location.get("email_sender_name") ||
-    location.get("email_sender_address")
-  ) {
-    return {
-      address:
-        location.get("email_sender_address") ||
-        $app.settings().meta.senderAddress,
-      name:
-        location.get("email_sender_name") || $app.settings().meta.senderName,
-    };
-  }
   return {
-    address: $app.settings().meta.senderAddress,
-    name: $app.settings().meta.senderName,
+    address: location.get("email") || $app.settings().meta.senderAddress,
+    name: location.get("name") || $app.settings().meta.senderName,
   };
 }
 
