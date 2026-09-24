@@ -71,6 +71,10 @@ label {
   column-gap: var(--spacing-2);
   cursor: pointer;
 }
+input:focus-visible + label .switch {
+  outline: 2px solid var(--text-color);
+  outline-offset: 2px;
+}
 label .switch {
   --margin: 0.2rem;
   --knob-size: 1.1rem;
