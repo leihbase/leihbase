@@ -4,17 +4,19 @@
 const ReservationConfirmationVars = /** @type {const} */ ([
   "APP_URL",
   "USER_NAME",
+  "LOCATION_NAME",
   "PRODUCT_URL",
   "PRODUCT_NAME",
+  "PRODUCT_LINK",
   "PRODUCT_DEPOSIT",
   "RESERVATION_START",
   "RESERVATION_END",
-  "LENDING_CONDITIONS_LINK",
 ]);
 
 const ReservationConfirmationLocationVars = /** @type {const} */ ([
   "APP_URL",
   "USER_NAME",
+  "LOCATION_NAME",
   "USER_EMAIL",
   "PRODUCT_URL",
   "PRODUCT_NAME",
@@ -46,16 +48,18 @@ const ReservationEndReminderVars = /** @type {const} */ ([
 const CancellationConfirmationVars = /** @type {const} */ ([
   "APP_URL",
   "USER_NAME",
+  "LOCATION_NAME",
   "PRODUCT_URL",
   "PRODUCT_NAME",
 ]);
 
 const ReservationCancellationLocationVars = /** @type {const} */ ([
   "APP_URL",
-  "PRODUCT_URL",
-  "PRODUCT_NAME",
   "USER_NAME",
   "USER_EMAIL",
+  "LOCATION_NAME",
+  "PRODUCT_URL",
+  "PRODUCT_NAME",
   "RESERVATION_START",
   "RESERVATION_END",
 ]);

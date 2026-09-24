@@ -3,22 +3,13 @@ module.exports = {
     subject: "Reservation confirmation of '{PRODUCT_NAME}'",
     html: `Hi {USER_NAME},<br>
 <br>
-We hereby confirm the reservation of the item
-"<a href="{PRODUCT_URL}">{PRODUCT_NAME}</a>"<br>
+your reservation for the item "{PRODUCT_LINK}" is confirmed. You can pick it up on {RESERVATION_START} and use it until {RESERVATION_END}.<br>
 <br>
-Your reservation runs from {RESERVATION_START} to {RESERVATION_END}.<br>
+{#if PRODUCT_DEPOSIT}Please bring the deposit of {PRODUCT_DEPOSIT}, preferably in exact change.<br><br>{/if}
+You can cancel anytime in your <a href="{APP_URL}/reservations">reservation overview</a>.<br>
 <br>
-The item can be picked up at {RESERVATION_START}. If it is the first time that
-you are borrowing something, we will ask you to sign the
-{#if LENDING_CONDITIONS_LINK}<a href="{LENDING_CONDITIONS_LINK}">{/if}terms and conditions{#if LENDING_CONDITIONS_LINK}</a>{/if} of borrowing on site.<br>
-<br>
-{#if PRODUCT_DEPOSIT}A deposit of {PRODUCT_DEPOSIT} is required to borrow {PRODUCT_NAME}. Please bring the exact amount if possible.<br><br>{/if}
-You can cancel your reservation or change the borrowing period in your <a href="{APP_URL}/reservations">reservation overview</a>.<br>
-<br>
-We're happy that you have decided to borrow instead of buy!<br>
-<br>
-See you soon<br>
-Your Leihbar`,
+Best regards,<br>
+The {LOCATION_NAME} team`,
   },
   reservation_confirmation_location: {
     subject: "New reservation: {USER_NAME} - {PRODUCT_NAME}",
@@ -27,6 +18,7 @@ Your Leihbar`,
 A new reservation by {USER_NAME} (<a href="mailto:{USER_EMAIL}">{USER_EMAIL}</a>).<br>
 <br>
 <strong>Details</strong><br>
+Location: {LOCATION_NAME}<br>
 Item: <a href="{PRODUCT_URL}">{PRODUCT_NAME}</a><br>
 Start: {RESERVATION_START}<br>
 End: {RESERVATION_END}<br>
@@ -45,10 +37,8 @@ End: {RESERVATION_END}<br>
 you reserved a {PRODUCT_NAME} at {LOCATION_NAME}. The item can be picked up tomorrow ({RESERVATION_START}) {#if START_HOUR}between {START_HOUR} and {END_HOUR}{/if}.<br>
 If you no longer need it, you can cancel your reservation in your <a href="{APP_URL}/reservations">reservation overview</a>.<br>
 <br>
-Thank you that you choose for borrowing instead of buying!<br>
-<br>
-See you soon<br>
-Your LeihBar<br>`,
+Best regards,<br>
+The {LOCATION_NAME} team`,
   },
   reservation_end_reminder: {
     subject: "Return of '{PRODUCT_NAME}'",
@@ -61,8 +51,8 @@ The borrow-period ends tomorrow ({RESERVATION_END}), so we would like to remind 
 {#if START_HOUR}{LOCATION_NAME} is tomorrow open from {START_HOUR} to {END_HOUR}.<br><br>{/if}
 If you would like to keep the item for longer, you can extend the reservation in your <a href="{APP_URL}/reservations">reservation overview</a>.<br>
 <br>
-Thank you, and see you tomorrow!<br>
-Your LeihBar-Team`,
+Best regards,<br>
+The {LOCATION_NAME} team`,
   },
   cancellation_confirmation: {
     subject: "Cancellation confirmation for {PRODUCT_NAME}",
@@ -74,13 +64,15 @@ Thanks for sharing, the item is now available again for other neighbours!<br>
 <br>
 See you next time!<br>
 <br>
-Your Leihbar`,
+Best regards,<br>
+The {LOCATION_NAME} team`,
   },
   reservation_cancellation_location: {
     subject: "Cancellation: {USER_NAME} - {PRODUCT_NAME}",
     html: `The reservation of {USER_NAME} (<a href="mailto:{USER_EMAIL}">{USER_EMAIL}</a>) for the item "{PRODUCT_NAME}" has been cancelled.<br>
 <br>
 <strong>Details</strong><br>
+Location: {LOCATION_NAME}<br>
 Item: <a href="{PRODUCT_URL}">{PRODUCT_NAME}</a><br>
 Start: {RESERVATION_START}<br>
 End: {RESERVATION_END}`,

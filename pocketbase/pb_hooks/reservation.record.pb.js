@@ -221,7 +221,6 @@ onRecordCreateRequest((e) => {
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
-  const lendingConditionsLink = $os.getenv("CONFIG_LENDING_CONDITIONS_LINK");
   const appUrl = $app.settings().meta.appURL;
 
   const { record } = e;
@@ -270,10 +269,11 @@ onRecordCreateRequest((e) => {
       locale,
       {
         APP_URL: appUrl,
-        PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
-        PRODUCT_NAME: productName,
         USER_NAME: userName,
         USER_EMAIL: user.get("email"),
+        LOCATION_NAME: location.get('name'),
+        PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
+        PRODUCT_NAME: productName,
         RESERVATION_START: formatDate(start, locale),
         RESERVATION_END: formatDate(end, locale),
         MESSAGE: record.get("message"),
@@ -283,6 +283,7 @@ onRecordCreateRequest((e) => {
 
   // Notify user, if the user is the one making the reservation
   if (user && requestUser && requestUser.get("id") === user.get("id")) {
+    const productUrl = `${appUrl}/link/product/${product.get("id")}`;
     sendLocationTemplateEmail(
       location,
       "reservation_confirmation",
@@ -291,12 +292,13 @@ onRecordCreateRequest((e) => {
       {
         APP_URL: appUrl,
         USER_NAME: userName,
-        PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
+        LOCATION_NAME: location.get('name'),
+        PRODUCT_LINK: `<a href="${productUrl}">${productName}</a>`,
+        PRODUCT_URL: productUrl,
         PRODUCT_NAME: productName,
         RESERVATION_START: formatDate(start, locale),
         RESERVATION_END: formatDate(end, locale),
         PRODUCT_DEPOSIT: product.get("deposit") ? formatCurrency(product.get("deposit")) : null,
-        LENDING_CONDITIONS_LINK: lendingConditionsLink,
       }
     );
     // Store that email has been sent
@@ -356,6 +358,7 @@ onRecordUpdateRequest((e) => {
         {
           APP_URL: appUrl,
           USER_NAME: user.get("name"),
+          LOCATION_NAME: location.get('name'),
           PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
           PRODUCT_NAME: productName,
         }
@@ -372,10 +375,11 @@ onRecordUpdateRequest((e) => {
         locale,
         {
           APP_URL: appUrl,
-          PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
-          PRODUCT_NAME: productName,
           USER_NAME: user.get("name"),
           USER_EMAIL: user.get("email"),
+          LOCATION_NAME: location.get('name'),
+          PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
+          PRODUCT_NAME: productName,
           RESERVATION_START: formatDate(start, locale),
           RESERVATION_END: formatDate(end, locale),
         }
