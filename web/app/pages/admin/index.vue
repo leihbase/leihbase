@@ -42,6 +42,12 @@ import Heading from "@/components/core/Heading.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import type { Location } from "~~/models/location";
 
+const { leihbase } = useLeihbase();
+
+useHead({
+  title: `Admin | ${leihbase.name}`,
+});
+
 const { t } = useI18n({ useScope: "local" });
 const { pb, isValid } = usePocketbase();
 
