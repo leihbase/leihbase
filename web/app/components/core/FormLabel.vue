@@ -1,7 +1,10 @@
 <template>
   <component :is="is" class="label" :for="for">
     <slot />
-    <span v-if="!required && !hideRequired"> ({{ t("optional") }})</span>
+    <span v-if="!required && !hideRequired">&nbsp;({{ t("optional") }})</span>
+    <span class="suffix">
+      <slot name="suffix" />
+    </span>
   </component>
 </template>
 
@@ -26,13 +29,17 @@ const { t } = useI18n({
 
 <style scoped>
 .label {
-  display: block;
+  display: flex;
+  align-items: center;
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-2);
 }
 .label span {
   font-weight: var(--font-weight-normal);
   color: var(--text-color-light);
+}
+.label .suffix {
+  margin-left: auto;
 }
 </style>
 
