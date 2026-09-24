@@ -27,12 +27,9 @@ import Footer from "./components/modules/Footer.vue";
 import NavBar from "./components/modules/NavBar.vue";
 
 const {
-  public: { plausibleTrackingDomain, locale: defaultLocale },
+  public: { plausibleTrackingDomain },
 } = useRuntimeConfig();
-const { locale, setLocale } = useI18n();
-
-// Set default locale based on runtime config
-setLocale(defaultLocale);
+const { locale } = useI18n();
 
 // Fetch Leihbase collection on a central location
 // await for the result before processing the rest of the page

@@ -14,11 +14,11 @@
 
 <script lang="ts" setup>
 const props = defineProps<{
-  centered: boolean;
   width: "sm" | "md" | "lg";
-  noPadding: boolean;
-  paddingX: boolean;
-  paddingY: boolean;
+  centered?: boolean;
+  noPadding?: boolean;
+  paddingX?: boolean;
+  paddingY?: boolean;
 }>();
 </script>
 

@@ -17,7 +17,7 @@ import "@shoelace-style/shoelace/dist/themes/light.css";
 import { useLeihbase } from "@/stores/leihbase";
 import { useUserStore } from "@/stores/user";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
-import type { User } from "~~/models/User.js";
+import type { User } from "~~/models/user";
 import Footer from "./components/modules/Footer.vue";
 import NavBar from "./components/modules/NavBar.vue";
 import ReservationDialog from "./components/ReservationDialog.vue";
@@ -30,12 +30,9 @@ setBasePath(
 const { pb, isValid, logout } = usePocketbase();
 const userStore = useUserStore();
 const {
-  public: { plausibleTrackingDomain, locale: defaultLocale },
+  public: { plausibleTrackingDomain },
 } = useRuntimeConfig();
-const { locale, setLocale } = useI18n();
-
-// Set default locale based on runtime config
-setLocale(defaultLocale);
+const { locale } = useI18n();
 
 // Fetch Leihbase collection on a central location
 // await for the result before processing the rest of the page
