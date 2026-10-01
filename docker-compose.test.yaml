@@ -13,7 +13,7 @@ services:
     volumes:
       - ./pocketbase/pb_migrations:/leihbase/pocketbase/pb_migrations
       - ./pocketbase/pb_hooks:/leihbase/pocketbase/pb_hooks
-      - ./tests/tests:/leihbase/tests/tests
+      - ./tests/browser:/leihbase/tests/browser
     networks:
       - leihbar
 
