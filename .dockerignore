@@ -1,5 +1,6 @@
 .git
 node_modules
+*/.env
 */node_modules
 .bin
 Dockerfile.dev
