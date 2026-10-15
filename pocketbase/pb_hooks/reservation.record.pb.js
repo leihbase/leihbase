@@ -1,10 +1,9 @@
 /// <reference path="../pb_data/types.d.ts" />
+/// <reference path="./types.d.ts" />
 
 onRecordCreateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
-  const { validateStartEnd, hasOverlappingReservations } = require(
-    `${__hooks}/lib/reservation`
-  );
+  const { validateStartEnd, hasOverlappingReservations } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/user')} */
   const { hasActiveReservationForProduct } = require(`${__hooks}/lib/user`);
   /** @type {typeof import('./lib/product')} */
@@ -137,9 +136,7 @@ onRecordCreateRequest((e) => {
 
 onRecordUpdateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
-  const { validateStartEnd, hasOverlappingReservations } = require(
-    `${__hooks}/lib/reservation`
-  );
+  const { validateStartEnd, hasOverlappingReservations } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/user')} */
   const { hasActiveReservationForProduct } = require(`${__hooks}/lib/user`);
 
@@ -218,16 +215,16 @@ onRecordCreateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationNotificationEmail, sendUserEmail } = require(
-    `${__hooks}/lib/email`
-  );
-  /** @type {typeof import('./lib/emails.en')} */
-  const {
-    reservationConfirmationEmail,
-    reservationConfirmationLocationEmail,
-  } = require(`${__hooks}/lib/emails.${locale}`);
+  const { sendLocationTemplateEmail, formatCurrency, formatDate } = require(`${__hooks}/lib/email`);
+  /** @type {typeof import('./lib/location')} */
+  const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
+
+  const appUrl = $app.settings().meta.appURL;
 
   const { record } = e;
+  if (!record) {
+    throw new BadRequestError("Record_not_defined.");
+  }
 
   const requestUser = e.auth;
   $app.expandRecord(record, ["location"], null);
@@ -261,35 +258,46 @@ onRecordCreateRequest((e) => {
   const end = new Date(record.get("end").string().split(" ")[0]);
 
   // Notify location
-  sendLocationNotificationEmail(
-    location,
-    reservationConfirmationLocationEmail({
-      productUrl: `${$app.settings().meta.appURL}/link/product/${product.get(
-        "id"
-      )}`,
-      productName,
-      userName,
-      userEmail: user.get("email"),
-      start,
-      end,
-      message: record.get("message"),
-    })
-  );
+  const notificationEmails = getNotificationEmailAddresses(location);
+  if (notificationEmails.length > 0) {
+    sendLocationTemplateEmail(
+      location,
+      "reservation_confirmation_location",
+      notificationEmails,
+      locale,
+      {
+        APP_URL: appUrl,
+        USER_NAME: userName,
+        USER_EMAIL: user.get("email"),
+        LOCATION_NAME: location.get('name'),
+        PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
+        PRODUCT_NAME: productName,
+        RESERVATION_START: formatDate(start, locale),
+        RESERVATION_END: formatDate(end, locale),
+        MESSAGE: record.get("message"),
+      }
+    );
+  }
 
   // Notify user, if the user is the one making the reservation
   if (user && requestUser && requestUser.get("id") === user.get("id")) {
-    sendUserEmail(
-      user,
-      reservationConfirmationEmail({
-        productUrl: `${$app.settings().meta.appURL}/link/product/${product.get(
-          "id"
-        )}`,
-        productName,
-        userName,
-        start,
-        end,
-        deposit: product.get("deposit"),
-      })
+    const productUrl = `${appUrl}/link/product/${product.get("id")}`;
+    sendLocationTemplateEmail(
+      location,
+      "reservation_confirmation",
+      user.get("email"),
+      locale,
+      {
+        APP_URL: appUrl,
+        USER_NAME: userName,
+        LOCATION_NAME: location.get('name'),
+        PRODUCT_LINK: `<a href="${productUrl}">${productName}</a>`,
+        PRODUCT_URL: productUrl,
+        PRODUCT_NAME: productName,
+        RESERVATION_START: formatDate(start, locale),
+        RESERVATION_END: formatDate(end, locale),
+        PRODUCT_DEPOSIT: product.get("deposit") ? formatCurrency(product.get("deposit"), locale) : null,
+      }
     );
     // Store that email has been sent
     saveSentEmail(record, "confirmation");
@@ -299,23 +307,20 @@ onRecordCreateRequest((e) => {
 onRecordUpdateRequest((e) => {
   e.next();
 
-  const locale = $os.getenv("CONFIG_LOCALE") || "en";
-
   /** @type {typeof import('./lib/reservation')} */
   const { removeSentEmail } = require(`${__hooks}/lib/reservation`);
-
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationNotificationEmail, sendUserEmail } = require(
-    `${__hooks}/lib/email`
-  );
+  const { sendLocationTemplateEmail, formatDate } = require(`${__hooks}/lib/email`);
+  /** @type {typeof import('./lib/location')} */
+  const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
-  /** @type {typeof import('./lib/emails.en')} */
-  const {
-    cancellationConfirmationEmail,
-    reservationCancellationLocationEmail,
-  } = require(`${__hooks}/lib/emails.${locale}`);
+  const locale = $os.getenv("CONFIG_LOCALE") || "en";
 
   let { record } = e;
+  if (!record) {
+    throw new BadRequestError("Record_not_defined.");
+  }
+
   const requestUser = e.auth;
   const originalRecord = record.original();
 
@@ -337,34 +342,44 @@ onRecordUpdateRequest((e) => {
     const user = record.expandedOne("user");
     const start = new Date(record.get("start").string().split(" ")[0]);
     const end = new Date(record.get("end").string().split(" ")[0]);
+    const appUrl = $app.settings().meta.appURL;
 
     // Notify the user if they do the cancellation themselves
     if (user && requestUser && requestUser.get("id") === user.get("id")) {
-      sendUserEmail(
-        user,
-        cancellationConfirmationEmail({
-          productUrl: `${
-            $app.settings().meta.appURL
-          }/link/product/${product.get("id")}`,
-          productName,
-          userName: user.get("name"),
-        })
+      sendLocationTemplateEmail(
+        location,
+        "cancellation_confirmation",
+        user.get("email"),
+        locale,
+        {
+          APP_URL: appUrl,
+          USER_NAME: user.get("name"),
+          LOCATION_NAME: location.get('name'),
+          PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
+          PRODUCT_NAME: productName,
+        }
       );
     }
 
     // Notify the location of the cancellation
-    sendLocationNotificationEmail(
-      location,
-      reservationCancellationLocationEmail({
-        productUrl: `${$app.settings().meta.appURL}/link/product/${product.get(
-          "id"
-        )}`,
-        productName,
-        userName: user.get("name"),
-        userEmail: user.get("email"),
-        start,
-        end,
-      })
-    );
+    const notificationEmails = getNotificationEmailAddresses(location);
+    if (notificationEmails.length > 0) {
+      sendLocationTemplateEmail(
+        location,
+        "reservation_cancellation_location",
+        notificationEmails,
+        locale,
+        {
+          APP_URL: appUrl,
+          USER_NAME: user.get("name"),
+          USER_EMAIL: user.get("email"),
+          LOCATION_NAME: location.get('name'),
+          PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
+          PRODUCT_NAME: productName,
+          RESERVATION_START: formatDate(start, locale),
+          RESERVATION_END: formatDate(end, locale),
+        }
+      );
+    }
   }
 }, "reservations");

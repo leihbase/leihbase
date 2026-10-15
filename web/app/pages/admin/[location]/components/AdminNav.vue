@@ -47,13 +47,15 @@ defineProps<{ location: RecordModel }>();
     "reservations": "Reservations",
     "products": "Products",
     "statistics": "Statistics",
-    "settings": "Settings"
+    "settings": "Settings",
+    "email_templates": "Email Templates"
   },
   "de": {
     "reservations": "Reservierungen",
     "products": "Gegenständen",
     "statistics": "Statistieken",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "email_templates": "E-Mail-Vorlagen"
   }
 }
 </i18n>
