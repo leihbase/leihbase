@@ -4,7 +4,12 @@
       {{ label }}
     </label>
     <div class="select">
-      <select :id="`select-${id}`" v-bind="$attrs" v-model="model">
+      <select
+        :id="`select-${id}`"
+        v-bind="$attrs"
+        :disabled="disabled"
+        v-model="model"
+      >
         <slot />
       </select>
       <NavArrowDown />
