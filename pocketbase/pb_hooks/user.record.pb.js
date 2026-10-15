@@ -39,7 +39,10 @@ onRecordCreateRequest((e) => {
     throw new BadRequestError("Terms_required.")
   }
 
-  record.set("role", "user");
+  const isSuperuser = e.hasSuperuserAuth();
+  if (!isSuperuser || !record.get('role')) {
+    record.set("role", "user");
+  }
 
   e.next();
 }, "users");

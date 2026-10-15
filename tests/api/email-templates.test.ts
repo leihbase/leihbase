@@ -6,11 +6,12 @@ import { pocketbase } from "../services/pocketbase";
 
 test.describe("email templates", () => {
   test.describe("CRUD operations", () => {
-    test("admin can create email template", async () => {
-      const pb = await pocketbase();
+    test("admin user can create email template", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
-      const template = await pb.collection("email_templates").create({
+      const template = await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "en",
@@ -18,7 +19,6 @@ test.describe("email templates", () => {
         html: "<p>Test HTML</p>",
         enabled: true,
       });
-
       expect(template).toBeDefined();
       expect(template.id).toBeTruthy();
       expect(template.name).toBe("reservation_confirmation");
@@ -27,14 +27,16 @@ test.describe("email templates", () => {
       expect(template.locale).toBe("en");
       expect(template.enabled).toBe(true);
       expect(template.location).toBe(location.id);
+
     });
 
-    test("admin can list email templates", async () => {
-      const pb = await pocketbase();
+    test("admin user can list email templates", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
       // Create a template
-      await pb.collection("email_templates").create({
+      await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "en",
@@ -43,20 +45,21 @@ test.describe("email templates", () => {
         enabled: true,
       });
 
-      const templates = await pb.collection("email_templates").getFullList({
-        filter: pb.filter("location = {:loc}", { loc: location.id }),
+      const templates = await adminPb.collection("email_templates").getFullList({
+        filter: adminPb.filter("location = {:loc}", { loc: location.id }),
       });
 
       expect(templates.length).toBeGreaterThan(0);
       expect(templates[0].name).toBe("reservation_confirmation");
     });
 
-    test("admin can list all templates without filter", async () => {
-      const pb = await pocketbase();
+    test("admin user can list all templates without filter", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
       // Create a template
-      await pb.collection("email_templates").create({
+      await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "en",
@@ -65,18 +68,19 @@ test.describe("email templates", () => {
         enabled: true,
       });
 
-      const allTemplates = await pb
+      const allTemplates = await adminPb
         .collection("email_templates")
         .getFullList({ sort: "-created" });
 
       expect(allTemplates.length).toBeGreaterThan(0);
     });
 
-    test("admin can get single template by id", async () => {
-      const pb = await pocketbase();
+    test("admin user can get single template by id", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
-      const created = await pb.collection("email_templates").create({
+      const created = await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "en",
@@ -85,7 +89,7 @@ test.describe("email templates", () => {
         enabled: true,
       });
 
-      const fetched = await pb
+      const fetched = await adminPb
         .collection("email_templates")
         .getOne(created.id);
 
@@ -93,12 +97,13 @@ test.describe("email templates", () => {
       expect(fetched.name).toBe("reservation_confirmation");
     });
 
-    test("admin can update email template", async () => {
-      const pb = await pocketbase();
+    test("admin user can update email template", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
       // Create a template
-      const template = await pb.collection("email_templates").create({
+      const template = await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "en",
@@ -108,7 +113,7 @@ test.describe("email templates", () => {
       });
 
       // Update the template
-      const updated = await pb.collection("email_templates").update(
+      const updated = await adminPb.collection("email_templates").update(
         template.id,
         {
           subject: "Updated Subject",
@@ -122,12 +127,13 @@ test.describe("email templates", () => {
       expect(updated.enabled).toBe(false);
     });
 
-    test("admin can delete email template", async () => {
-      const pb = await pocketbase();
+    test("admin user can delete email template", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
       // Create a template
-      const template = await pb.collection("email_templates").create({
+      const template = await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "en",
@@ -137,18 +143,19 @@ test.describe("email templates", () => {
       });
 
       // Delete the template
-      await pb.collection("email_templates").delete(template.id);
+      await adminPb.collection("email_templates").delete(template.id);
 
       // Verify deletion
-      const { items } = await pb.collection("email_templates").getList(1, 1, {
-        filter: pb.filter("id = {:id}", { id: template.id }),
+      const { items } = await adminPb.collection("email_templates").getList(1, 1, {
+        filter: adminPb.filter("id = {:id}", { id: template.id }),
       });
 
       expect(items.length).toBe(0);
     });
 
-    test("admin can create template for each template type", async () => {
-      const pb = await pocketbase();
+    test("admin user can create template for each template type", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
       const templateTypes = [
@@ -161,7 +168,7 @@ test.describe("email templates", () => {
       ];
 
       for (const templateType of templateTypes) {
-        const template = await pb.collection("email_templates").create({
+        const template = await adminPb.collection("email_templates").create({
           name: templateType,
           location: location.id,
           locale: "en",
@@ -174,12 +181,13 @@ test.describe("email templates", () => {
       }
     });
 
-    test("admin can create template with different locales", async () => {
-      const pb = await pocketbase();
+    test("admin user can create template with different locales", async () => {
+      const adminUser = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
       // Create English template
-      const enTemplate = await pb.collection("email_templates").create({
+      const enTemplate = await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "en",
@@ -189,7 +197,7 @@ test.describe("email templates", () => {
       });
 
       // Create German template for same location and name
-      const deTemplate = await pb.collection("email_templates").create({
+      const deTemplate = await adminPb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
         locale: "de",
@@ -228,7 +236,7 @@ test.describe("email templates", () => {
       const userPb = await pocketbase(user.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
-      // Create a template as admin
+      // Create a template as superuser
       await pb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
@@ -250,7 +258,7 @@ test.describe("email templates", () => {
       const userPb = await pocketbase(user.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
-      // Create a template as admin
+      // Create a template as superuser
       const template = await pb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
@@ -272,7 +280,7 @@ test.describe("email templates", () => {
       const userPb = await pocketbase(user.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
-      // Create a template as admin
+      // Create a template as superuser
       const template = await pb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
@@ -296,7 +304,7 @@ test.describe("email templates", () => {
       const userPb = await pocketbase(user.email, DEFAULT_PASSWORD, false);
       const location = await createLocation("multiple");
 
-      // Create a template as admin
+      // Create a template as superuser
       const template = await pb.collection("email_templates").create({
         name: "reservation_confirmation",
         location: location.id,
