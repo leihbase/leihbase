@@ -6,6 +6,8 @@
  * @param {core.RequestEvent} e
  */
 routerAdd("GET", "/api/email-templates/defaults/{locale}/{templateName}", (e) => {
+  /** @type {typeof import('./lib/locale')} */
+  const { isValidLocale } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/email')} */
   const { emailTemplateVars } = require(`${__hooks}/lib/email`);
 
@@ -14,16 +16,26 @@ routerAdd("GET", "/api/email-templates/defaults/{locale}/{templateName}", (e) =>
   const templateName = /** @type {TemplateName} */ (e.request.pathValue("templateName"));
   const locale = e.request.pathValue("locale");
 
-  /** @type {typeof import('./lib/emails.en')} */
-  const templates = require(`${__hooks}/lib/emails.${locale}`);
-  
-  const template = templates[templateName];
-  
-  if (!template) {
-    return e.json(404, { error: "Template not found" });
+  // Validate locale to prevent path traversal
+  if (!isValidLocale(locale)) {
+    return e.json(400, { error: "Invalid locale" });
   }
-  
-  return e.json(200, { template, vars: emailTemplateVars[templateName] });
+
+  try {
+    /** @type {typeof import('./lib/emails.en')} */
+    const templates = require(`${__hooks}/lib/emails.${locale}`);
+    
+    const template = templates[templateName];
+    
+    if (!template) {
+      return e.json(404, { error: "Template not found" });
+    }
+    
+    return e.json(200, { template, vars: emailTemplateVars[templateName] });
+  } catch (err) {
+    console.error("[email-templates] Failed to load template:", err);
+    return e.json(500, { error: "Failed to load template" });
+  }
 });
 
 /**
@@ -31,6 +43,8 @@ routerAdd("GET", "/api/email-templates/defaults/{locale}/{templateName}", (e) =>
  * @param {core.RequestEvent} e
  */
 routerAdd("GET", "/api/email-templates/preview", (e) => {
+  /** @type {typeof import('./lib/locale')} */
+  const { isValidLocale } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/email')} */
   const { getPreviewTemplate, renderPreviewTemplate } = require(`${__hooks}/lib/email`);
 
@@ -41,6 +55,11 @@ routerAdd("GET", "/api/email-templates/preview", (e) => {
   const locationId = e.request.url?.query().get('locationId');
   const customSubject = e.request.url?.query().get('customSubject');
   const customHtml = e.request.url?.query().get('customHtml');
+
+  // Validate locale to prevent path traversal
+  if (locale && !isValidLocale(locale)) {
+    return e.json(400, { error: "Invalid locale" });
+  }
 
   if (!templateName || !locale) {
     return e.json(400, { error: "templateName and locale query params are required" });
@@ -64,11 +83,16 @@ routerAdd("GET", "/api/email-templates/preview", (e) => {
     html = template.html;
   }
 
-  // Render with preview variables
-  const rendered = renderPreviewTemplate(subject, html, templateName);
-  
-  return e.json(200, {
-    templateName,
-    ...rendered,
-  });
+  try {
+    // Render with preview variables
+    const rendered = renderPreviewTemplate(subject, html, templateName);
+    
+    return e.json(200, {
+      templateName,
+      ...rendered,
+    });
+  } catch (err) {
+    console.error("[email-templates] Failed to render preview:", err);
+    return e.json(500, { error: "Failed to render preview" });
+  }
 });

@@ -14,6 +14,9 @@
     </header>
 
     <form @submit.prevent="handleSubmit" class="lb-stack">
+      <Alert v-if="error" variant="error" @dismiss="error = null">
+        {{ error }}
+      </Alert>
       <Select
         :label="t('template_type')"
         name="name"
@@ -112,6 +115,7 @@
 
 <script setup lang="ts">
 import type { EmailTemplate } from "@@/models/EmailTemplate";
+import Alert from "@/components/core/Alert.vue";
 import Badge from "@/components/core/Badge.vue";
 import Button from "@/components/core/Button.vue";
 import Drawer from "@/components/core/Drawer.vue";
@@ -139,6 +143,7 @@ const emit = defineEmits(["saved", "deleted", "cancelled"]);
 const loading = ref(false);
 const deleting = ref(false);
 const fetchingTemplateSettings = ref(false);
+const error = ref<string | null>(null);
 
 const name = ref("");
 const subject = ref("");
@@ -155,7 +160,7 @@ const editing = computed(() => !!props.template);
 
 watch(open, (isOpening) => {
   if (!isOpening) return;
-  // error.value = null;
+  error.value = null;
   enabled.value = props.template?.enabled || true;
   name.value = props.template?.name || "";
   subject.value = props.template?.subject || "";
@@ -174,7 +179,9 @@ watch(name, async () => {
 
 // Fetches template settings
 async function fetchTemplateSettings() {
+  if (!name.value) return;
   fetchingTemplateSettings.value = true;
+  error.value = null;
   try {
     const result = await pb.send(
       `/api/email-templates/defaults/${locale.value}/${name.value}`,
@@ -185,8 +192,10 @@ async function fetchTemplateSettings() {
       html: result.template?.html,
       variables: result.vars || [],
     };
-  } catch (error) {
-    console.error("Failed to fetch default template:", error);
+  } catch (err) {
+    error.value = err?.response?.data?.error || t("failed_to_load_template");
+    console.error("Failed to fetch default template:", err);
+    return null;
   } finally {
     fetchingTemplateSettings.value = false;
   }
@@ -194,6 +203,7 @@ async function fetchTemplateSettings() {
 
 async function handleSubmit() {
   loading.value = true;
+  error.value = null;
   try {
     const data = {
       location: props.location.id,
@@ -214,6 +224,9 @@ async function handleSubmit() {
     }
     emit("saved", result);
     open.value = false;
+  } catch (err) {
+    error.value = err?.response?.data?.error || t("failed_to_save_template");
+    console.error("Failed to save template:", err);
   } finally {
     loading.value = false;
   }
@@ -223,12 +236,16 @@ async function handleDelete() {
   if (!props.template?.id) return;
 
   deleting.value = true;
+  error.value = null;
   try {
     await pb.collection("email_templates").delete(props.template.id);
     emit("deleted");
+    open.value = false;
+  } catch (err) {
+    error.value = err?.response?.data?.error || t("failed_to_delete_template");
+    console.error("Failed to delete template:", err);
   } finally {
     deleting.value = false;
-    open.value = false;
   }
 }
 
@@ -298,6 +315,9 @@ footer {
     "loading_default_template": "Loading default template...",
     "choose_a_template": "Choose a template type",
     "preview": "Preview",
+    "failed_to_load_template": "Failed to load template.",
+    "failed_to_save_template": "Failed to save template.",
+    "failed_to_delete_template": "Failed to delete template.",
     "reservation_confirmation": "Reservation Confirmation (User)",
     "reservation_confirmation_location": "Reservation Confirmation (Location)",
     "reservation_start_reminder": "Pickup Reminder",
@@ -320,7 +340,10 @@ footer {
     "cancel": "Abbrechen",
     "loading_default_template": "Lade Standard-Vorlage...",
     "choose_a_template": "Wähle einen Vorlagentyp",
-    "preview": "Vorschau"
+    "preview": "Vorschau",
+    "failed_to_load_template": "Fehler beim Laden der Vorlage.",
+    "failed_to_save_template": "Fehler beim Speichern der Vorlage.",
+    "failed_to_delete_template": "Fehler beim Löschen der Vorlage."
   }
 }
 </i18n>
