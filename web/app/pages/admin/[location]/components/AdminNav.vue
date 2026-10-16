@@ -1,18 +1,31 @@
 <template>
   <HorizontalScroll is="nav" class="nav">
-    <Button variant="secondary" :to="`/admin/${location?.slug}`">
+    <Button
+      variant="secondary"
+      :to="`/admin/${location?.slug}`"
+      :class="{ active: isActive('') }"
+    >
       {{ t("reservations") }}
     </Button>
-    <Button variant="secondary" :to="`/admin/${location?.slug}/products`">
+    <Button
+      variant="secondary"
+      :to="`/admin/${location?.slug}/products`"
+      :class="{ active: isActive('products') }"
+    >
       {{ t("products") }}
     </Button>
-    <Button variant="secondary" :to="`/admin/${location?.slug}/stats`">
+    <Button
+      variant="secondary"
+      :to="`/admin/${location?.slug}/stats`"
+      :class="{ active: isActive('stats') }"
+    >
       {{ t("statistics") }}
     </Button>
     <Button
       :disabled="!userStore.isAdmin"
       variant="secondary"
       :to="`/admin/${location?.slug}/settings`"
+      :class="{ active: isActive('settings') || isActive('email-templates') }"
     >
       {{ t("settings") }}
     </Button>
@@ -30,10 +43,36 @@ const { t } = useI18n({
   useScope: "local",
 });
 
-defineProps<{ location: RecordModel }>();
+const props = defineProps<{ location: RecordModel }>();
+const route = useRoute();
+
+// Make sure the active page is visible when the nav overflows on small screens
+onMounted(() => {
+  document
+    .querySelector(".nav .active")
+    ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+});
+
+/**
+ * If the given admin sub page (empty for the reservations overview) is the
+ * current page
+ */
+function isActive(page: string) {
+  const base = `/admin/${props.location?.slug}`;
+  const path = route.path.replace(/\/$/, "");
+  return page ? path.startsWith(`${base}/${page}`) : path === base;
+}
 </script>
 
 <style scoped>
+.nav :deep(a) {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.nav :deep(.active) {
+  background-color: var(--text-color);
+  color: var(--background-color);
+}
 .nav {
   display: flex;
   gap: 0.5rem;
