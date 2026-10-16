@@ -170,7 +170,7 @@ function removeRange(day: WeekDay, index: number) {
   margin-top: var(--spacing-1);
   color: #d55136;
 }
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .day {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
