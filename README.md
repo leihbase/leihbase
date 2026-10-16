@@ -136,8 +136,8 @@ Users have a `role` which can be set in the PocketBase admin interface in the
 `users` collection:
 
 - `user`: can make and manage their own reservations
-- `manager`: can manage the products and reservations of the locations selected
-  in the user's `manager_locations` field
+- `manager`: can manage the products, reservations and opening hours of the
+  locations selected in the user's `manager_locations` field
 - `admin`: can manage all locations, and the email templates
 
 ### Leihbase
@@ -191,8 +191,8 @@ Links shown on the location page.
 
 #### Opening Hours
 
-Using the following JSON format the opening hours of a location can be
-configured:
+Managers and admins can edit the opening hours of a location in the admin
+section (Opening hours). They are stored in the following JSON format:
 
 ```json
 {

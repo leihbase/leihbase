@@ -22,6 +22,13 @@
       {{ t("statistics") }}
     </Button>
     <Button
+      variant="secondary"
+      :to="`/admin/${location?.slug}/opening-hours`"
+      :class="{ active: isActive('opening-hours') }"
+    >
+      {{ t("opening_hours") }}
+    </Button>
+    <Button
       :disabled="!userStore.isAdmin"
       variant="secondary"
       :to="`/admin/${location?.slug}/settings`"
@@ -86,6 +93,7 @@ function isActive(page: string) {
     "reservations": "Reservations",
     "products": "Products",
     "statistics": "Statistics",
+    "opening_hours": "Opening hours",
     "settings": "Settings",
     "email_templates": "Email Templates"
   },
@@ -93,6 +101,7 @@ function isActive(page: string) {
     "reservations": "Reservierungen",
     "products": "Gegenständen",
     "statistics": "Statistieken",
+    "opening_hours": "Öffnungszeiten",
     "settings": "Einstellungen",
     "email_templates": "E-Mail-Vorlagen"
   }

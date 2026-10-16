@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { formatDate, getStartOfDay } from "./date";
 
-type OpeningHoursRange = {
+export type OpeningHoursRange = {
   from: string;
   to: string;
 };
@@ -18,6 +18,27 @@ export type OpeningHours = {
   days: OpeningHoursDays;
   except: OpeningHoursExcept;
 };
+
+/**
+ * Week days in the order they are displayed, starting on Monday
+ */
+export const WeekDays = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+] as const;
+
+export type WeekDay = (typeof WeekDays)[number];
+
+/**
+ * Time ranges per week day, as stored in `OpeningHours.days`. Only open days
+ * have a key, a day without key is closed.
+ */
+export type WeeklySchedule = Partial<Record<WeekDay, OpeningHoursRange[]>>;
 
 export const Days = [
   "sunday",
@@ -63,7 +84,7 @@ export function openingHoursToString(
   );
 
   // Upcoming exceptions
-  const nextWeek = DateTime.now().plus({ days: 7 }).toJSDate();
+  const nextWeek = DateTime.now().plus({ days: 30 }).toJSDate();
   const closed = (openingHours?.except?.dates || [])
     .filter(
       (d) =>
@@ -76,4 +97,22 @@ export function openingHoursToString(
   return `${days.join("<br />")}${
     closed.length > 0 ? `<br/>${t("closed_at")}: ${closed.join(", ")}` : ""
   }`;
+}
+
+/**
+ * If a location is open on a given date (YYYY-MM-DD), taking closed dates into
+ * account. Without opening hours a location is considered to be always open.
+ */
+export function isOpenOnDate(
+  openingHours: OpeningHours | null | undefined,
+  date: string
+): boolean {
+  if (!openingHours?.days) {
+    return true;
+  }
+  if (openingHours.except?.dates?.includes(date)) {
+    return false;
+  }
+  const day = Days[new Date(`${date}T00:00:00Z`).getUTCDay()]!;
+  return (openingHours.days[day]?.length || 0) > 0;
 }
