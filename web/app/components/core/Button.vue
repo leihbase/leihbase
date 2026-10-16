@@ -7,6 +7,7 @@
       ['size-' + size]: true,
       circle,
       loading,
+      active,
     }"
     :href="href"
     :to="to"
@@ -45,6 +46,8 @@ interface Props extends /* @vue-ignore */ NativeAttributes {
   type?: "submit" | "reset" | "button" | undefined;
   loading?: boolean;
   disabled?: boolean;
+  /** Highlight as the currently selected item, e.g. in a navigation */
+  active?: boolean;
   title?: string;
 }
 
@@ -54,6 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: "button",
   loading: false,
   disabled: false,
+  active: false,
 });
 
 const { isClientMounted } = useClientMounted();
@@ -75,6 +79,18 @@ button {
   cursor: pointer;
   text-decoration: none;
 
+  &.active {
+    position: relative;
+    &:before {
+      content: "";
+      position: absolute;
+      left: 0.5rem;
+      right: 0.5rem;
+      bottom: 0;
+      height: 2px;
+    }
+  }
+
   &.variant-primary {
     background-color: var(--primary-color);
     border: 0;
@@ -83,11 +99,25 @@ button {
     &:hover {
       background-color: color-mix(in srgb, var(--primary-color) 80%, #000);
     }
+    &.active:before {
+      background-color: color-mix(
+        in srgb,
+        var(--primary-text-color) 75%,
+        var(--primary-color)
+      );
+    }
   }
   &.variant-secondary {
     background-color: var(--secondary-color);
     color: var(--secondary-text-color);
     border: 0;
+    &.active:before {
+      background-color: color-mix(
+        in srgb,
+        var(--primary-color) 75%,
+        var(--secondary-color)
+      );
+    }
     &:hover {
       outline: 2px solid var(--primary-color);
     }
