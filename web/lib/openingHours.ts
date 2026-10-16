@@ -20,7 +20,7 @@ export type OpeningHours = {
 };
 
 /**
- * Week days in the order they are displayed, starting on Monday
+ * Week days in the order they are displayed, starting on Monday.
  */
 export const WeekDays = [
   "monday",
@@ -40,6 +40,9 @@ export type WeekDay = (typeof WeekDays)[number];
  */
 export type WeeklySchedule = Partial<Record<WeekDay, OpeningHoursRange[]>>;
 
+/**
+ * Week days indexed by Date.getDay()
+ */
 export const Days = [
   "sunday",
   "monday",
@@ -76,7 +79,7 @@ export function openingHoursToString(
   const { t } = useI18n();
 
   // Opening hours
-  const days = Object.keys(openingHours.days).map(
+  const days = WeekDays.filter((day) => openingHours.days[day]).map(
     (day) =>
       `${t(`week_days.${day}`)}, ${openingHours.days[day]
         .map((range) => `${range.from} - ${range.to} ${t("hour")}`)
