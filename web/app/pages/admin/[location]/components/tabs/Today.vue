@@ -1,5 +1,5 @@
 <template>
-  <TabHeader fixed-width>
+  <TabHeader>
     <template #prefix>
       <!-- Previous day button -->
       <button class="change-date-button" @click="handleDayBackward">

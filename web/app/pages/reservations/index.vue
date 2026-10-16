@@ -16,7 +16,7 @@
           <li v-if="data?.products[reservation.product]">
             <ReservationCardButton
               :reservation="reservation"
-              :product="data.products[reservation.product]"
+              :product="data.products[reservation.product]!"
               @click="selectedReservation = reservation"
             />
           </li>
@@ -35,7 +35,7 @@
           <li v-if="data?.products[reservation.product]">
             <ReservationCardButton
               :reservation="reservation"
-              :product="data.products[reservation.product]"
+              :product="data.products[reservation.product]!"
               @click="selectedReservation = reservation"
             />
           </li>

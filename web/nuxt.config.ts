@@ -80,7 +80,7 @@ export default defineNuxtConfig({
     tsConfig: {
       vueCompilerOptions: {
         strictTemplates: true,
-        fallthroughAttributes: true,
+        fallthroughAttributes: false,
       },
     },
   },
