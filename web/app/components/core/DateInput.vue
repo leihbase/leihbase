@@ -1,6 +1,6 @@
 <template>
   <div class="root">
-    <FormLabel :for="id" :required="required">
+    <FormLabel :for="id" :required="required" :class="{ 'sr-only': hideLabel }">
       {{ label }}<template #suffix><slot name="label-suffix" /></template>
     </FormLabel>
     <Popup v-model:open="showPopup">
@@ -8,6 +8,7 @@
         :id="id"
         :name="name"
         :required="required"
+        :placeholder="placeholder"
         :value="model ? formatDate(model, 'DD.MM.YYYY', locale) : ''"
         class="lb-input"
         :data-testid="dataTestid"
@@ -59,6 +60,8 @@ const props = withDefaults(
     dataTestid?: string;
     description?: string;
     popoutKey?: string;
+    hideLabel?: boolean;
+    placeholder?: string;
   }>(),
   { showOutsideDays: true, popoutKey: "" }
 );
