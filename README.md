@@ -1,6 +1,8 @@
 # Leihbase
 
-Web application to manage Leihladen, also known as Borrow Stores.
+Leihbase is a web application that covers every aspect of running one or
+multiple Borrow Stores (or Libraries of Things): community-driven spaces where
+people can borrow items instead of buying them.
 
 ## Features
 
@@ -107,41 +109,12 @@ uploaded files.
 The repository contains [fly.toml](https://fly.io/docs/reference/configuration/)
 files to deploy the service as [fly.io](https://fly.io) applications.
 
-## Development
+### Initial setup
 
-### Setup
+Leihbase does not have a setup flow yet. After starting the services, enter some
+initial data to be able to use the application:
 
-Requirements: [Mise](https://mise.jdx.dev)
-
-```bash
-# Install repository tools (mailpit, pocketbase)
-$ mise install
-# Setup project
-$ mise run //...:setup
-```
-
-### Run
-
-```bash
-# Run services
-$ mise run //...:dev
-```
-
-This starts PocketBase on [localhost:8090](http://localhost:8090), the
-front-end on [localhost:3000](http://localhost:3000) and mailpit on
-[localhost:8025](http://localhost:8025).
-
-Environment variables are configured in `web/mise.toml` and
-`pocketbase/mise.toml`, and can be overridden locally with a `.env` file in the
-`web/` or `pocketbase/` directory.
-
-### Initial content
-
-After starting the service using the setup steps above. Enter some initial data
-to be able to use the application:
-
-1. Browse to [localhost:8090/\_/](http://localhost:8090/_/) to visit the Pocketbase
-   admin interface
+1. Browse to `<leihbase-pb url>/_/` to visit the PocketBase admin interface
 1. Create a PocketBase superuser account
 1. Create a record in the `leihbase` collection, containing some configuration
    settings for the instance (see [Configuration](#configuration))
@@ -152,46 +125,12 @@ to be able to use the application:
 1. Sign up via the front-end, and in the PocketBase admin interface set the
    `role` of your user in the `users` collection to `admin` to get access to
    the Leihbase admin section
-1. Now you should be able to visit [localhost:3000](http://localhost:3000) to
-   visit the front-end
-
-### E-mail
-
-When starting the services, [mailpit](https://github.com/axllent/mailpit) also
-starts. In Pocketbase ([localhost:8090/\_/](http://localhost:8090/_/) >
-Settings > Mail settings) the following SMTP values can be configured:
-
-- SMTP server host: localhost
-- Port: 1025
-- Username: _\<empty>_
-- Password: _\<empty>_
-
-Any sent e-mail can then be viewed in the mailpit web interface at
-[localhost:8025](http://localhost:8025).
-
-## Tests
-
-Tests are configured and run using [Playwright](https://playwright.dev/), as the
-tests includes visual snapshots tests they are executed
-in a docker environment.
-
-### Run tests
-
-```bash
-# Run e2e tests
-mise run test:e2e
-# Run e2e tests, and update visual snapshots
-mise run test:e2e:update
-```
+1. Now you should be able to visit the front-end
 
 ## Contributing
 
-```bash
-# Format code
-$ pnpm prettier
-# Typecheck the front-end
-$ cd web && pnpm run typecheck
-```
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to set up a development
+environment, run the tests and contribute changes.
 
 ## Configuration
 
