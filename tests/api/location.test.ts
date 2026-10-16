@@ -106,5 +106,48 @@ test.describe("location", () => {
       expect(updated.name).toBe("Renamed by admin");
     });
 
+    const invalidOpeningHours: [string, unknown][] = [
+      ["unknown day", { days: { someday: [{ from: "10:00", to: "12:00" }] } }],
+      ["day without ranges", { days: { monday: [] } }],
+      ["invalid time", { days: { monday: [{ from: "10", to: "12:00" }] } }],
+      [
+        "range ending before it starts",
+        { days: { monday: [{ from: "12:00", to: "10:00" }] } },
+      ],
+      [
+        "overlapping ranges",
+        {
+          days: {
+            monday: [
+              { from: "10:00", to: "12:00" },
+              { from: "11:00", to: "13:00" },
+            ],
+          },
+        },
+      ],
+      ["invalid closed date", { days: {}, except: { dates: ["25-12-2030"] } }],
+      ["missing days", { except: { dates: [] } }],
+    ];
+
+    for (const [name, openingHours] of invalidOpeningHours) {
+      test(`rejects invalid opening hours: ${name}`, async () => {
+        const location = await createLocation("multiple");
+        const admin = await createUser(undefined, undefined, "admin");
+        const adminPb = await pocketbase(admin.email, DEFAULT_PASSWORD, false);
+
+        try {
+          await adminPb
+            .collection("location")
+            .update(location.id, { opening_hours: openingHours });
+          throw new Error("Expected update to be rejected");
+        } catch (err) {
+          expect(err).toBeInstanceOf(ClientResponseError);
+          expect((err as ClientResponseError).status).toBe(400);
+          expect(
+            (err as ClientResponseError).response.data.opening_hours.code
+          ).toBe("invalid_opening_hours");
+        }
+      });
+    }
   });
 });
