@@ -1,6 +1,11 @@
 <template>
-  <div class="root">
-    <FormLabel v-if="label" :for="id" :required="required">
+  <div :class="{ root: true, ['orientation-' + orientation]: true }">
+    <FormLabel
+      v-if="label"
+      :for="id"
+      :required="required"
+      :class="{ 'sr-only': hideLabel }"
+    >
       {{ label }}<template #suffix><slot name="label-suffix" /></template>
     </FormLabel>
     <div class="wrapper">
@@ -45,21 +50,26 @@ import FormLabel from "./FormLabel.vue";
 
 const emits = defineEmits(["blur"]);
 const model = defineModel();
-const props = defineProps<{
-  id?: string;
-  label?: string;
-  name?: string;
-  value?: string;
-  placeholder?: string;
-  required?: boolean;
-  disabled?: boolean;
-  readonly?: boolean;
-  type?: string;
-  description?: string;
-  error?: string;
-  autocomplete?: string;
-  dataTestid?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    id?: string;
+    label?: string;
+    name?: string;
+    value?: string;
+    placeholder?: string;
+    required?: boolean;
+    disabled?: boolean;
+    readonly?: boolean;
+    type?: string;
+    description?: string;
+    error?: string;
+    autocomplete?: string;
+    dataTestid?: string;
+    orientation?: "vertical" | "horizontal";
+    hideLabel?: boolean;
+  }>(),
+  { orientation: "vertical" }
+);
 if (props.value) {
   model.value = props.value;
 }
@@ -69,6 +79,18 @@ const id = props.id || useId();
 <style scoped>
 .root {
   width: 100%;
+}
+.orientation-horizontal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: var(--spacing-3);
+}
+.orientation-horizontal > :deep(.label) {
+  margin-bottom: 0;
+}
+.orientation-horizontal > p {
+  grid-column: 2;
 }
 .wrapper {
   display: flex;
