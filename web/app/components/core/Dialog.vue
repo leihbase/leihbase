@@ -96,9 +96,8 @@ function close() {
 @use "@/assets/styles/breakpoints.scss";
 
 dialog {
-  left: 50%;
-  top: -100%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  margin: auto;
   height: 100%;
   max-height: 100%;
   max-width: 100%;
@@ -159,25 +158,26 @@ dialog {
   }
 }
 
+// Slide in from above the viewport
 @keyframes dialog-in {
   from {
     visibility: hidden;
-    top: -100%;
+    transform: translateY(-100vh);
   }
   to {
     visibility: visible;
-    top: 50%;
+    transform: none;
   }
 }
 
 @keyframes dialog-out {
   from {
     visibility: visible;
-    top: 50%;
+    transform: none;
   }
   to {
     visibility: hidden;
-    top: -100%;
+    transform: translateY(-100vh);
   }
 }
 

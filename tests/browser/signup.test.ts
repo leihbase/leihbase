@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { waitForHydration, waitForClientMount } from "../lib/utils";
+import { expect, test } from "@playwright/test";
+import { uniqueId, waitForClientMount, waitForHydration } from "../lib/utils";
 
 test.describe("signup", () => {
   test("can reach signup from homepage", async ({ page, isMobile }) => {
@@ -20,7 +20,7 @@ test.describe("signup", () => {
     await page.getByTestId("name-input").fill("John");
     await page
       .getByTestId("email-input")
-      .fill(`john@example${Math.round(Math.random() * 100)}.com`);
+      .fill(`john-${uniqueId()}@example.com`);
     await page.getByTestId("password-input").fill("123456789");
     await page.getByTestId("tac-checkbox").check();
     await page.getByTestId("submit-button").click();
@@ -36,7 +36,7 @@ test.describe("signup", () => {
     await page.getByTestId("name-input").fill("John");
     await page
       .getByTestId("email-input")
-      .fill(`john@example${Math.round(Math.random() * 100)}.com`);
+      .fill(`john-${uniqueId()}@example.com`);
     await page.getByTestId("password-input").fill("123456789");
     await page.getByTestId("submit-button").click();
     await expect(

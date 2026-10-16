@@ -1,13 +1,18 @@
 import { pocketbase } from "../services/pocketbase";
+import { uniqueId } from "./utils";
 
 export const DEFAULT_PASSWORD = "123456789";
 
-export async function createUser(email?: string, password?: string, role: 'user' | 'manager' | 'admin' = 'user', locations: string[] = []) {
+export async function createUser(
+  email?: string,
+  password?: string,
+  role: "user" | "manager" | "admin" = "user",
+  locations: string[] = []
+) {
   const pb = await pocketbase();
   const user = await pb.collection("users").create({
     name: "Test User",
-    email:
-      email || `test-user-${Math.round(Math.random() * 10000)}@example.com`,
+    email: email || `test-user-${uniqueId()}@example.com`,
     password: password || DEFAULT_PASSWORD,
     passwordConfirm: password || DEFAULT_PASSWORD,
     role,

@@ -1,6 +1,7 @@
 import type { OpeningHours } from "../../web/lib/openingHours";
 import { Location } from "../../web/models/location";
 import { pocketbase } from "../services/pocketbase";
+import { uniqueId } from "./utils";
 
 /**
  * Default opening hours matching the ones in global.setup.ts
@@ -52,13 +53,14 @@ export async function createLocation(
   reservationStartLimit?: number
 ) {
   const pb = await pocketbase();
+  const id = uniqueId();
   try {
     const location = await pb.collection("location").create({
       active: true,
-      name: `Test Location ${reservationSystem} ${Math.round(Math.random() * 1000)}`,
+      name: `Test Location ${reservationSystem} ${id}`,
       address: "Test Address",
       email: `location-${reservationSystem}@example.com`,
-      slug: `test-location-${reservationSystem}-${Math.round(Math.random() * 1000)}`,
+      slug: `test-location-${reservationSystem}-${id}`,
       reservation_system: reservationSystem,
       opening_hours: openingHours,
       max_reservation_days: 14,

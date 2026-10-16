@@ -7,10 +7,15 @@ import {
   updateLastProductReservation,
 } from "../lib/product";
 import { createUser } from "../lib/user";
-import { waitForClientMount } from "../lib/utils";
+import { uniqueId, waitForClientMount } from "../lib/utils";
 import { pocketbase } from "../services/pocketbase";
 
-async function reserve(page: Page, startIndex: number, endIndex: number, navigateToNextMonth = true) {
+async function reserve(
+  page: Page,
+  startIndex: number,
+  endIndex: number,
+  navigateToNextMonth = true
+) {
   // Click reserve
   await waitForClientMount(page.getByTestId("reserve-button"));
   await page.getByTestId("reserve-button").click();
@@ -66,7 +71,7 @@ test.describe("reservation", () => {
     await expect(page).toHaveURL("/signup");
 
     // Signup
-    const email = `john${Math.round(Math.random() * 100)}@example.com`;
+    const email = `john-${uniqueId()}@example.com`;
     const password = "123456789";
     await page.getByTestId("name-input").fill("John2");
     await page.getByTestId("email-input").fill(email);
@@ -92,7 +97,7 @@ test.describe("reservation", () => {
   test("user can't access reservations of others", async ({ page }) => {
     // Create product, user, and reservation
     const product = await createProduct();
-    const firstUserEmail = `a${Math.round(Math.random() * 100)}@example.com`;
+    const firstUserEmail = `a-${uniqueId()}@example.com`;
     const firstUserPassword = "123456789";
     await createUser(firstUserEmail, firstUserPassword);
     await login(page, firstUserEmail, firstUserPassword);
@@ -110,7 +115,7 @@ test.describe("reservation", () => {
     expect(firstReservations.length).toBe(1);
 
     // Create second user
-    const secondUserEmail = `b${Math.round(Math.random() * 100)}@example.com`;
+    const secondUserEmail = `b-${uniqueId()}@example.com`;
     const secondUserPassword = "123456789";
     await createUser(secondUserEmail, secondUserPassword);
     const secondUserPb = await pocketbase(

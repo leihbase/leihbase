@@ -1,4 +1,12 @@
-import { type Page, type Locator, expect } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+import { expect, type Locator, type Page } from "@playwright/test";
+
+/**
+ * Returns a unique id, e.g. to create test records with unique emails or slugs.
+ */
+export function uniqueId() {
+  return randomUUID();
+}
 
 export async function waitForHydration(page: Page) {
   // Wait for dehydration

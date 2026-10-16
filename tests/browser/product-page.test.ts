@@ -1,7 +1,7 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { login } from "../lib/login";
 import { createProduct, navigateToProductPage } from "../lib/product";
 import { waitForClientMount } from "../lib/utils";
-import { login } from "../lib/login";
 
 test.describe("product page", () => {
   test("has screenshot", async ({ page }) => {
