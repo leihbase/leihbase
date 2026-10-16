@@ -265,6 +265,7 @@ async function handleSubmit() {
       opening_hours: openingHours.value,
     });
     savedOpeningHours.value = updated.opening_hours;
+    location.value = updated;
     success.value = true;
   } catch {
     // Errors are shown through `errors`, set by `update`

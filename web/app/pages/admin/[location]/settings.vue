@@ -192,7 +192,7 @@ async function handleSubmit(e: SubmitEvent) {
     data.get("allow_same_day_reservations") ? "true" : "false"
   );
   try {
-    await update(location.value!.id, data);
+    location.value = await update(location.value!.id, data);
     success.value = true;
   } catch (e) {
     if (e instanceof ClientResponseError) {
