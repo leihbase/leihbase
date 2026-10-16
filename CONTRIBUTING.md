@@ -8,7 +8,7 @@ the idea.
 
 - `web/`: the [Nuxt](https://nuxt.com/) front-end, including the admin section
 - `pocketbase/`: the [PocketBase](https://pocketbase.io/) back-end
-  - `pb_hooks/`: server-side logic, such as e-mails, reminders and custom routes
+  - `pb_hooks/`: server-side logic, such as emails, reminders and custom routes
   - `pb_migrations/`: database schema migrations
 - `tests/`: [Playwright](https://playwright.dev/) API and browser tests
 
@@ -16,7 +16,8 @@ the idea.
 
 ### Setup
 
-Requirements: [Mise](https://mise.jdx.dev)
+Requirements: [Mise](https://mise.jdx.dev) and [Docker](https://www.docker.com/)
+(for running the tests)
 
 ```bash
 # Install repository tools (mailpit, pocketbase)
@@ -32,8 +33,8 @@ $ mise run //...:setup
 $ mise run //...:dev
 ```
 
-This starts PocketBase on [localhost:8090](http://localhost:8090), the
-front-end on [localhost:3000](http://localhost:3000) and mailpit on
+This starts PocketBase on [localhost:8090](http://localhost:8090), the front-end
+on [localhost:3000](http://localhost:3000) and mailpit on
 [localhost:8025](http://localhost:8025).
 
 Environment variables are configured in `web/mise.toml` and
@@ -47,10 +48,10 @@ To be able to use the application, follow the
 [localhost:8090/\_/](http://localhost:8090/_/) for the PocketBase admin
 interface and [localhost:3000](http://localhost:3000) for the front-end.
 
-### E-mail
+### Email
 
 When starting the services, [mailpit](https://github.com/axllent/mailpit) also
-starts. In Pocketbase ([localhost:8090/\_/](http://localhost:8090/_/) >
+starts. In PocketBase ([localhost:8090/\_/](http://localhost:8090/_/) >
 Settings > Mail settings) the following SMTP values can be configured:
 
 - SMTP server host: localhost
@@ -58,14 +59,13 @@ Settings > Mail settings) the following SMTP values can be configured:
 - Username: _\<empty>_
 - Password: _\<empty>_
 
-Any sent e-mail can then be viewed in the mailpit web interface at
+Any sent email can then be viewed in the mailpit web interface at
 [localhost:8025](http://localhost:8025).
 
 ## Tests
 
 Tests are configured and run using [Playwright](https://playwright.dev/), as the
-tests includes visual snapshots tests they are executed
-in a docker environment.
+tests include visual snapshot tests they are executed in a Docker environment.
 
 ### Run tests
 

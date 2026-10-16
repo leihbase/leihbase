@@ -10,7 +10,7 @@ people can borrow items instead of buying them.
 - 🎫 Online reservations, with user sign-up/login
 - 👷 Admin section to manage products, reservations and statistics across
   multiple locations
-- 📧 E-mail confirmations and pickup/return reminders, with customizable
+- 📧 Email confirmations and pickup/return reminders, with customizable
   templates
 - 🎨 Themeable, available in English and German
 
@@ -21,19 +21,20 @@ people can borrow items instead of buying them.
 ## Tech
 
 - Back-end and API using [PocketBase](https://pocketbase.io/)
-- Front-end with server-side rendering using [NuxtJS](https://nuxt.com/)
+- Front-end with server-side rendering using [Nuxt](https://nuxt.com/)
 
 ## Deployment
 
 ### Docker
 
-Leihbase has two Docker Images available which are both required to set up the application:
+Leihbase has two Docker Images available which are both required to set up the
+application:
 
 - [leihbase-webapp](https://hub.docker.com/r/lumocra/leihbase-webapp)
 - [leihbase-pb](https://hub.docker.com/r/lumocra/leihbase-pb)
 
-Images are tagged with the release version, `latest` is built
-from the `next` branch. Pinning a release version is recommended.
+Images are tagged with the release version, `latest` is built from the `next`
+branch. Pinning a release version is recommended.
 
 Use the following docker-compose.yml as a base to deploy Leihbase using Docker:
 
@@ -84,25 +85,25 @@ services:
 
 | Variable                          | Description                                                                      |
 | --------------------------------- | -------------------------------------------------------------------------------- |
-| `CONFIG_LOCALE`                   | Language of the e-mails: `en` or `de`                                            |
+| `CONFIG_LOCALE`                   | Language of the emails: `en` or `de`                                             |
 | `CONFIG_RESERVATION_REQUIRE_USER` | If a reservation created in the admin section is required to be linked to a user |
 | `CONFIG_CAP_INSTANCE_HOST`        | Optional, Cap captcha instance host                                              |
 | `CONFIG_CAP_SITE_KEY`             | Optional, Cap captcha site key                                                   |
 | `CONFIG_CAP_SECRET_KEY`           | Optional, Cap captcha secret key                                                 |
 
-#### E-mail
+#### Email
 
-To send e-mails (reservation confirmations, reminders, notifications), configure
+To send emails (reservation confirmations, reminders, notifications), configure
 an SMTP server in the PocketBase admin interface (`/_/` > Settings > Mail
 settings). Pickup and return reminders are sent by a cron job every day at 12:00
 (UTC).
 
 #### Updating & backups
 
-Database migrations are applied automatically when PocketBase starts, so updating
-is a matter of changing the image versions and restarting the containers. Make
-sure to back up the `pb_data` volume before updating, it contains all data and
-uploaded files.
+Database migrations are applied automatically when PocketBase starts, so
+updating is a matter of changing the image versions and restarting the
+containers. Make sure to back up the `pb_data` volume before updating, it
+contains all data and uploaded files.
 
 ### Fly.io
 
@@ -123,14 +124,9 @@ initial data to be able to use the application:
 1. Create a product in the `products` collection (make sure to set the product
    as 'active')
 1. Sign up via the front-end, and in the PocketBase admin interface set the
-   `role` of your user in the `users` collection to `admin` to get access to
-   the Leihbase admin section
+   `role` of your user in the `users` collection to `admin` to get access to the
+   Leihbase admin section
 1. Now you should be able to visit the front-end
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to set up a development
-environment, run the tests and contribute changes.
 
 ## Configuration
 
@@ -140,9 +136,9 @@ Users have a `role` which can be set in the PocketBase admin interface in the
 `users` collection:
 
 - `user`: can make and manage their own reservations
-- `manager`: can manage the products and reservations of the locations
-  selected in the user's `manager_locations` field
-- `admin`: can manage all locations, and the e-mail templates
+- `manager`: can manage the products and reservations of the locations selected
+  in the user's `manager_locations` field
+- `admin`: can manage all locations, and the email templates
 
 ### Leihbase
 
@@ -151,8 +147,8 @@ The single record in the `leihbase` collection contains instance-wide settings:
 - `description`, `image`: shown on the front page
 - `imprint`, `privacy_policy`: content of the imprint and privacy policy pages
 - `privacy_policy_link`: if set, users have to accept it when signing up
-- `footer_links`: links shown in the footer, in the same JSON format as
-  location [links](#links)
+- `footer_links`: links shown in the footer, in the same JSON format as location
+  [links](#links)
 - `style`: CSS variables to theme the front-end, for example:
 
 ```css
@@ -163,17 +159,17 @@ The single record in the `leihbase` collection contains instance-wide settings:
 --border-radius: 5px;
 ```
 
-### E-mail templates
+### Email templates
 
-Admins can customize the e-mails sent by Leihbase per location in the admin
-section (Settings > Configure email templates). If no custom template is enabled, the default
-template for the configured locale is used.
+Admins can customize the emails sent by Leihbase per location in the admin
+section (Settings > Configure email templates). If no custom template is
+enabled, the default template for the configured locale is used.
 
 ### Location
 
 #### Notifications
 
-Using the following JSON format the e-mail addresses which should receives
+Using the following JSON format the email addresses which should receive
 notifications of this location can be configured:
 
 ```json
@@ -220,6 +216,12 @@ configured:
 }
 ```
 
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to set up a development
+environment, run the tests and contribute changes.
+
 ## License
 
-Leihbase is licensed under the [GNU Affero General Public License v3.0](./LICENSE).
+Leihbase is licensed under the
+[GNU Affero General Public License v3.0](./LICENSE).

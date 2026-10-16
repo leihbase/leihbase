@@ -1,6 +1,7 @@
 # Leihbase Front-End
 
-A Nuxt application containing the front-end and back-end of the front-end of Leihbase.
+A Nuxt application containing the front-end and back-end of the front-end of
+Leihbase.
 
 ## Typecheck
 
