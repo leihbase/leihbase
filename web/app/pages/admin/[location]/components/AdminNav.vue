@@ -3,28 +3,28 @@
     <Button
       variant="secondary"
       :to="`/admin/${location?.slug}`"
-      :class="{ active: isActive('') }"
+      :active="isActive('')"
     >
       {{ t("reservations") }}
     </Button>
     <Button
       variant="secondary"
       :to="`/admin/${location?.slug}/products`"
-      :class="{ active: isActive('products') }"
+      :active="isActive('products')"
     >
       {{ t("products") }}
     </Button>
     <Button
       variant="secondary"
       :to="`/admin/${location?.slug}/stats`"
-      :class="{ active: isActive('stats') }"
+      :active="isActive('stats')"
     >
       {{ t("statistics") }}
     </Button>
     <Button
       variant="secondary"
       :to="`/admin/${location?.slug}/opening-hours`"
-      :class="{ active: isActive('opening-hours') }"
+      :active="isActive('opening-hours')"
     >
       {{ t("opening_hours") }}
     </Button>
@@ -32,7 +32,7 @@
       :disabled="!userStore.isAdmin"
       variant="secondary"
       :to="`/admin/${location?.slug}/settings`"
-      :class="{ active: isActive('settings') || isActive('email-templates') }"
+      :active="isActive('settings') || isActive('email-templates')"
     >
       {{ t("settings") }}
     </Button>
@@ -75,10 +75,6 @@ function isActive(page: string) {
 .nav :deep(a) {
   flex-shrink: 0;
   white-space: nowrap;
-}
-.nav :deep(.active) {
-  background-color: var(--text-color);
-  color: var(--background-color);
 }
 .nav {
   display: flex;
