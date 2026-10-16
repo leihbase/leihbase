@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { DateTime, type DateTimeFormatOptions } from "luxon";
 
 const Days = [
   "sunday",
@@ -21,7 +21,7 @@ const FORMATS = {
     month: "short",
     year: "numeric",
   },
-};
+} satisfies Record<string, DateTimeFormatOptions>;
 
 /**
  * Formats the calendar date of a date. Dates are stored as UTC midnight (and
@@ -39,7 +39,7 @@ export function formatDate(
 }
 
 export function isDateOnDays(date: Date, days: string[]) {
-  return days.includes(Days[date.getDay()]);
+  return days.includes(Days[date.getDay()]!);
 }
 
 export function isToday(date: Date): boolean {
@@ -81,7 +81,7 @@ export function endOfUTCDate(date: Date): Date {
 }
 
 export function toShortISO(date: Date): string {
-  return date.toISOString().split("T")[0];
+  return date.toISOString().split("T")[0]!;
 }
 
 export function subtractDays(date: Date, days: number) {

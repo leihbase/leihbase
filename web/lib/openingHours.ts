@@ -63,7 +63,7 @@ export function isInOpeningHoursDay(
   const openDays = _openingHours.days
     ? Object.keys(_openingHours.days)
     : Object.keys(_openingHours);
-  return openDays.includes(Days[date.getDay()]);
+  return openDays.includes(Days[date.getDay()]!);
 }
 
 /**
@@ -81,7 +81,7 @@ export function openingHoursToString(
   // Opening hours
   const days = WeekDays.filter((day) => openingHours.days[day]).map(
     (day) =>
-      `${t(`week_days.${day}`)}, ${openingHours.days[day]
+      `${t(`week_days.${day}`)}, ${openingHours.days[day]!
         .map((range) => `${range.from} - ${range.to} ${t("hour")}`)
         .join(" & ")}`
   );
