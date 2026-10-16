@@ -9,17 +9,26 @@
 
 <script setup lang="ts">
 import { InfoCircle, ThumbsUp, WarningTriangle } from "@iconoir/vue";
+import type { HTMLAttributes } from "vue";
 
-withDefaults(
-  defineProps<{
-    variant?: "success" | "error" | "warning" | "info";
-    size?: "sm" | "md";
-  }>(),
-  {
-    variant: "success",
-    size: "md",
-  }
-);
+/**
+ * Native attributes (e.g. `data-testid`) which fall through to the root
+ * element. Only used for type checking, see `@vue-ignore`.
+ */
+interface NativeAttributes extends HTMLAttributes {
+  // data-* attributes, camelized by Vue
+  [dataAttribute: `data${Capitalize<string>}`]: unknown;
+}
+
+interface Props extends /* @vue-ignore */ NativeAttributes {
+  variant?: "success" | "error" | "warning" | "info";
+  size?: "sm" | "md";
+}
+
+withDefaults(defineProps<Props>(), {
+  variant: "success",
+  size: "md",
+});
 </script>
 
 <style lang="scss" scoped>

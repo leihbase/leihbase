@@ -10,7 +10,7 @@ export type Location = RecordModel & {
   slug: string;
   active: boolean;
   opening_hours: OpeningHours;
-  links: string;
+  links: { text: string; link: string }[];
   max_reservation_days: number;
   reservation_system: "disabled" | "single" | "multiple";
   reservation_start_limit: number;

@@ -14,7 +14,7 @@
     </header>
 
     <form @submit.prevent="handleSubmit" class="lb-stack">
-      <Alert v-if="error" variant="error" @dismiss="error = null">
+      <Alert v-if="error" variant="error">
         {{ error }}
       </Alert>
       <Select

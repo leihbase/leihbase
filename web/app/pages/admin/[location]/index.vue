@@ -2,8 +2,8 @@
   <Container width="lg" centered>
     <PageAlert class="banner" />
 
-    <AdminNav :location="location" />
-    <AdminHeader :title="t('title')" :location="location">
+    <AdminNav v-if="location" :location="location" />
+    <AdminHeader v-if="location" :title="t('title')" :location="location">
       <Button @click="handleNewReservationClick">
         {{ t("new_reservation") }}
       </Button>

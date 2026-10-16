@@ -23,27 +23,38 @@
 
 <script setup lang="ts">
 import { NuxtLink } from "#components";
+import type { ButtonHTMLAttributes } from "vue";
 
-const props = withDefaults(
-  defineProps<{
-    to?: string;
-    href?: string;
-    variant?: "primary" | "secondary";
-    size?: "lg" | "md" | "sm";
-    circle?: boolean;
-    type?: "submit" | "reset" | "button" | undefined;
-    loading?: boolean;
-    disabled?: boolean;
-    title?: string;
-  }>(),
-  {
-    variant: "primary",
-    size: "md",
-    type: "button",
-    loading: false,
-    disabled: false,
-  }
-);
+/**
+ * Native attributes (e.g. `@click`, `aria-*`, `data-testid`) which fall
+ * through to the rendered <button>, <a> or <NuxtLink>. Only used for type
+ * checking, see `@vue-ignore`.
+ */
+interface NativeAttributes extends ButtonHTMLAttributes {
+  target?: string;
+  // data-* attributes, camelized by Vue
+  [dataAttribute: `data${Capitalize<string>}`]: unknown;
+}
+
+interface Props extends /* @vue-ignore */ NativeAttributes {
+  to?: string;
+  href?: string;
+  variant?: "primary" | "secondary";
+  size?: "lg" | "md" | "sm";
+  circle?: boolean;
+  type?: "submit" | "reset" | "button" | undefined;
+  loading?: boolean;
+  disabled?: boolean;
+  title?: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  variant: "primary",
+  size: "md",
+  type: "button",
+  loading: false,
+  disabled: false,
+});
 
 const { isClientMounted } = useClientMounted();
 

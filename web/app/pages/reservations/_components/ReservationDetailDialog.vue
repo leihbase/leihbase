@@ -1,5 +1,5 @@
 <template>
-  <Dialog inset title="Reservierung" v-model:open="open">
+  <Dialog inset title="Reservierung" v-model:open="open" @close="emit('close')">
     <div v-if="reservation && product && location" class="product">
       <img
         :src="`${config.public.pocketbase.clientBaseUrl}/api/files/products/${product.id}/${product.images[0]}${thumbs.sm}`"
@@ -141,7 +141,7 @@ const props = defineProps<{
   location?: Location;
 }>();
 
-const emit = defineEmits<{ update: [] }>();
+const emit = defineEmits<{ update: []; close: [] }>();
 
 const open = ref<boolean>(false);
 watch(

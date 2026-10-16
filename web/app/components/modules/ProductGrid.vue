@@ -47,7 +47,7 @@
     <section v-if="totalPages > 1" class="page-navigation">
       <Button
         v-if="currentPage > 1"
-        :to="currentPage > 1 ? getUrl({ page: currentPage - 1 }) : null"
+        :to="currentPage > 1 ? getUrl({ page: currentPage - 1 }) : undefined"
         class="page-button previous-page"
       >
         <ArrowLeft class="icon" />
@@ -55,7 +55,9 @@
       </Button>
       <Button
         :to="
-          currentPage < totalPages ? getUrl({ page: currentPage + 1 }) : null
+          currentPage < totalPages
+            ? getUrl({ page: currentPage + 1 })
+            : undefined
         "
         class="page-button next-page"
       >

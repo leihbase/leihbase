@@ -78,9 +78,11 @@ export default defineNuxtConfig({
 
   typescript: {
     tsConfig: {
+      // lib/ uses auto-imports (e.g. useI18n), so it needs the app context
+      include: ["../lib/**/*"],
       vueCompilerOptions: {
         strictTemplates: true,
-        fallthroughAttributes: true,
+        fallthroughAttributes: false,
       },
     },
   },

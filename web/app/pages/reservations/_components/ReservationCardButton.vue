@@ -2,6 +2,7 @@
   <Button
     variant="secondary"
     :class="['card', 'status-' + getReservationStatus(reservation)]"
+    @click="emit('click', $event)"
   >
     <img
       :src="`${config.public.pocketbase.clientBaseUrl}/api/files/products/${reservation.product}/${product.images[0]}${thumbs.sm}`"
@@ -39,6 +40,7 @@ const { t, locale } = useI18n({
 });
 
 defineProps<{ reservation: Reservation; product: Product }>();
+const emit = defineEmits<{ click: [event: MouseEvent] }>();
 </script>
 
 <style scoped lang="scss">

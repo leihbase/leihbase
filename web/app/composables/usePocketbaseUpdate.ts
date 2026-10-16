@@ -31,14 +31,17 @@ export function usePocketbaseUpdate(pb: Client, collection: string) {
       result = await pb.collection(collection).update(id, data);
       resetErrors();
     } catch (e) {
-      // Parse errors
+      resetErrors();
+      // Parse field errors. Errors without a server response (e.g. connection
+      // errors) have no data.
       if (e instanceof ClientResponseError) {
-        Object.entries(e.response.data).map(([key, value]) => {
+        Object.entries(e.response?.data ?? {}).map(([key, value]) => {
           if (isErrorCode(value)) {
             errors.fields[key] = value.code;
           }
         });
-      } else {
+      }
+      if (Object.keys(errors.fields).length === 0) {
         errors.general = "general";
       }
       if (e instanceof Error) {
@@ -54,6 +57,6 @@ export function usePocketbaseUpdate(pb: Client, collection: string) {
   return {
     loading,
     update,
-    errors
+    errors,
   };
 }
