@@ -101,11 +101,10 @@ watch(model, (newValue) => {
 .ql-container .ql-editor :is(h2, h3, h4, h5, h6, ul, p) {
   margin-bottom: 0.5rem;
 }
-/* Match the sizes of the Heading component */
 .ql-editor h3 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
 }
 .ql-editor h4 {
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 </style>

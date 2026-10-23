@@ -23,7 +23,7 @@ import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.j
 import type { User } from "~~/models/user";
 import Footer from "./components/modules/Footer.vue";
 import NavBar from "./components/modules/NavBar.vue";
-import ReservationDialog from "./components/ReservationDialog.vue";
+import ReservationDialog from "./components/reservation-dialog/ReservationDialog.vue";
 import VerificationDialog from "./components/VerificationDialog.vue";
 
 setBasePath(

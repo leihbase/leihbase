@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ height: string }>();
+defineProps<{ height?: string }>();
 </script>
 
 <style scoped>

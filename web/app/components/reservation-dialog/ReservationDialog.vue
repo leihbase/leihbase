@@ -1,50 +1,25 @@
 <template>
   <Dialog v-model:open="isOpen" inset :title="t('reserve')">
     <div class="dialog">
-      <!-- Opening hours -->
-      <p
-        v-if="location?.opening_hours"
-        class="opening-hours"
-        data-testid="opening-hours"
-      >
-        <span>{{ t("opening_hours_of") }} {{ location?.name }}:</span>
-        <br />
-        <span
-          v-html="openingHoursToString(location?.opening_hours, locale)"
-        ></span>
-      </p>
-      <form v-if="product" @submit.prevent="onSubmit">
-        <Input
-          type="text"
-          :label="t('product')"
-          v-model="product.name"
-          required
-          disabled
-          readonly
+      <form v-if="product && location" :id="formId" @submit.prevent="onSubmit">
+        <ReservationDatesStep
+          v-if="step === 'dates'"
+          :location="location"
+          :product="product"
+          v-model:start="start"
+          v-model:end="end"
+          v-model:message="message"
         />
-        <DateInput
-          :label="t('start')"
-          :key="`start-date-${location?.id}`"
-          v-model="start"
-          :is-date-disallowed="isStartDateDisallowed"
-          :show-outside-days="false"
-          :description="startDateDescription"
-          data-testid="start-input"
-          required
+        <ReservationBorrowAgreementStep
+          v-if="step === 'agreement' && borrowAgreement"
+          :location="location"
+          :borrow-agreement="borrowAgreement"
+          v-model:accepted="isBorrowAgreementAccepted"
         />
-        <DateInput
-          :label="t('end')"
-          :key="`end-date-${location?.id}`"
-          :popout-key="`end-date-popout-${start?.getTime()}`"
-          v-model="end"
-          :is-date-disallowed="isEndDateDisallowed"
-          :show-outside-days="false"
-          :description="endDateDescription"
-          data-testid="end-input"
-          required
-        />
-        <Textarea :label="t('message')" v-model="message" />
-
+      </form>
+    </div>
+    <template #footer>
+      <div class="footer">
         <Alert
           v-if="reservationCreationError"
           variant="error"
@@ -54,44 +29,53 @@
           {{ reservationCreationError }}
         </Alert>
 
-        <Button
-          :loading="isSubmittingReservation"
-          size="lg"
-          type="submit"
-          data-testid="reserve-submit"
-        >
-          {{ t("reserve_now_button") }}
-        </Button>
-      </form>
-    </div>
+        <div class="buttons">
+          <Button
+            v-if="step === 'agreement'"
+            variant="secondary"
+            size="lg"
+            data-testid="reserve-back"
+            @click="step = 'dates'"
+          >
+            {{ t("back_button") }}
+          </Button>
+          <Button
+            :loading="isSubmittingReservation"
+            size="lg"
+            type="submit"
+            :form="formId"
+            data-testid="reserve-submit"
+          >
+            {{
+              step === "dates" && requiresBorrowAgreement
+                ? t("continue_button")
+                : t("reserve_now_button")
+            }}
+          </Button>
+        </div>
+      </div>
+    </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { isInOpeningHoursDay } from "@@/lib/openingHours";
-import type { OpeningHours } from "@@/lib/openingHours";
-import {
-  addDays,
-  startOfDate as getStartOfDate,
-  getStartOfDay,
-  isSameDate,
-} from "~~/lib/date.js";
-import { openingHoursToString } from "~~/lib/openingHours.js";
+import type { BorrowAgreement } from "~~/models/borrowAgreement.js";
+import type { Location } from "~~/models/location.js";
 import type { Reservation } from "~~/models/reservation.js";
 import { ClientResponseError } from "pocketbase";
-import Alert from "./core/Alert.vue";
-import Button from "./core/Button.vue";
-import DateInput from "./core/DateInput.vue";
-import Dialog from "./core/Dialog.vue";
-import Input from "./core/Input.vue";
-import Textarea from "./core/Textarea.vue";
+import Alert from "../core/Alert.vue";
+import Button from "../core/Button.vue";
+import Dialog from "../core/Dialog.vue";
+import ReservationBorrowAgreementStep from "./ReservationBorrowAgreementStep.vue";
+import ReservationDatesStep from "./ReservationDatesStep.vue";
 
 const { pb, user } = usePocketbase();
-const { t, locale } = useI18n({ useScope: "local" });
+const { t } = useI18n({ useScope: "local" });
 const nuxtApp = useNuxtApp();
 const userStore = useUserStore();
 
 const { isOpen, product, location } = useReservationDialog();
+const formId = useId();
 
 // Fields
 const start = ref<Date>();
@@ -101,94 +85,49 @@ const message = ref<string>();
 const reservationCreationError = ref<string>();
 const isSubmittingReservation = ref(false);
 
-const startOfToday = getStartOfDay();
-const closedDates = computed(() =>
-  (location.value?.opening_hours?.except?.dates || []).map((d) =>
-    getStartOfDate(new Date(d))
-  )
+// Borrow agreement
+const step = ref<"dates" | "agreement">("dates");
+const borrowAgreement = ref<BorrowAgreement>();
+const isBorrowAgreementAccepted = ref(false);
+const requiresBorrowAgreement = computed(
+  () =>
+    !!location.value?.borrow_agreement &&
+    !(user.value?.accepted_borrow_agreements || []).includes(
+      location.value.borrow_agreement
+    )
 );
-const maxReservationDays = computed(
-  () => location.value?.max_reservation_days || 0
-);
-const reservationStartLimit = computed(
-  () => location.value?.reservation_start_limit || 0
-);
-
-const startDateDescription = computed(() => {
-  if (reservationStartLimit.value <= 0) {
-    return undefined;
-  }
-  return `${location.value?.name} ${t("allows_reserving_days_in_future", { days: reservationStartLimit.value })}`;
-});
-
-const endDateDescription = computed(() => {
-  if (maxReservationDays.value <= 0) {
-    return undefined;
-  }
-  return `${location.value?.name} ${t("allows_reservations_up_to_days", { days: maxReservationDays.value })}`;
-});
 
 watch(isOpen, (newValue) => {
   if (!newValue) {
     start.value = undefined;
     end.value = undefined;
+    step.value = "dates";
+    borrowAgreement.value = undefined;
+    isBorrowAgreementAccepted.value = false;
+    reservationCreationError.value = undefined;
   }
 });
 
-function isPastDate(startOfDate: Date, today: Date) {
-  return startOfDate < today;
-}
-
-function isClosedDate(startOfDate: Date, closedDatesList: Date[]) {
-  return closedDatesList.some((date) => isSameDate(date, startOfDate));
-}
-
-function isBeyondStartLimit(startOfDate: Date, limit: number, today: Date) {
-  if (limit <= 0) return false;
-  const limitDate = addDays(today, limit);
-  return startOfDate > limitDate;
-}
-
-function isBeyondMaxDuration(
-  date: Date,
-  startDate: Date | undefined,
-  limit: number
-) {
-  if (limit <= 0 || !startDate) return false;
-  const maxEndDate = addDays(getStartOfDate(startDate), limit);
-  return date > maxEndDate;
-}
-
-function isOpenDay(date: Date, openingHours: OpeningHours | undefined) {
-  return openingHours ? isInOpeningHoursDay(openingHours, date) : true;
-}
-
-function isStartDateDisallowed(date: Date): boolean {
-  const startOfDate = getStartOfDate(date);
-  const isOpen = isOpenDay(date, location.value?.opening_hours);
-  const isPast = isPastDate(startOfDate, startOfToday);
-  const isClosed = isClosedDate(startOfDate, closedDates.value);
-  const isBeyondLimit = isBeyondStartLimit(
-    startOfDate,
-    reservationStartLimit.value,
-    startOfToday
-  );
-  return !isOpen || isPast || isClosed || isBeyondLimit;
-}
-
-function isEndDateDisallowed(date: Date): boolean {
-  const startOfDate = getStartOfDate(date);
-  const isBeforeStart =
-    start.value && startOfDate <= getStartOfDate(start.value);
-  const isOpen = isOpenDay(date, location.value?.opening_hours);
-  const isPast = isPastDate(startOfDate, startOfToday);
-  const isClosed = isClosedDate(startOfDate, closedDates.value);
-  const isBeyondMax = isBeyondMaxDuration(
-    startOfDate,
-    start.value,
-    maxReservationDays.value
-  );
-  return !isOpen || isPast || isBeforeStart || isClosed || isBeyondMax;
+/**
+ * Shows the current borrow agreement of the location, to be accepted before
+ * creating the reservation
+ */
+async function showBorrowAgreement() {
+  if (!location.value?.borrow_agreement) {
+    return;
+  }
+  isSubmittingReservation.value = true;
+  try {
+    borrowAgreement.value = await pb
+      .collection("borrow_agreements")
+      .getOne<BorrowAgreement>(location.value.borrow_agreement);
+    isBorrowAgreementAccepted.value = false;
+    step.value = "agreement";
+  } catch (e) {
+    reservationCreationError.value = t("errors.general");
+  } finally {
+    isSubmittingReservation.value = false;
+  }
 }
 
 async function onSubmit() {
@@ -202,6 +141,13 @@ async function onSubmit() {
   }
 
   reservationCreationError.value = undefined;
+
+  // Show the borrow agreement first, if it has not been accepted before
+  if (step.value === "dates" && requiresBorrowAgreement.value) {
+    await showBorrowAgreement();
+    return;
+  }
+
   isSubmittingReservation.value = true;
   let reservation;
   try {
@@ -212,6 +158,9 @@ async function onSubmit() {
       end: end.value,
       message: message.value,
       send_confirmation: true,
+      borrow_agreement: requiresBorrowAgreement.value
+        ? borrowAgreement.value?.id
+        : undefined,
     })) as Reservation;
   } catch (e) {
     isSubmittingReservation.value = false;
@@ -262,6 +211,15 @@ async function onSubmit() {
             "errors.reservation_system_disabled"
           );
           break;
+        case "Borrow_agreement_not_accepted.":
+          // The borrow agreement has changed in the meantime, show the
+          // current one
+          location.value = await pb
+            .collection("public_locations")
+            .getOne<Location>(location.value.id);
+          await showBorrowAgreement();
+          reservationCreationError.value = t("errors.borrow_agreement_changed");
+          break;
         case "Reservation_start_too_far_in_future.":
           reservationCreationError.value = t(
             "errors.reservation_start_too_far_in_future",
@@ -282,27 +240,50 @@ async function onSubmit() {
     return;
   }
 
-  await userStore.fetchUserReservations();
+  // Refresh the user, to include newly accepted borrow agreements
+  await Promise.all([
+    userStore.fetchUserReservations(),
+    pb.collection("users").authRefresh(),
+  ]);
   nuxtApp.callHook("app:user:reservation:create", reservation);
   isSubmittingReservation.value = false;
   isOpen.value = false;
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use "@/assets/styles/breakpoints.scss";
+
+// Fill the height of the (full screen) dialog on mobile
+.dialog {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (min-width: breakpoints.$breakpoint-sm) {
+    min-height: 0;
+  }
+}
 .dialog form {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-.dialog .alert {
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.footer .alert {
   margin: 0;
 }
-.opening-hours {
-  padding: 1rem;
-  background-color: #ecf4fe;
-  border-radius: var(--border-radius);
-  margin-bottom: 1rem;
+.footer .buttons {
+  display: flex;
+  gap: 1rem;
+}
+.footer .buttons > :last-child {
+  flex-grow: 1;
 }
 </style>
 
@@ -310,14 +291,9 @@ async function onSubmit() {
 {
   "en": {
     "reserve": "Reserve",
-    "opening_hours_of": "Opening hours of",
-    "product": "Product",
-    "start": "Start",
-    "end": "End",
-    "message": "Message",
     "reserve_now_button": "Reserve now",
-    "allows_reserving_days_in_future": "allows reserving {days} days in the future.",
-    "allows_reservations_up_to_days": "allows reservations up to {days} days.",
+    "continue_button": "Continue to borrowing terms",
+    "back_button": "Back",
     "errors": {
       "user_not_verified": "Confirm your e-mail address before placing a reservation.",
       "product_has_open_reservation": "This product is currently not available.",
@@ -330,19 +306,15 @@ async function onSubmit() {
       "end_before_start": "The end can't be befor the start of the reservation.",
       "reservation_system_disabled": "Reservations are not allowed for this location.",
       "reservation_start_too_far_in_future": "Reservations can't start more than {days} days in the future. Reach out on {email} to discuss.",
+      "borrow_agreement_changed": "The borrowing terms have changed, please read and accept them.",
       "general": "Something went wrong while creating the reservation, please try again."
     }
   },
   "de": {
     "reserve": "Reservieren",
-    "opening_hours_of": "Öffnungszeiten von",
-    "product": "Gegenstand",
-    "start": "Start",
-    "end": "Ende",
-    "message": "Nachricht",
     "reserve_now_button": "Jetzt reservieren",
-    "allows_reserving_days_in_future": "erlaubt Reservierungen bis zu {days} Tage im Voraus.",
-    "allows_reservations_up_to_days": "erlaubt Reservierungen von bis zu {days} Tagen.",
+    "continue_button": "Weiter zu den Leihbedingungen",
+    "back_button": "Zurück",
     "errors": {
       "user_not_verified": "Bestätige deine E-Mail-Adresse, bevor du reservierst.",
       "product_has_open_reservation": "Diesen Gegenstand ist derzeit nicht verfügbar.",
@@ -355,6 +327,7 @@ async function onSubmit() {
       "end_before_start": "Ende kann nicht vor Beginn der Reservierung liegen.",
       "reservation_system_disabled": "Reservierungen sind für diesen Standort nicht erlaubt.",
       "reservation_start_too_far_in_future": "Reservierungen können nicht mehr als {days} Tage im Voraus beginnen. Kontaktiere uns unter {email}, um dies zu besprechen.",
+      "borrow_agreement_changed": "Die Leihbedingungen haben sich geändert, bitte lies und akzeptiere sie.",
       "general": "Beim Erstellen deiner Reservierung ist ein Fehler aufgetreten, bitte versuche es erneut."
     }
   }
