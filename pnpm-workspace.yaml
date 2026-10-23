@@ -2,6 +2,11 @@ packages:
   - "web"
   - "tests"
 
+# Shared dependency versions, referenced with "catalog:" in package.json
+catalog:
+  pocketbase: ^0.26.9
+  typescript: ^6.0.3
+
 allowBuilds:
   "@parcel/watcher": true
   esbuild: true
