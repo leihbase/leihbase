@@ -329,12 +329,12 @@ async function handleSubmit(e: SubmitEvent) {
       "description": "Allow a new reservation to start on the same day as the previous reservation ends"
     },
     "borrow-agreement": {
-      "title": "Borrow agreement",
-      "description": "Users have to accept the borrow agreement before their first reservation at this location. Leave empty to not require a borrow agreement.",
-      "label": "Borrow agreement",
+      "title": "Borrowing terms",
+      "description": "Users have to accept the borrowing terms before their first reservation at this location. Leave empty to not require borrowing terms.",
+      "label": "Borrowing terms",
       "minor-edit": {
         "label": "Minor edit",
-        "description": "Users who accepted the borrow agreement don't have to accept it again. Only use this for small corrections, like typos. Without this, all users have to accept the changed borrow agreement."
+        "description": "Users who accepted the borrowing terms don't have to accept them again. Only use this for small corrections, like typos. Without this, all users have to accept the changed borrowing terms."
       }
     },
     "email_settings": "Email",
@@ -378,12 +378,12 @@ async function handleSubmit(e: SubmitEvent) {
       "description": "Ermöglicht den Beginn einer neuen Reservierung am selben Tag, an dem die vorherige Reservierung endet."
     },
     "borrow-agreement": {
-      "title": "Ausleihvereinbarung",
-      "description": "Nutzer müssen die Ausleihvereinbarung vor ihrer ersten Reservierung an diesem Standort akzeptieren. Leer lassen, um keine Ausleihvereinbarung zu verlangen.",
-      "label": "Ausleihvereinbarung",
+      "title": "Leihbedingungen",
+      "description": "Nutzer müssen die Leihbedingungen vor ihrer ersten Reservierung an diesem Standort akzeptieren. Leer lassen, um keine Leihbedingungen zu verlangen.",
+      "label": "Leihbedingungen",
       "minor-edit": {
         "label": "Kleine Änderung",
-        "description": "Nutzer, die die Ausleihvereinbarung akzeptiert haben, müssen sie nicht erneut akzeptieren. Nur für kleine Korrekturen wie Tippfehler verwenden. Ohne diese Option müssen alle Nutzer die geänderte Ausleihvereinbarung erneut akzeptieren."
+        "description": "Nutzer, die die Leihbedingungen akzeptiert haben, müssen sie nicht erneut akzeptieren. Nur für kleine Korrekturen wie Tippfehler verwenden. Ohne diese Option müssen alle Nutzer die geänderten Leihbedingungen erneut akzeptieren."
       }
     },
     "email_settings": "E-Mail",

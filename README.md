@@ -189,12 +189,12 @@ Links shown on the location page.
 ]
 ```
 
-#### Borrow agreement
+#### Borrowing terms
 
-Admins can define a borrow agreement per location in the admin section
-(Settings > Borrow agreement). Users have to accept it before their first
-reservation at the location. When the borrow agreement is changed, users have to
-accept it again, unless the change is saved as a 'minor edit'.
+Admins can define borrowing terms per location in the admin section (Settings >
+Borrowing terms). Users have to accept them before their first reservation at
+the location. When the borrowing terms are changed, users have to accept them
+again, unless the change is saved as a 'minor edit'.
 
 #### Opening Hours
 
