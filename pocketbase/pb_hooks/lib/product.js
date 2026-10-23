@@ -5,10 +5,16 @@
  * @param {boolean} [includeUnreturned=false] - Also include reservations that were not marked as ended
  * @returns {boolean}
  */
-function hasActiveReservation(productId, excludeReservation, includeUnreturned = false) {
+function hasActiveReservation(
+  productId,
+  excludeReservation,
+  includeUnreturned = false
+) {
   /** @type {typeof import('./date')} */
   const { endOfDate } = require(`${__hooks}/lib/date`);
-  const endedFilter = includeUnreturned ? "(end > {:endOfToday} || ended != true)" : "end > {:endOfToday}";
+  const endedFilter = includeUnreturned
+    ? "(end > {:endOfToday} || ended != true)"
+    : "end > {:endOfToday}";
   const records = $app.findRecordsByFilter(
     "reservations",
     [
@@ -34,8 +40,8 @@ function hasActiveReservation(productId, excludeReservation, includeUnreturned =
 /**
  * Returns active reservations of a product in the given date range.
  * @param {string} product
- * @param {Date} startDate 
- * @param {Date} endDate 
+ * @param {Date} startDate
+ * @param {Date} endDate
  * @returns {Array<(core.Record | undefined)>}
  */
 function getActiveReservationsForDateRange(product, startDate, endDate) {

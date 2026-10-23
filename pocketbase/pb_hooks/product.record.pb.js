@@ -52,7 +52,10 @@ onRecordEnrich(({ record, requestInfo, next }) => {
       }
     } else {
       // For single system, include unreturned reservations as active
-      record.set("computedIsAvailable", !hasActiveReservation(record.id, null, true));
+      record.set(
+        "computedIsAvailable",
+        !hasActiveReservation(record.id, null, true)
+      );
     }
   }
 

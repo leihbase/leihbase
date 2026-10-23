@@ -3,7 +3,9 @@
 
 onRecordCreateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
-  const { validateStartEnd, hasOverlappingReservations } = require(`${__hooks}/lib/reservation`);
+  const { validateStartEnd, hasOverlappingReservations } = require(
+    `${__hooks}/lib/reservation`
+  );
   /** @type {typeof import('./lib/user')} */
   const { hasActiveReservationForProduct } = require(`${__hooks}/lib/user`);
   /** @type {typeof import('./lib/product')} */
@@ -25,7 +27,7 @@ onRecordCreateRequest((e) => {
   const product = record.expandedOne("product");
   $app.expandRecord(product, ["location"], null);
   const location = product.expandedOne("location");
-  const isAdmin = requestUser && requestUser.get("role") === "admin"
+  const isAdmin = requestUser && requestUser.get("role") === "admin";
   const isLocationUser =
     requestUser &&
     requestUser.get("manager_locations") &&
@@ -93,7 +95,7 @@ onRecordCreateRequest((e) => {
     start,
     end,
     location.getInt("max_reservation_days") || 14,
-    isLocationUser || isAdmin || isSuperuser,
+    isLocationUser || isAdmin || isSuperuser
   );
 
   // Make sure the reservation is linked to a user
@@ -136,7 +138,9 @@ onRecordCreateRequest((e) => {
 
 onRecordUpdateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
-  const { validateStartEnd, hasOverlappingReservations } = require(`${__hooks}/lib/reservation`);
+  const { validateStartEnd, hasOverlappingReservations } = require(
+    `${__hooks}/lib/reservation`
+  );
   /** @type {typeof import('./lib/user')} */
   const { hasActiveReservationForProduct } = require(`${__hooks}/lib/user`);
 
@@ -199,7 +203,9 @@ onRecordUpdateRequest((e) => {
     ? JSON.parse(location.getString("config")) || {}
     : {};
   const allowSameDayReservations =
-    isSuperuser || isLocationUser || !!locationConfig.allow_same_day_reservations;
+    isSuperuser ||
+    isLocationUser ||
+    !!locationConfig.allow_same_day_reservations;
   if (hasOverlappingReservations(record, allowSameDayReservations)) {
     throw new BadRequestError("Overlapping_reservation.");
   }
@@ -215,7 +221,9 @@ onRecordCreateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail, formatCurrency, formatDate } = require(`${__hooks}/lib/email`);
+  const { sendLocationTemplateEmail, formatCurrency, formatDate } = require(
+    `${__hooks}/lib/email`
+  );
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
@@ -269,7 +277,7 @@ onRecordCreateRequest((e) => {
         APP_URL: appUrl,
         USER_NAME: userName,
         USER_EMAIL: user.get("email"),
-        LOCATION_NAME: location.get('name'),
+        LOCATION_NAME: location.get("name"),
         PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
         PRODUCT_NAME: productName,
         RESERVATION_START: formatDate(start, locale),
@@ -290,13 +298,15 @@ onRecordCreateRequest((e) => {
       {
         APP_URL: appUrl,
         USER_NAME: userName,
-        LOCATION_NAME: location.get('name'),
+        LOCATION_NAME: location.get("name"),
         PRODUCT_LINK: `<a href="${productUrl}">${productName}</a>`,
         PRODUCT_URL: productUrl,
         PRODUCT_NAME: productName,
         RESERVATION_START: formatDate(start, locale),
         RESERVATION_END: formatDate(end, locale),
-        PRODUCT_DEPOSIT: product.get("deposit") ? formatCurrency(product.get("deposit"), locale) : null,
+        PRODUCT_DEPOSIT: product.get("deposit")
+          ? formatCurrency(product.get("deposit"), locale)
+          : null,
       }
     );
     // Store that email has been sent
@@ -310,7 +320,9 @@ onRecordUpdateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
   const { removeSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail, formatDate } = require(`${__hooks}/lib/email`);
+  const { sendLocationTemplateEmail, formatDate } = require(
+    `${__hooks}/lib/email`
+  );
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
@@ -354,7 +366,7 @@ onRecordUpdateRequest((e) => {
         {
           APP_URL: appUrl,
           USER_NAME: user.get("name"),
-          LOCATION_NAME: location.get('name'),
+          LOCATION_NAME: location.get("name"),
           PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
           PRODUCT_NAME: productName,
         }
@@ -373,7 +385,7 @@ onRecordUpdateRequest((e) => {
           APP_URL: appUrl,
           USER_NAME: user.get("name"),
           USER_EMAIL: user.get("email"),
-          LOCATION_NAME: location.get('name'),
+          LOCATION_NAME: location.get("name"),
           PRODUCT_URL: `${appUrl}/link/product/${product.get("id")}`,
           PRODUCT_NAME: productName,
           RESERVATION_START: formatDate(start, locale),

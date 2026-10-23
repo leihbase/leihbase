@@ -1,8 +1,7 @@
-
 /**
  * Checks if a user has another overlapping reservation for the given product.
- * @param {core.Record} user 
- * @param {core.Record} product 
+ * @param {core.Record} user
+ * @param {core.Record} product
  * @param {core.Record} reservation
  * @returns {boolean}
  */
@@ -16,7 +15,7 @@ function hasActiveReservationForProduct(user, product, reservation) {
   if (!reservation.get("user")) {
     return false;
   }
- const records = $app.findRecordsByFilter(
+  const records = $app.findRecordsByFilter(
     "reservations",
     reservation.get("id")
       ? `id != {:id} && user = {:user} && product = {:product} && end > {:endOfToday} && cancelled != true`

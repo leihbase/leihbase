@@ -6,12 +6,7 @@
  * @param {Number} maxReservationDays
  * @param {Boolean} isManager
  */
-function validateStartEnd(
-  start,
-  end,
-  maxReservationDays,
-  isManager 
-) {
+function validateStartEnd(start, end, maxReservationDays, isManager) {
   var startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
 
@@ -35,10 +30,7 @@ function validateStartEnd(
 
   // Consider maximum reservation length configured in location
   const maxDays = 1000 * 60 * 60 * 24 * maxReservationDays;
-  if (
-    end.getTime() - start.getTime() > maxDays &&
-    !isManager
-  ) {
+  if (end.getTime() - start.getTime() > maxDays && !isManager) {
     throw new BadRequestError("Date_range_too_long.");
   }
 }
@@ -76,7 +68,6 @@ function hasOverlappingReservations(reservation, allowSameDay) {
   );
   return records.length > 0;
 }
-
 
 /**
  * @param {core.Record} reservation

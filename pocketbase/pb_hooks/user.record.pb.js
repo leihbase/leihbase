@@ -35,12 +35,12 @@ onRecordCreateRequest((e) => {
 
   // Make sure privacy policy has been accepted, if defined
   const leihbase = $app.findAllRecords("leihbase")[0];
-  if (leihbase?.get('privacy_policy_link') && !record.getBool('terms'))  {
-    throw new BadRequestError("Terms_required.")
+  if (leihbase?.get("privacy_policy_link") && !record.getBool("terms")) {
+    throw new BadRequestError("Terms_required.");
   }
 
   const isSuperuser = e.hasSuperuserAuth();
-  if (!isSuperuser || !record.get('role')) {
+  if (!isSuperuser || !record.get("role")) {
     record.set("role", "user");
   }
 
@@ -48,7 +48,6 @@ onRecordCreateRequest((e) => {
 }, "users");
 
 onRecordEnrich((e) => {
-
   // Unhide 'role' and 'manager_locations' for requesting user.
   if (
     e.record &&
