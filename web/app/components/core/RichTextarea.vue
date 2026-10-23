@@ -3,18 +3,14 @@
     <FormLabel :for="id" :required="required">
       {{ label }}<template #suffix><slot name="label-suffix" /></template>
     </FormLabel>
-    <div class="textarea">
+    <div class="textarea" :style="height ? { height } : undefined">
       <ClientOnly>
         <QuillEditor
           ref="editor"
           theme="snow"
           v-model:content="model"
           contentType="html"
-          :toolbar="[
-            ['bold', 'italic', 'underline', 'strike', 'link'],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            ['clean'],
-          ]"
+          :toolbar="toolbar"
         />
       </ClientOnly>
     </div>
@@ -43,7 +39,18 @@ const props = defineProps<{
   disabled?: boolean;
   readonly?: boolean;
   dataTestid?: string;
+  /** Heading levels which can be selected in the toolbar */
+  headings?: (1 | 2 | 3 | 4 | 5 | 6)[];
+  /** Height of the editor, including the toolbar (default: 10rem) */
+  height?: string;
 }>();
+
+const toolbar = computed(() => [
+  ...(props.headings?.length ? [[{ header: [...props.headings, false] }]] : []),
+  ["bold", "italic", "underline", "strike", "link"],
+  [{ list: "ordered" }, { list: "bullet" }],
+  ["clean"],
+]);
 
 if (props.value) {
   model.value = props.value;
@@ -90,5 +97,12 @@ watch(model, (newValue) => {
 .ql-editor > ul,
 .ql-editor > ol {
   padding-left: 0 !important;
+}
+/* Match the sizes of the Heading component */
+.ql-editor h3 {
+  font-size: 1.25rem;
+}
+.ql-editor h4 {
+  font-size: 1.125rem;
 }
 </style>
