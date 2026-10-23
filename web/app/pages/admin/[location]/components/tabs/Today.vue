@@ -49,7 +49,7 @@
         t("no_reservations_on_date", {
           date: isToday(date)
             ? t("today")
-            : t("on") + " " + formatDate(date, "DD.MM", locale),
+            : t("on") + " " + formatDate(date, "DD.MM.YYYY", locale),
         })
       }}.
     </i>

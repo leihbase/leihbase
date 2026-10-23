@@ -22,9 +22,9 @@
         <p>
           <strong>{{ t("borrow_period") }}</strong>
           <br />
-          {{ formatDate(reservation.start, DateTime.DATE_MED, locale) }}
+          {{ formatDate(reservation.start, "DD.MM.YYYY", locale) }}
           -
-          {{ formatDate(reservation.end, DateTime.DATE_MED, locale) }}
+          {{ formatDate(reservation.end, "DD.MM.YYYY", locale) }}
         </p>
         <p
           v-if="
@@ -124,7 +124,6 @@ import {
   ReservationCancellationStatus,
   useReservationCancellation,
 } from "@/composables/useReservationCancellation";
-import { DateTime } from "luxon";
 
 const config = useRuntimeConfig();
 const {

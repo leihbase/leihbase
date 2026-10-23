@@ -10,9 +10,9 @@
     <div class="details">
       <h2>{{ product?.name }}</h2>
       <p>
-        {{ formatDate(reservation.start, DateTime.DATE_MED, locale) }}
+        {{ formatDate(reservation.start, "DD.MM.YYYY", locale) }}
         -
-        {{ formatDate(reservation.end, DateTime.DATE_MED, locale) }}
+        {{ formatDate(reservation.end, "DD.MM.YYYY", locale) }}
       </p>
       <span class="tag">
         {{ t(getReservationStatus(reservation)) }}
@@ -27,7 +27,6 @@ import { getReservationStatus } from "@@/lib/reservation";
 import type { Product } from "@@/models/product";
 import { type Reservation } from "@@/models/reservation";
 import Button from "@/components/core/Button.vue";
-import { DateTime } from "luxon";
 
 const config = useRuntimeConfig();
 
