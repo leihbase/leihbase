@@ -76,7 +76,7 @@ export function openingHoursToString(
   const openingHours = _openingHours.days
     ? (_openingHours as OpeningHours)
     : ({ days: _openingHours } as OpeningHours);
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: "global" });
 
   // Opening hours
   const days = WeekDays.filter((day) => openingHours.days[day]).map(
