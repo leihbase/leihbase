@@ -36,7 +36,8 @@ const { t, locale } = useI18n({ useScope: "local" });
 
 // Fetch Leihbase collection on a central location
 // await for the result before processing the rest of the page
-const { fetch, leihbase } = useLeihbase();
+const { fetch } = useLeihbase();
+const { leihbase } = storeToRefs(useLeihbase());
 await fetch();
 
 const props = defineProps({
