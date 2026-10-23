@@ -8,7 +8,10 @@
         v-model="query"
       />
     </template>
-    <table v-if="documents && documents.length > 0" cellspacing="0">
+    <div v-if="status === 'pending'" class="loading">
+      <LoadingSpinner />
+    </div>
+    <table v-else-if="documents && documents.length > 0" cellspacing="0">
       <tbody>
         <tr v-for="d in documents" :key="d.id">
           <td width="36">
@@ -34,6 +37,7 @@ import { refDebounced } from "@vueuse/core";
 import type { RecordModel } from "pocketbase";
 import Dialog from "../core/Dialog.vue";
 import Input from "../core/Input.vue";
+import LoadingSpinner from "../core/LoadingSpinner.vue";
 
 const { t } = useI18n({
   useScope: "local",
@@ -79,7 +83,11 @@ const selectedIds = computed(() => {
  * Fetches the first page of documents for the current collection, matching
  * the search query and optional `filter` prop
  */
-const { data: documents, execute } = await useAsyncData(
+const {
+  data: documents,
+  execute,
+  status,
+} = await useAsyncData(
   `record-picker-${props.id}-${props.collection}`,
   async () => {
     if (!props.collection || !props.columns) {
@@ -149,6 +157,11 @@ function handleRecordClick(_record: RecordModel) {
 <style scoped>
 .input {
   margin-bottom: 1rem;
+}
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
 }
 table {
   width: 100%;
