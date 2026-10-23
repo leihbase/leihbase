@@ -70,6 +70,8 @@
 
 <script lang="ts" setup>
 import { ArrowLeft, ArrowRight, NavArrowDown } from "@iconoir/vue";
+import type { Location } from "~~/models/location";
+import type { LocationQueryValue } from "vue-router";
 import Button from "../core/Button.vue";
 import Heading from "../core/Heading.vue";
 import Input from "../core/Input.vue";
@@ -79,21 +81,26 @@ const { t } = useI18n({
   useScope: "local",
 });
 
-const props = defineProps({
-  title: {
-    type: String,
-  },
-  location: {
-    type: Object,
-  },
-});
+const props = defineProps<{
+  title?: string;
+  location: Location;
+}>();
 
 const { pb } = usePocketbase();
 const route = useRoute();
 
-const categoryId = ref(route.query.category);
-const page = ref(route.query.page);
-const query = ref(route.query.query);
+/**
+ * Returns the first value of a query parameter, which can occur multiple times
+ */
+function getQueryValue(
+  value: LocationQueryValue | LocationQueryValue[] | undefined
+) {
+  return (Array.isArray(value) ? value[0] : value) ?? undefined;
+}
+
+const categoryId = ref(getQueryValue(route.query.category));
+const page = ref(getQueryValue(route.query.page));
+const query = ref(getQueryValue(route.query.query));
 
 // TODO: hide all categories by default
 const showAllCategories = ref(true);
@@ -101,7 +108,7 @@ const showAllCategories = ref(true);
 watch(
   () => route.query.category,
   (newId) => {
-    categoryId.value = newId;
+    categoryId.value = getQueryValue(newId);
     refreshProducts();
   }
 );
@@ -109,7 +116,7 @@ watch(
 watch(
   () => route.query.page,
   (newPage) => {
-    page.value = newPage;
+    page.value = getQueryValue(newPage);
     refreshProducts();
   }
 );
@@ -117,7 +124,7 @@ watch(
 watch(
   () => route.query.query,
   (newQuery) => {
-    query.value = newQuery;
+    query.value = getQueryValue(newQuery);
     refreshProducts();
   }
 );
@@ -129,22 +136,20 @@ const { data: categories } = await useAsyncData("categories", () =>
 const { data: productsData, refresh: refreshProducts } = await useAsyncData(
   "products",
   () =>
-    pb
-      .collection("products")
-      .getList(parseInt((page.value as string) ?? "0"), 24, {
-        filter: getFilter(),
-        sort: "name",
-        query: {
-          computeAvailability: true,
-        },
-      })
+    pb.collection("products").getList(parseInt(page.value ?? "0"), 24, {
+      filter: getFilter(),
+      sort: "name",
+      query: {
+        computeAvailability: true,
+      },
+    })
 );
 
 const products = computed(() => {
   return productsData.value?.items;
 });
-const currentPage = computed(() => productsData.value?.page);
-const totalPages = computed(() => productsData.value?.totalPages);
+const currentPage = computed(() => productsData.value?.page ?? 1);
+const totalPages = computed(() => productsData.value?.totalPages ?? 0);
 
 function onSearchInput() {
   navigateTo(getUrl({ page: null, query: null }));
@@ -157,7 +162,7 @@ function onSearchBlur() {
 
 function getFilter() {
   const filter = ["active = true"];
-  const args = {};
+  const args: Record<string, string> = {};
   if (props.location && props.location.id) {
     filter.push("location = {:location}");
     args.location = props.location.id;
@@ -173,20 +178,20 @@ function getFilter() {
   return pb.filter(filter.join(" && "), args);
 }
 
-function getUrl(overwrites) {
+function getUrl(overwrites: Record<string, string | number | null>) {
   const url = new URL(`https://example.com/l/${props.location.slug}`);
   if (categoryId.value) {
     url.searchParams.set("category", categoryId.value);
   }
-  if (page.value && page.value > 1) {
+  if (page.value && parseInt(page.value) > 1) {
     url.searchParams.set("page", page.value);
   }
   if (query.value) {
     url.searchParams.set("query", query.value);
   }
-  Object.keys(overwrites).forEach((key) => {
-    if (overwrites[key] !== null) {
-      url.searchParams.set(key, overwrites[key]);
+  Object.entries(overwrites).forEach(([key, value]) => {
+    if (value !== null) {
+      url.searchParams.set(key, String(value));
     } else {
       url.searchParams.delete(key);
     }
