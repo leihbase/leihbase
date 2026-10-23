@@ -69,8 +69,7 @@ import type { RecordModel } from "pocketbase";
 import TabHeader from "../TabHeader.vue";
 
 const { pb } = usePocketbase();
-const { locale } = useI18n();
-const { t } = useI18n({
+const { t, locale } = useI18n({
   useScope: "local",
 });
 

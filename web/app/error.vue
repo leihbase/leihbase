@@ -32,14 +32,12 @@ import NavBar from "./components/modules/NavBar.vue";
 const {
   public: { plausibleTrackingDomain },
 } = useRuntimeConfig();
-const { locale } = useI18n();
+const { t, locale } = useI18n({ useScope: "local" });
 
 // Fetch Leihbase collection on a central location
 // await for the result before processing the rest of the page
 const { fetch, leihbase } = useLeihbase();
 await fetch();
-
-const { t } = useI18n({ useScope: "local" });
 
 const props = defineProps({
   error: Object as () => NuxtError,
