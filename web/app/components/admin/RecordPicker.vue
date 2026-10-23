@@ -8,7 +8,10 @@
         v-model="query"
       />
     </template>
-    <table v-if="documents && documents.length > 0" cellspacing="0">
+    <div v-if="status === 'pending'" class="loading">
+      <LoadingSpinner />
+    </div>
+    <table v-else-if="documents && documents.length > 0" cellspacing="0">
       <tbody>
         <tr v-for="d in documents" :key="d.id">
           <td width="36">
@@ -30,9 +33,11 @@
 
 <script lang="ts" setup>
 import { Check } from "@iconoir/vue";
+import { refDebounced } from "@vueuse/core";
 import type { RecordModel } from "pocketbase";
 import Dialog from "../core/Dialog.vue";
 import Input from "../core/Input.vue";
+import LoadingSpinner from "../core/LoadingSpinner.vue";
 
 const { t } = useI18n({
   useScope: "local",
@@ -45,6 +50,7 @@ const props = defineProps<{
   multiple: boolean;
   selected: RecordModel[] | null;
   title: string;
+  filter?: string;
 }>();
 
 const open = defineModel<boolean>("open", { default: false });
@@ -57,10 +63,9 @@ const { pb } = usePocketbase();
 
 // Search query
 const query = ref("");
+const debouncedQuery = refDebounced(query, 250);
 
-/**
- * Reset query when closing dialog
- */
+// Reset query when closing the dialog
 watch(open, () => {
   if (!open.value) {
     query.value = "";
@@ -75,30 +80,47 @@ const selectedIds = computed(() => {
 });
 
 /**
- * Fetches all documents for the current collection
+ * Fetches the first page of documents for the current collection, matching
+ * the search query and optional `filter` prop
  */
-const { data: documents, refresh } = await useAsyncData(
+const {
+  data: documents,
+  execute,
+  status,
+} = await useAsyncData(
   `record-picker-${props.id}-${props.collection}`,
-  () => {
+  async () => {
     if (!props.collection || !props.columns) {
       throw new Error(
         "[RecordPicker] no `collection` or `columns` parameter set"
       );
     }
-    return pb.collection(props.collection).getFullList(
-      query.value
-        ? {
-            filter: pb.filter(
-              props.columns.map((s) => `${s} ~ {:query}`).join(" || "),
-              {
-                query: query.value,
-              }
-            ),
-          }
-        : {}
-    );
+    const filters = [
+      props.filter,
+      debouncedQuery.value
+        ? pb.filter(props.columns.map((s) => `${s} ~ {:query}`).join(" || "), {
+            query: debouncedQuery.value,
+          })
+        : undefined,
+    ].filter(Boolean);
+    const result = await pb.collection(props.collection).getList(1, 50, {
+      filter: filters.map((f) => `(${f})`).join(" && "),
+      fields: ["id", ...props.columns].join(","),
+    });
+    return result.items;
   },
-  { server: false, watch: [query] }
+  { server: false, immediate: false }
+);
+
+// Only fetch documents while the dialog is open
+watch(
+  [open, debouncedQuery, () => props.filter],
+  () => {
+    if (open.value) {
+      execute();
+    }
+  },
+  { immediate: true }
 );
 
 function handleRecordClick(_record: RecordModel) {
@@ -135,6 +157,11 @@ function handleRecordClick(_record: RecordModel) {
 <style scoped>
 .input {
   margin-bottom: 1rem;
+}
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
 }
 table {
   width: 100%;
