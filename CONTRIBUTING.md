@@ -86,9 +86,11 @@ admin interface are automatically written as migration files to
 
 ```bash
 # Format code
-$ pnpm prettier
+$ pnpm format
+# Check formatting
+$ pnpm format:check
 # Typecheck the front-end
-$ cd web && pnpm run typecheck
+$ pnpm typecheck
 ```
 
 ## Pull requests
