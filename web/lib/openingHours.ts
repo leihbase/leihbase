@@ -81,9 +81,9 @@ export function openingHoursToString(
   // Opening hours
   const days = WeekDays.filter((day) => openingHours.days[day]).map(
     (day) =>
-      `${t(`week_days.${day}`)}, ${openingHours.days[day]!
-        .map((range) => `${range.from} - ${range.to} ${t("hour")}`)
-        .join(" & ")}`
+      `${t(`week_days.${day}`)}, ${openingHours.days[day]!.map(
+        (range) => `${range.from} - ${range.to} ${t("hour")}`
+      ).join(" & ")}`
   );
 
   // Upcoming exceptions

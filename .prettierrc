@@ -1,7 +1,5 @@
 {
   "plugins": ["@ianvs/prettier-plugin-sort-imports"],
   "trailingComma": "es5",
-  "proseWrap": "always",
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  "proseWrap": "always"
 }

@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test";
-import { waitForHydration, waitForClientMount } from "../lib/utils";
+import { expect, test } from "@playwright/test";
 import { login } from "../lib/login";
+import { waitForHydration } from "../lib/utils";
 
 test.describe("login", () => {
   test("can reach login", async ({ page }) => {

@@ -1,5 +1,5 @@
-import type { Reservation } from "@@/models/reservation";
 import type { Location } from "@@/models/location";
+import type { Reservation } from "@@/models/reservation";
 
 export enum ReservationCancellationStatus {
   Default = "default",
