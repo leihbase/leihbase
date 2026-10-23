@@ -1,23 +1,21 @@
 <template>
   <Dialog v-model:open="isOpen" inset :title="t('reserve')">
-    <div class="dialog">
-      <form v-if="product && location" :id="formId" @submit.prevent="onSubmit">
-        <ReservationDatesStep
-          v-if="step === 'dates'"
-          :location="location"
-          :product="product"
-          v-model:start="start"
-          v-model:end="end"
-          v-model:message="message"
-        />
-        <ReservationBorrowAgreementStep
-          v-if="step === 'agreement' && borrowAgreement"
-          :location="location"
-          :borrow-agreement="borrowAgreement"
-          v-model:accepted="isBorrowAgreementAccepted"
-        />
-      </form>
-    </div>
+    <form v-if="product && location" :id="formId" @submit.prevent="onSubmit">
+      <ReservationDatesStep
+        v-if="step === 'dates'"
+        :location="location"
+        :product="product"
+        v-model:start="start"
+        v-model:end="end"
+        v-model:message="message"
+      />
+      <ReservationBorrowAgreementStep
+        v-if="step === 'agreement' && borrowAgreement"
+        :key="borrowAgreement.id"
+        :location="location"
+        :borrow-agreement="borrowAgreement"
+      />
+    </form>
     <template #footer>
       <div class="footer">
         <Alert
@@ -88,7 +86,6 @@ const isSubmittingReservation = ref(false);
 // Borrow agreement
 const step = ref<"dates" | "agreement">("dates");
 const borrowAgreement = ref<BorrowAgreement>();
-const isBorrowAgreementAccepted = ref(false);
 const requiresBorrowAgreement = computed(
   () =>
     !!location.value?.borrow_agreement &&
@@ -103,7 +100,6 @@ watch(isOpen, (newValue) => {
     end.value = undefined;
     step.value = "dates";
     borrowAgreement.value = undefined;
-    isBorrowAgreementAccepted.value = false;
     reservationCreationError.value = undefined;
   }
 });
@@ -121,7 +117,6 @@ async function showBorrowAgreement() {
     borrowAgreement.value = await pb
       .collection("borrow_agreements")
       .getOne<BorrowAgreement>(location.value.borrow_agreement);
-    isBorrowAgreementAccepted.value = false;
     step.value = "agreement";
   } catch (e) {
     reservationCreationError.value = t("errors.general");
@@ -158,9 +153,8 @@ async function onSubmit() {
       end: end.value,
       message: message.value,
       send_confirmation: true,
-      borrow_agreement: requiresBorrowAgreement.value
-        ? borrowAgreement.value?.id
-        : undefined,
+      // Only set when the borrow agreement step has been shown
+      borrow_agreement: borrowAgreement.value?.id,
     })) as Reservation;
   } catch (e) {
     isSubmittingReservation.value = false;
@@ -254,8 +248,8 @@ async function onSubmit() {
 <style lang="scss" scoped>
 @use "@/assets/styles/breakpoints.scss";
 
-// Fill the height of the (full screen) dialog on mobile
-.dialog {
+// Fill the height of the (full screen) dialog on mobile, so steps can grow
+form {
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -263,12 +257,6 @@ async function onSubmit() {
   @media screen and (min-width: breakpoints.$breakpoint-sm) {
     min-height: 0;
   }
-}
-.dialog form {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 .footer {
   display: flex;

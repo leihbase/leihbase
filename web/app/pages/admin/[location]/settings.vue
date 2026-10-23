@@ -117,8 +117,7 @@
       >
         <RichTextarea
           :label="t('borrow-agreement.label')"
-          name="borrow_agreement_content"
-          :value="borrowAgreement?.content"
+          v-model="borrowAgreementContent"
           :headings="[3, 4]"
           height="24rem"
           data-testid="borrow-agreement-input"
@@ -215,6 +214,9 @@ const { data: borrowAgreement } = await useAsyncData(
           .getOne<BorrowAgreement>(location.value.borrow_agreement)
       : null
 );
+const borrowAgreementContent = ref<string | undefined>(
+  borrowAgreement.value?.content
+);
 
 useHead({
   title: `${t("title")} | ${location.value.name}`,
@@ -225,7 +227,8 @@ useHead({
  * agreement in place, otherwise a new borrow agreement is created, which users
  * have to accept again. Returns the id of the current borrow agreement.
  */
-async function saveBorrowAgreement(content: string, isMinorEdit: boolean) {
+async function saveBorrowAgreement() {
+  const content = borrowAgreementContent.value || "";
   if (content === (borrowAgreement.value?.content || "")) {
     return borrowAgreement.value?.id || "";
   }
@@ -233,7 +236,7 @@ async function saveBorrowAgreement(content: string, isMinorEdit: boolean) {
     borrowAgreement.value = null;
     return "";
   }
-  if (isMinorEdit && borrowAgreement.value) {
+  if (isBorrowAgreementMinorEdit.value && borrowAgreement.value) {
     borrowAgreement.value = await pb
       .collection("borrow_agreements")
       .update<BorrowAgreement>(borrowAgreement.value.id, { content });
@@ -258,18 +261,9 @@ async function handleSubmit(e: SubmitEvent) {
     data.get("allow_same_day_reservations") ? "true" : "false"
   );
 
-  // First store the borrow_agreement (when changed), then send the id of the (new) borrow agreement along
-  const borrowAgreementContent = (data.get("borrow_agreement_content") ||
-    "") as string;
-  data.delete("borrow_agreement_content");
   try {
-    data.set(
-      "borrow_agreement",
-      await saveBorrowAgreement(
-        borrowAgreementContent,
-        isBorrowAgreementMinorEdit.value
-      )
-    );
+    // First store the borrow_agreement (when changed), then send the id of the (new) borrow agreement along
+    data.set("borrow_agreement", await saveBorrowAgreement());
     isBorrowAgreementMinorEdit.value = false;
     location.value = await update(location.value!.id, data);
     success.value = true;
