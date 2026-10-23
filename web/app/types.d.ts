@@ -6,3 +6,10 @@ declare module "#app" {
     "app:user:reservation:create": (reservation: Reservation) => HookResult;
   }
 }
+
+declare module "vue" {
+  interface ComponentCustomProps {
+    // Allow data-* attributes (e.g. `data-testid`) on all components, camelized by Vue
+    [dataAttribute: `data${Capitalize<string>}`]: unknown;
+  }
+}

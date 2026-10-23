@@ -176,7 +176,11 @@ test.describe("reservation system", () => {
   test.describe("reservation_start_limit", () => {
     test("allows reservations when reservation_start_limit is 0", async () => {
       // Create location with reservation_start_limit = 0
-      const location = await createLocation("multiple", DEFAULT_OPENING_HOURS, 0);
+      const location = await createLocation(
+        "multiple",
+        DEFAULT_OPENING_HOURS,
+        0
+      );
       // Create product in that location
       const product = await createProduct(location);
       // Create user
@@ -196,7 +200,11 @@ test.describe("reservation system", () => {
 
     test("allows reservations within reservation_start_limit", async () => {
       // Create location with reservation_start_limit = 14
-      const location = await createLocation("multiple", DEFAULT_OPENING_HOURS, 14);
+      const location = await createLocation(
+        "multiple",
+        DEFAULT_OPENING_HOURS,
+        14
+      );
       // Create product in that location
       const product = await createProduct(location);
       // Create user
@@ -216,7 +224,11 @@ test.describe("reservation system", () => {
 
     test("blocks reservations beyond reservation_start_limit for regular users", async () => {
       // Create location with reservation_start_limit = 14
-      const location = await createLocation("multiple", DEFAULT_OPENING_HOURS, 14);
+      const location = await createLocation(
+        "multiple",
+        DEFAULT_OPENING_HOURS,
+        14
+      );
       // Create product in that location
       const product = await createProduct(location);
       // Create user
@@ -238,11 +250,17 @@ test.describe("reservation system", () => {
     test("allows reservations beyond reservation_start_limit for admin users", async () => {
       const adminPb = await pocketbase();
       // Create location with reservation_start_limit = 14
-      const location = await createLocation("multiple", DEFAULT_OPENING_HOURS, 14);
+      const location = await createLocation(
+        "multiple",
+        DEFAULT_OPENING_HOURS,
+        14
+      );
       // Create product in that location
       const product = await createProduct(location);
       // Create manager
-      const manager = await createUser(undefined, undefined, 'manager', [location.id]);
+      const manager = await createUser(undefined, undefined, "manager", [
+        location.id,
+      ]);
 
       // Admin creates reservation beyond limit (20 days)
       const reservation = await createReservation(adminPb, {

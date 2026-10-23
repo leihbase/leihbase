@@ -105,6 +105,15 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    pocketbase:
+      specifier: ^0.26.9
+      version: 0.26.9
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
+
 importers:
 
   .:
@@ -115,11 +124,14 @@ importers:
       prettier:
         specifier: 3.8.1
         version: 3.8.1
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   tests:
     dependencies:
       pocketbase:
-        specifier: ^0.26.6
+        specifier: 'catalog:'
         version: 0.26.9
     devDependencies:
       '@nuxt/test-utils':
@@ -134,6 +146,9 @@ importers:
       taze:
         specifier: ^0.18.0
         version: 0.18.0(supports-color@10.2.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   web:
     dependencies:
@@ -165,7 +180,7 @@ importers:
         specifier: ^3.0.4
         version: 3.0.4(typescript@6.0.3)(vue@3.5.42(typescript@6.0.3))
       pocketbase:
-        specifier: ^0.26.9
+        specifier: 'catalog:'
         version: 0.26.9
     devDependencies:
       '@nuxt/kit':
@@ -181,7 +196,7 @@ importers:
         specifier: ^1.104.0
         version: 1.104.0
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vue-tsc:
         specifier: ^3.3.11

@@ -28,11 +28,15 @@ function getNotificationEmailAddresses(locationRecord) {
  */
 function sendReminders(location, type) {
   /** @type {typeof import('./date')} */
-  const { addDays, startOfDate, endOfDate, formatPocketbaseDate } = require(`${__hooks}/lib/date`);
+  const { addDays, startOfDate, endOfDate, formatPocketbaseDate } = require(
+    `${__hooks}/lib/date`
+  );
   /** @type {typeof import('./reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./email')} */
-  const { sendLocationTemplateEmail, formatDate } = require(`${__hooks}/lib/email`);
+  const { sendLocationTemplateEmail, formatDate } = require(
+    `${__hooks}/lib/email`
+  );
   /** @type {typeof import('./openingHours')} */
   const { getOpeningHoursDay } = require(`${__hooks}/lib/openingHours`);
 
@@ -47,7 +51,7 @@ function sendReminders(location, type) {
     type === "start"
       ? `location = {:location} && cancelled != true && user != "" && created < {:startOfToday} && sent_emails !~ "start_reminder" && start >= {:startOfTomorrow} && start <= {:endOfTomorrow}`
       : `location = {:location} && cancelled != true && user != "" && started = true && ended = false && sent_emails !~ "end_reminder" && end >= {:startOfTomorrow} && end <= {:endOfTomorrow}`,
-    '',
+    "",
     100,
     0,
     {
@@ -106,8 +110,14 @@ function sendReminders(location, type) {
           LOCATION_NAME: location.get("name"),
           PRODUCT_NAME: product.get("name"),
           RESERVATION_START: formatDate(start, locale),
-          START_HOUR: startOpenHours && startOpenHours.length > 0 ? startOpenHours[0].from : null,
-          END_HOUR: startOpenHours && startOpenHours.length > 0 ? startOpenHours[0].to : null,
+          START_HOUR:
+            startOpenHours && startOpenHours.length > 0
+              ? startOpenHours[0].from
+              : null,
+          END_HOUR:
+            startOpenHours && startOpenHours.length > 0
+              ? startOpenHours[0].to
+              : null,
         }
       );
     } else {
@@ -122,8 +132,12 @@ function sendReminders(location, type) {
           LOCATION_NAME: location.get("name"),
           PRODUCT_NAME: product.get("name"),
           RESERVATION_END: formatDate(end, locale),
-          START_HOUR: endOpenHours && endOpenHours.length > 0 ? endOpenHours[0].from : null,
-          END_HOUR: endOpenHours && endOpenHours.length > 0 ? endOpenHours[0].to : null,
+          START_HOUR:
+            endOpenHours && endOpenHours.length > 0
+              ? endOpenHours[0].from
+              : null,
+          END_HOUR:
+            endOpenHours && endOpenHours.length > 0 ? endOpenHours[0].to : null,
         }
       );
     }

@@ -59,7 +59,11 @@ test.describe("user", () => {
     test("user with admin role can authenticate", async () => {
       const pb = await pocketbase();
       const adminUser = await createUser(undefined, undefined, "admin");
-      const adminPb = await pocketbase(adminUser.email, DEFAULT_PASSWORD, false);
+      const adminPb = await pocketbase(
+        adminUser.email,
+        DEFAULT_PASSWORD,
+        false
+      );
 
       expect(adminPb.authStore.isValid).toBe(true);
       expect(adminPb.authStore.model?.role).toBe("admin");
@@ -68,7 +72,11 @@ test.describe("user", () => {
     test("user with manager role can authenticate", async () => {
       const pb = await pocketbase();
       const managerUser = await createUser(undefined, undefined, "manager");
-      const managerPb = await pocketbase(managerUser.email, DEFAULT_PASSWORD, false);
+      const managerPb = await pocketbase(
+        managerUser.email,
+        DEFAULT_PASSWORD,
+        false
+      );
 
       expect(managerPb.authStore.isValid).toBe(true);
       expect(managerPb.authStore.model?.role).toBe("manager");

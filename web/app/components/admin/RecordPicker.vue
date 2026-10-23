@@ -47,7 +47,7 @@ const props = defineProps<{
   title: string;
 }>();
 
-const open = defineModel<boolean>("open");
+const open = defineModel<boolean>("open", { default: false });
 
 const emit = defineEmits<{
   (e: "select", records: RecordModel[]): void;

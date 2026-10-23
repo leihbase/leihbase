@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-const open = defineModel<boolean>("open");
+const open = defineModel<boolean>("open", { default: false });
 const id = useId();
 
 function close(e: Event) {

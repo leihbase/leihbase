@@ -23,14 +23,14 @@
     "luxon": "^3.7.2",
     "nuxt": "^4.5.2",
     "pinia": "^3.0.4",
-    "pocketbase": "^0.26.9"
+    "pocketbase": "catalog:"
   },
   "devDependencies": {
     "@nuxt/kit": "^4.5.2",
     "@pinia/nuxt": "^0.5.5",
     "@types/luxon": "^3.7.6",
     "sass": "^1.104.0",
-    "typescript": "^6.0.3",
+    "typescript": "catalog:",
     "vue-tsc": "^3.3.11"
   }
 }

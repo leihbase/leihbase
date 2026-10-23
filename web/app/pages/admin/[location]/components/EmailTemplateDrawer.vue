@@ -125,6 +125,7 @@ import Select from "@/components/core/Select.vue";
 import Switch from "@/components/core/Switch.vue";
 import Textarea from "@/components/core/Textarea.vue";
 import { Eye, Trash, Xmark } from "@iconoir/vue";
+import { ClientResponseError, type RecordModel } from "pocketbase";
 import { useI18n } from "vue-i18n";
 import EmailTemplatePreviewDialog from "./EmailTemplatePreviewDialog.vue";
 
@@ -138,7 +139,11 @@ const props = defineProps<{
 
 const open = defineModel("open");
 
-const emit = defineEmits(["saved", "deleted", "cancelled"]);
+const emit = defineEmits<{
+  saved: [RecordModel];
+  deleted: [];
+  cancelled: [];
+}>();
 
 const loading = ref(false);
 const deleting = ref(false);
@@ -193,7 +198,9 @@ async function fetchTemplateSettings() {
       variables: result.vars || [],
     };
   } catch (err) {
-    error.value = err?.response?.data?.error || t("failed_to_load_template");
+    error.value =
+      (err instanceof ClientResponseError && err.response?.data?.error) ||
+      t("failed_to_load_template");
     console.error("Failed to fetch default template:", err);
     return null;
   } finally {
@@ -225,7 +232,9 @@ async function handleSubmit() {
     emit("saved", result);
     open.value = false;
   } catch (err) {
-    error.value = err?.response?.data?.error || t("failed_to_save_template");
+    error.value =
+      (err instanceof ClientResponseError && err.response?.data?.error) ||
+      t("failed_to_save_template");
     console.error("Failed to save template:", err);
   } finally {
     loading.value = false;
@@ -242,7 +251,9 @@ async function handleDelete() {
     emit("deleted");
     open.value = false;
   } catch (err) {
-    error.value = err?.response?.data?.error || t("failed_to_delete_template");
+    error.value =
+      (err instanceof ClientResponseError && err.response?.data?.error) ||
+      t("failed_to_delete_template");
     console.error("Failed to delete template:", err);
   } finally {
     deleting.value = false;

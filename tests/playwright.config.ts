@@ -3,10 +3,10 @@ import { defineConfig, devices, selectors } from "@playwright/test";
 
 // Selector to query, and unwrap a shadowroot element
 const createShadowRootEngine = () => ({
-  query(root, selector) {
-    return root.querySelector(selector).shadowRoot;
+  query(root: Element | Document, selector: string) {
+    return root.querySelector(selector)?.shadowRoot ?? null;
   },
-  queryAll(root, selector) {
+  queryAll(root: Element | Document, selector: string) {
     return Array.from(root.querySelectorAll(selector)).map((s) => s.shadowRoot);
   },
 });

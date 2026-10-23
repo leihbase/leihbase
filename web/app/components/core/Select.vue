@@ -7,6 +7,8 @@
       <select
         :id="`select-${id}`"
         v-bind="$attrs"
+        :name="name"
+        :required="required"
         :disabled="disabled"
         v-model="model"
       >
@@ -19,23 +21,32 @@
 
 <script lang="ts" setup>
 import { NavArrowDown } from "@iconoir/vue";
+import type { SelectHTMLAttributes } from "vue";
 
 defineOptions({
   inheritAttrs: false,
 });
-withDefaults(
-  defineProps<{
-    label: string;
-    name: string;
-    required?: boolean;
-    disabled?: boolean;
-    hideLabel?: boolean;
-    orientation?: "vertical" | "horizontal";
-  }>(),
-  {
-    orientation: "vertical",
-  }
-);
+/**
+ * Native attributes (e.g. `@input`) which are bound to the <select>. Only used
+ * for type checking, see `@vue-ignore`.
+ */
+interface NativeAttributes extends SelectHTMLAttributes {
+  // data-* attributes, camelized by Vue
+  [dataAttribute: `data${Capitalize<string>}`]: unknown;
+}
+
+interface Props extends /* @vue-ignore */ NativeAttributes {
+  label: string;
+  name?: string;
+  required?: boolean;
+  disabled?: boolean;
+  hideLabel?: boolean;
+  orientation?: "vertical" | "horizontal";
+}
+
+withDefaults(defineProps<Props>(), {
+  orientation: "vertical",
+});
 const id = useId();
 const model = defineModel();
 </script>

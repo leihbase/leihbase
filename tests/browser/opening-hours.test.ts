@@ -32,9 +32,7 @@ test.describe("opening hours", () => {
     // Monday is closed by default, add a time range
     await page.getByTestId("opening-hours-monday-add").click();
     await page.getByTestId("opening-hours-save").click();
-    await expect(
-      page.getByText("Opening hours saved.")
-    ).toBeVisible();
+    await expect(page.getByText("Opening hours saved.")).toBeVisible();
 
     const updated = await pb.collection("location").getOne(location.id);
     expect(updated.opening_hours.days.monday).toEqual([

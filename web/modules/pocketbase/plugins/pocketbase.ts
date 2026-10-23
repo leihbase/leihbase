@@ -1,5 +1,5 @@
 import { useUserStore } from "@@/app/stores/user";
-import PocketBase from "pocketbase";
+import PocketBase, { type AuthRecord } from "pocketbase";
 
 export default defineNuxtPlugin(async () => {
   const config = useRuntimeConfig();
@@ -10,16 +10,19 @@ export default defineNuxtPlugin(async () => {
 
   const pb = new PocketBase(url);
 
-  const cookie = useCookie("pb_auth", {
-    path: "/",
-    secure: config.public.ci ? false : true,
-    sameSite: "lax",
-    httpOnly: false, // change to "true" if you want only server-side access
-    maxAge: 604800,
-  });
+  const cookie = useCookie<{ token: string; model: AuthRecord } | null>(
+    "pb_auth",
+    {
+      path: "/",
+      secure: config.public.ci ? false : true,
+      sameSite: "lax",
+      httpOnly: false, // change to "true" if you want only server-side access
+      maxAge: 604800,
+    }
+  );
 
   // load the store data from the cookie value
-  pb.authStore.save(cookie.value?.token, cookie.value?.model);
+  pb.authStore.save(cookie.value?.token ?? "", cookie.value?.model);
 
   // send back the default 'pb_auth' cookie to the client with the latest store state
   pb.authStore.onChange(() => {

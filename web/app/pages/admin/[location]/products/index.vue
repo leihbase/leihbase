@@ -75,10 +75,10 @@ const { t } = useI18n({
 const route = useRoute();
 const { pb } = usePocketbase();
 
-const slug = route.params.location;
+const slug = route.params.location as string;
 
 const location = await useLocation({
-  slug: Array.isArray(slug) ? slug[0] : slug,
+  slug,
 });
 
 const status = ref("");

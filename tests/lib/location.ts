@@ -1,5 +1,6 @@
-import type { OpeningHours } from "../../web/lib/openingHours";
-import { Location } from "../../web/models/location";
+import { ClientResponseError } from "pocketbase";
+import type { Location } from "../../web/models/location";
+import type { OpeningHours } from "../../web/models/openingHours";
 import { pocketbase } from "../services/pocketbase";
 import { uniqueId } from "./utils";
 
@@ -68,7 +69,10 @@ export async function createLocation(
     });
     return location as Location;
   } catch (err) {
-    console.log("Error creating test location", err?.response?.data);
+    console.log(
+      "Error creating test location",
+      err instanceof ClientResponseError ? err.response.data : err
+    );
     throw new Error(
       `createLocation: couldn't create location with reservation_system=${reservationSystem}`
     );

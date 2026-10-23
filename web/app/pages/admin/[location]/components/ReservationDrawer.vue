@@ -159,7 +159,7 @@ const props = defineProps<{
   reservation: Reservation | null;
 }>();
 const open = defineModel("open");
-const emit = defineEmits(["update"]);
+const emit = defineEmits<{ update: [] }>();
 
 const productId = ref<string>();
 const userId = ref<string>();

@@ -1,14 +1,16 @@
 <template>
-  <div class="grid">
-    <NavBar></NavBar>
-    <main>
-      <NuxtLoadingIndicator color="#fff" />
-      <NuxtPage />
-    </main>
-    <Footer></Footer>
-  </div>
-  <ReservationDialog />
-  <VerificationDialog />
+  <IconoirProvider>
+    <div class="grid">
+      <NavBar></NavBar>
+      <main>
+        <NuxtLoadingIndicator color="#fff" />
+        <NuxtPage />
+      </main>
+      <Footer></Footer>
+    </div>
+    <ReservationDialog />
+    <VerificationDialog />
+  </IconoirProvider>
 </template>
 
 <script lang="ts" setup>
@@ -16,6 +18,7 @@ import "@/assets/styles/main.scss";
 import "@shoelace-style/shoelace/dist/themes/light.css";
 import { useLeihbase } from "@/stores/leihbase";
 import { useUserStore } from "@/stores/user";
+import { IconoirProvider } from "@iconoir/vue";
 import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
 import type { User } from "~~/models/user";
 import Footer from "./components/modules/Footer.vue";

@@ -31,7 +31,7 @@ export default defineNuxtConfig({
     head: {
       title: "Leihbase",
       link: [
-        { rel: "favicon", type: "image/png", href: "/favicon-192x192.png" },
+        { rel: "icon", type: "image/png", href: "/favicon-192x192.png" },
         { rel: "stylesheet", href: "/fonts/inter/inter.css" },
       ],
     },
@@ -43,13 +43,11 @@ export default defineNuxtConfig({
         "~": path.resolve(__dirname),
       },
     },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: "modern",
-        },
-      },
-    },
+  },
+
+  build: {
+    // Bundle Iconoir, otherwise it fails during SSR in production
+    transpile: ["@iconoir/vue"],
   },
 
   modules: ["@pinia/nuxt", "./modules/pocketbase", "@nuxtjs/i18n"],
@@ -57,9 +55,6 @@ export default defineNuxtConfig({
   i18n: {
     strategy: "no_prefix",
     detectBrowserLanguage: false,
-    bundle: {
-      optimizeTranslationDirective: false,
-    },
   },
 
   devtools: { enabled: true },

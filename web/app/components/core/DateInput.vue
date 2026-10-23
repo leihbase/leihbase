@@ -55,7 +55,7 @@ const props = withDefaults(
     label: string;
     name?: string;
     required?: boolean;
-    isDateDisallowed?: Function;
+    isDateDisallowed?: (date: Date) => boolean;
     showOutsideDays?: boolean;
     dataTestid?: string;
     description?: string;

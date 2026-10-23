@@ -20,10 +20,14 @@ cronAdd("reservation-reminder", "0 12 * * *", () => {
   );
 
   locations.forEach((location) => {
-    sendReminders(location, "start");
+    if (location) {
+      sendReminders(location, "start");
+    }
   });
 
   locations.forEach((location) => {
-    sendReminders(location, "end");
+    if (location) {
+      sendReminders(location, "end");
+    }
   });
 });

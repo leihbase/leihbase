@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { RecordModel } from "pocketbase";
-import type { User } from "../../models/User";
+import type { User } from "../../models/user";
 import { PageAlertType } from "../components/page-alert/PageAlert.model";
 
 interface State {

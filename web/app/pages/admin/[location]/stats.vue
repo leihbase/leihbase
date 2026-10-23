@@ -69,13 +69,13 @@ const { t } = useI18n({
 const route = useRoute();
 const { pb } = usePocketbase();
 
-const slug = route.params.location;
+const slug = route.params.location as string;
 
 const dateStart = ref<Date | undefined>(subtractDays(new Date(Date.now()), 30));
 const dateEnd = ref<Date | undefined>(new Date(Date.now()));
 
 const location = await useLocation({
-  slug: Array.isArray(slug) ? slug[0] : slug,
+  slug,
 });
 
 if (!location.value || !location.value.id) {
@@ -115,14 +115,10 @@ const products = computed(() => {
     ?.filter((r) => !!r && !!r.expand?.product)
     .reduce<{ [s: string]: { product: RecordModel; count: number } }>(
       (map, reservation) => {
-        if (reservation?.expand?.product) {
-          map[reservation.expand.product.id] = map[
-            reservation.expand.product.id
-          ] || {
-            product: reservation.expand.product,
-            count: 0,
-          };
-          map[reservation.expand.product.id].count++;
+        const product = reservation?.expand?.product;
+        if (product) {
+          const entry = (map[product.id] ??= { product, count: 0 });
+          entry.count++;
         }
         return map;
       },

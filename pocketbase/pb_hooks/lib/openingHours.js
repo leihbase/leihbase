@@ -17,6 +17,8 @@ module.exports = (function () {
 
   /**
    * Returns the opening hours of a given date
+   * @param {OpeningHours} openingHours
+   * @param {Date} date
    */
   function getOpeningHoursDay(openingHours, date) {
     return openingHours.days[Days[date.getDay()]];
@@ -24,6 +26,10 @@ module.exports = (function () {
 
   /**
    * Returns the date of the next open day
+   * @param {OpeningHours} openingHours
+   * @param {number} [skip=0] - Number of open days to skip
+   * @param {number} [limit=31] - Number of days to check
+   * @returns {Date | null}
    */
   function getNextOpenDate(openingHours, skip = 0, limit = 31) {
     const { days, except } = openingHours;

@@ -35,7 +35,7 @@
   </Teleport>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="Multiple extends boolean = false">
 import { equalValues } from "@@/lib/array";
 import type { RecordModel } from "pocketbase";
 import FormLabel from "../core/FormLabel.vue";
@@ -47,7 +47,12 @@ const { t } = useI18n({
 
 const { pb } = usePocketbase();
 
-const model = defineModel<string | string[]>();
+/**
+ * Model value is an array of ids when `multiple` is set, otherwise a single id
+ */
+type ModelValue = Multiple extends true ? string[] : string;
+
+const model = defineModel<ModelValue>();
 const props = defineProps<{
   id: string;
   label: string;
@@ -58,7 +63,7 @@ const props = defineProps<{
   disabled?: boolean;
   readonly?: boolean;
   dataTestid?: string;
-  multiple?: boolean;
+  multiple?: Multiple;
   description?: string;
 }>();
 
@@ -127,14 +132,14 @@ function handleSelect(selectedRecords: RecordModel[]) {
 
   // No value
   if (!selectedRecords || selectedRecords.length === 0 || !selectedRecords[0]) {
-    model.value = props.multiple ? [] : "";
+    model.value = (props.multiple ? [] : "") as ModelValue;
     return;
   }
 
   // Map records to ids/id
-  model.value = props.multiple
-    ? selectedRecords.map((r) => r.id)
-    : selectedRecords[0].id;
+  model.value = (
+    props.multiple ? selectedRecords.map((r) => r.id) : selectedRecords[0].id
+  ) as ModelValue;
 }
 </script>
 

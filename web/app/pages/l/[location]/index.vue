@@ -6,7 +6,7 @@
         <Button
           variant="secondary"
           :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-            location?.address
+            location?.address ?? ''
           )}`"
           target="_blank"
         >
@@ -41,7 +41,7 @@
       </div>
     </header>
     <section>
-      <ProductGrid :location="location" />
+      <ProductGrid v-if="location" :location="location" />
     </section>
   </Container>
 </template>

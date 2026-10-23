@@ -1,8 +1,8 @@
-import { expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { waitForHydration } from "./utils";
 
 export async function login(
-  page,
+  page: Page,
   email = "test@example.com",
   password = "testtest"
 ) {

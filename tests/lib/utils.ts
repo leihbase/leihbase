@@ -1,6 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { expect, type Locator, type Page } from "@playwright/test";
 
+declare global {
+  interface Window {
+    // Exposed by Nuxt in the browser, used to wait for hydration
+    useNuxtApp?: () => { isHydrating?: boolean };
+  }
+}
+
 /**
  * Returns a unique id, e.g. to create test records with unique emails or slugs.
  */

@@ -32,7 +32,7 @@ test.describe("product", () => {
       const product = await createProduct(location);
       // Create admin user to create reservation
       const adminPb = await pocketbase();
-      const adminUser = await adminPb.collection("users").getFirstListItem();
+      const adminUser = await adminPb.collection("users").getFirstListItem("");
 
       // Create future reservation
       await createReservation(adminPb, {
@@ -58,7 +58,7 @@ test.describe("product", () => {
       const product = await createProduct(location);
       // Create admin user to create reservation
       const adminPb = await pocketbase();
-      const adminUser = await adminPb.collection("users").getFirstListItem();
+      const adminUser = await adminPb.collection("users").getFirstListItem("");
 
       // Create past reservation that was not returned
       const reservation = await createReservation(adminPb, {
@@ -89,7 +89,7 @@ test.describe("product", () => {
       const product = await createProduct(location);
       // Get admin user to create reservation
       const adminPb = await pocketbase();
-      const adminUser = await adminPb.collection("users").getFirstListItem();
+      const adminUser = await adminPb.collection("users").getFirstListItem("");
 
       // Create future reservation
       await createReservation(adminPb, {
@@ -115,7 +115,7 @@ test.describe("product", () => {
       const product = await createProduct(location);
       // Create admin user to create reservation
       const adminPb = await pocketbase();
-      const adminUser = await adminPb.collection("users").getFirstListItem();
+      const adminUser = await adminPb.collection("users").getFirstListItem("");
 
       // Create reservation starting today (will overlap with next open days)
       await createReservation(adminPb, {
@@ -141,7 +141,7 @@ test.describe("product", () => {
       const product = await createProduct(location);
       // Create admin user to create reservation
       const adminPb = await pocketbase();
-      const adminUser = await adminPb.collection("users").getFirstListItem();
+      const adminUser = await adminPb.collection("users").getFirstListItem("");
 
       // Calculate next opening day based on current day
       // Default opening hours: tuesday (18:00-19:00) and friday (17:00-19:00)
@@ -172,7 +172,7 @@ test.describe("product", () => {
       const product = await createProduct(location);
       // Create admin user to create reservation
       const adminPb = await pocketbase();
-      const adminUser = await adminPb.collection("users").getFirstListItem();
+      const adminUser = await adminPb.collection("users").getFirstListItem("");
 
       // Create reservation ending today
       await createReservation(adminPb, {

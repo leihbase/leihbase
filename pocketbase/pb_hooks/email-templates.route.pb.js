@@ -5,38 +5,44 @@
  * Custom route to fetch a specific default email template
  * @param {core.RequestEvent} e
  */
-routerAdd("GET", "/api/email-templates/defaults/{locale}/{templateName}", (e) => {
-  /** @type {typeof import('./lib/locale')} */
-  const { isValidLocale } = require(`${__hooks}/lib/locale`);
-  /** @type {typeof import('./lib/email')} */
-  const { emailTemplateVars } = require(`${__hooks}/lib/email`);
+routerAdd(
+  "GET",
+  "/api/email-templates/defaults/{locale}/{templateName}",
+  (e) => {
+    /** @type {typeof import('./lib/locale')} */
+    const { isValidLocale } = require(`${__hooks}/lib/locale`);
+    /** @type {typeof import('./lib/email')} */
+    const { emailTemplateVars } = require(`${__hooks}/lib/email`);
 
-  if (!e.request) return
+    if (!e.request) return;
 
-  const templateName = /** @type {TemplateName} */ (e.request.pathValue("templateName"));
-  const locale = e.request.pathValue("locale");
+    const templateName = /** @type {TemplateName} */ (
+      e.request.pathValue("templateName")
+    );
+    const locale = e.request.pathValue("locale");
 
-  // Validate locale to prevent path traversal
-  if (!isValidLocale(locale)) {
-    return e.json(400, { error: "Invalid locale" });
-  }
-
-  try {
-    /** @type {typeof import('./lib/emails.en')} */
-    const templates = require(`${__hooks}/lib/emails.${locale}`);
-    
-    const template = templates[templateName];
-    
-    if (!template) {
-      return e.json(404, { error: "Template not found" });
+    // Validate locale to prevent path traversal
+    if (!isValidLocale(locale)) {
+      return e.json(400, { error: "Invalid locale" });
     }
-    
-    return e.json(200, { template, vars: emailTemplateVars[templateName] });
-  } catch (err) {
-    console.error("[email-templates] Failed to load template:", err);
-    return e.json(500, { error: "Failed to load template" });
+
+    try {
+      /** @type {typeof import('./lib/emails.en')} */
+      const templates = require(`${__hooks}/lib/emails.${locale}`);
+
+      const template = templates[templateName];
+
+      if (!template) {
+        return e.json(404, { error: "Template not found" });
+      }
+
+      return e.json(200, { template, vars: emailTemplateVars[templateName] });
+    } catch (err) {
+      console.error("[email-templates] Failed to load template:", err);
+      return e.json(500, { error: "Failed to load template" });
+    }
   }
-});
+);
 
 /**
  * Custom route to get a preview of an email template (custom or default)
@@ -46,15 +52,19 @@ routerAdd("GET", "/api/email-templates/preview", (e) => {
   /** @type {typeof import('./lib/locale')} */
   const { isValidLocale } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/email')} */
-  const { getPreviewTemplate, renderPreviewTemplate } = require(`${__hooks}/lib/email`);
+  const { getPreviewTemplate, renderPreviewTemplate } = require(
+    `${__hooks}/lib/email`
+  );
 
-  if (!e.request) return
+  if (!e.request) return;
 
-  const templateName = /** @type {TemplateName} */ (e.request.url?.query().get('templateName'));
-  const locale = e.request.url?.query().get('locale');
-  const locationId = e.request.url?.query().get('locationId');
-  const customSubject = e.request.url?.query().get('customSubject');
-  const customHtml = e.request.url?.query().get('customHtml');
+  const templateName = /** @type {TemplateName} */ (
+    e.request.url?.query().get("templateName")
+  );
+  const locale = e.request.url?.query().get("locale");
+  const locationId = e.request.url?.query().get("locationId");
+  const customSubject = e.request.url?.query().get("customSubject");
+  const customHtml = e.request.url?.query().get("customHtml");
 
   // Validate locale to prevent path traversal
   if (locale && !isValidLocale(locale)) {
@@ -62,7 +72,9 @@ routerAdd("GET", "/api/email-templates/preview", (e) => {
   }
 
   if (!templateName || !locale) {
-    return e.json(400, { error: "templateName and locale query params are required" });
+    return e.json(400, {
+      error: "templateName and locale query params are required",
+    });
   }
 
   let subject, html;
@@ -73,12 +85,16 @@ routerAdd("GET", "/api/email-templates/preview", (e) => {
     html = customHtml || "";
   } else {
     // Otherwise fetch the template
-    const template = getPreviewTemplate(templateName, locale, locationId || null);
-    
+    const template = getPreviewTemplate(
+      templateName,
+      locale,
+      locationId || null
+    );
+
     if (!template) {
       return e.json(404, { error: "Template not found" });
     }
-    
+
     subject = template.subject;
     html = template.html;
   }
@@ -86,7 +102,7 @@ routerAdd("GET", "/api/email-templates/preview", (e) => {
   try {
     // Render with preview variables
     const rendered = renderPreviewTemplate(subject, html, templateName);
-    
+
     return e.json(200, {
       templateName,
       ...rendered,

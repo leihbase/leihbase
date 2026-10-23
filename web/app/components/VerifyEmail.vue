@@ -37,10 +37,6 @@ const success = ref(false);
 const error = ref<string>();
 const loading = ref(false);
 
-useHead({
-  title: t("title"),
-});
-
 async function handleRequest() {
   loading.value = true;
   try {
@@ -67,7 +63,6 @@ p {
 <i18n lang="json">
 {
   "en": {
-    "title": "Verify e-mail",
     "already_verified": "Your e-mail address is already verified!",
     "not_verified": "Your e-mail address is not yet verified. You find a verification e-mail in your inbox, or request a new verification e-mail using the button below.",
     "resend": "Resend verification e-mail",
@@ -75,7 +70,6 @@ p {
     "success": "A new verification e-mail has been sent!"
   },
   "de": {
-    "title": "E-Mail bestätigen",
     "already_verified": "Deine E-Mail-Adresse ist bereits bestätigt!",
     "not_verified": "Deine E-Mail-Adresse ist noch nicht bestätigt. Du findest eine Bestätigungs-E-Mail in deinem Posteingang, oder fordere eine neue Bestätigungs-E-Mail über den untenstehenden Button an.",
     "resend": "Bestätigungs-E-Mail erneut senden",

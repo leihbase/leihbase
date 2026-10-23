@@ -28,7 +28,7 @@ function endOfDate(date) {
  * @returns {string}
  */
 function formatPocketbaseDate(date) {
-  return new Date(date).toISOString().replace('T', ' ');
+  return new Date(date).toISOString().replace("T", " ");
 }
 
 module.exports = {

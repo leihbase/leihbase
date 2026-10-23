@@ -86,10 +86,16 @@ admin interface are automatically written as migration files to
 
 ```bash
 # Format code
-$ pnpm prettier
-# Typecheck the front-end
-$ cd web && pnpm run typecheck
+$ pnpm format
+# Check formatting
+$ pnpm format:check
+# Typecheck the front-end, PocketBase hooks and tests
+$ pnpm typecheck
 ```
+
+The PocketBase hooks are typechecked using JSDoc and the types PocketBase
+generates in `pocketbase/pb_data/types.d.ts` on start. After upgrading
+PocketBase (`PB_VERSION`), start it once and commit the regenerated types.
 
 ## Pull requests
 

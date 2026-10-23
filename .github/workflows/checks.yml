@@ -1,0 +1,19 @@
+name: checks
+
+on:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install node and pnpm
+        uses: jdx/mise-action@v2
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check formatting
+        run: pnpm run format:check
+      - name: Typecheck
+        run: pnpm run typecheck

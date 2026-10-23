@@ -11,5 +11,5 @@ function isValidLocale(locale) {
 
 module.exports = {
   LOCALES,
-  isValidLocale
+  isValidLocale,
 };

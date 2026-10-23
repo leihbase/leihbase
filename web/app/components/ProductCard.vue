@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import type { RecordModel } from "pocketbase";
+import type { HTMLAttributes } from "vue";
 import AvailabilityCircle from "./AvailabilityCircle.vue";
 import ProductImage from "./ProductImage.vue";
 
@@ -48,15 +49,20 @@ if (process.client) {
 
 const { t } = useI18n();
 
-const props = withDefaults(
-  defineProps<{
-    product: RecordModel;
-    to?: string;
-    href?: string;
-    spacing?: "sm" | "md";
-  }>(),
-  { spacing: "md" }
-);
+/**
+ * Native attributes (e.g. `@click`) which fall through to the root element.
+ * Only used for type checking, see `@vue-ignore`.
+ */
+interface NativeAttributes extends HTMLAttributes {}
+
+interface Props extends /* @vue-ignore */ NativeAttributes {
+  product: RecordModel;
+  to?: string;
+  href?: string;
+  spacing?: "sm" | "md";
+}
+
+const props = withDefaults(defineProps<Props>(), { spacing: "md" });
 
 const {
   product: { thumbs },

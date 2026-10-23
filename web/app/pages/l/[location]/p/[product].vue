@@ -105,8 +105,9 @@ import ProductImage from "@/components/ProductImage.vue";
 import ReservationsBox from "@/components/ReservationsBox.vue";
 import { getLocationBySlug } from "@/composables/location";
 import { Lock } from "@iconoir/vue";
+import type { RecordModel } from "pocketbase";
 
-const { t } = useI18n({ useScope: "local" });
+const { t, locale } = useI18n({ useScope: "local" });
 const config = useRuntimeConfig();
 const {
   product: { thumbs },
@@ -116,7 +117,6 @@ const { open: openReservationDialog } = useReservationDialog();
 const nuxtApp = useNuxtApp();
 const route = useRoute();
 const userStore = useUserStore();
-const { locale } = useI18n();
 
 const imageIndex = ref(0);
 
@@ -146,7 +146,7 @@ const { reservations, refresh: refreshReservations } =
 
 const breadcrumb = computed<BreadcrumbList[]>(() => [
   { label: location.value?.name, href: `/l/${location.value?.slug}` },
-  (product.value?.expand?.categories ?? []).map((category) => ({
+  (product.value?.expand?.categories ?? []).map((category: RecordModel) => ({
     label: category.name_de,
     href: `/l/${location.value?.slug}?category=${category.id}`,
   })),

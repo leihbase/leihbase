@@ -143,11 +143,11 @@ const props = defineProps<{
   product: Product | null;
 }>();
 const open = defineModel("open");
-const emit = defineEmits(["update"]);
+const emit = defineEmits<{ update: [] }>();
 
 const name = ref<string>();
 const active = ref<boolean>();
-const categories = ref<string>();
+const categories = ref<string[]>();
 const deposit = ref<string>();
 const images = ref<string[]>([]);
 const newImages = ref<File[]>([]);

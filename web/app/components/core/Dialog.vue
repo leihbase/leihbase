@@ -14,7 +14,7 @@
   >
     <header>
       <div class="title">
-        <Heading is="h2" size="lg" :id="id + '-title'" gap>{{ title }}</Heading>
+        <Heading is="h2" size="lg" :id="id + '-title'">{{ title }}</Heading>
         <button @click="close">
           <span class="sr-only">{{ t("close") }}</span>
           <Xmark />
@@ -62,7 +62,7 @@ withDefaults(
 
 const emit = defineEmits<{ close: [] }>();
 
-const open = defineModel<boolean>("open");
+const open = defineModel<boolean>("open", { default: false });
 watch(open, (newValue) => {
   if (!dialog.value) {
     throw new Error("Can't open Dialog, no 'dialog' found");

@@ -47,8 +47,8 @@ import FormLabel from "./core/FormLabel.vue";
 
 const config = useRuntimeConfig();
 
-const images = defineModel<string[]>("images", { default: [] });
-const newImages = defineModel<File[]>("newImages", { default: [] });
+const images = defineModel<string[]>("images", { default: () => [] });
+const newImages = defineModel<File[]>("newImages", { default: () => [] });
 
 defineProps<{
   recordId?: string;

@@ -29,7 +29,7 @@
         :label="t('show_cancelled')"
         orientation="horizontal"
         v-model="showCancelled"
-        @change="refresh()"
+        @update:model-value="refresh()"
       />
     </template>
   </TabHeader>
@@ -49,7 +49,7 @@
         t("no_reservations_on_date", {
           date: isToday(date)
             ? t("today")
-            : t("on") + " " + formatDate(date, "DD.MM", locale),
+            : t("on") + " " + formatDate(date, "DD.MM.YYYY", locale),
         })
       }}.
     </i>
@@ -69,8 +69,7 @@ import type { RecordModel } from "pocketbase";
 import TabHeader from "../TabHeader.vue";
 
 const { pb } = usePocketbase();
-const { locale } = useI18n();
-const { t } = useI18n({
+const { t, locale } = useI18n({
   useScope: "local",
 });
 

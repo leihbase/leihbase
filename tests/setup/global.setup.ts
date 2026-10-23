@@ -1,4 +1,5 @@
 import { expect, test as setup } from "@playwright/test";
+import { ClientResponseError } from "pocketbase";
 import { createUser } from "../lib/user";
 import { pocketbase } from "../services/pocketbase";
 
@@ -35,7 +36,10 @@ setup.describe("setup", () => {
         ],
       });
     } catch (err) {
-      console.log("Error creating leihbase record", err.response.data);
+      console.log(
+        "Error creating leihbase record",
+        err instanceof ClientResponseError ? err.response.data : err
+      );
     }
 
     // Create test store
@@ -66,7 +70,10 @@ setup.describe("setup", () => {
         },
       });
     } catch (err) {
-      console.log("Error creating test store", err.response.data);
+      console.log(
+        "Error creating test store",
+        err instanceof ClientResponseError ? err.response.data : err
+      );
     }
 
     // Create test user

@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { ClientResponseError } from "pocketbase";
 import type { Location } from "../../web/models/location";
 import { pocketbase } from "../services/pocketbase";
@@ -8,7 +8,7 @@ import { waitForClientMount } from "./utils";
  * Navigates to the product page,
  * given a product id
  */
-export async function navigateToProductPage(page, productId) {
+export async function navigateToProductPage(page: Page, productId: string) {
   await page.goto(`/l/test-store`);
   await waitForClientMount(page.getByTestId(`product-card-${productId}`));
   await page.getByTestId(`product-card-${productId}`).click();
@@ -38,7 +38,10 @@ export async function createProduct(location?: Location) {
     });
     return product;
   } catch (err) {
-    console.log("Error creating test product", err?.response?.data);
+    console.log(
+      "Error creating test product",
+      err instanceof ClientResponseError ? err.response.data : err
+    );
     throw new Error("createProduct: couldn't create product");
   }
 }
@@ -58,7 +61,7 @@ export async function getProductWithAvailability(productId: string) {
   } catch (err) {
     console.log(
       "Error fetching product with availability",
-      err?.response?.data
+      err instanceof ClientResponseError ? err.response.data : err
     );
     throw new Error(
       `getProductWithAvailability: couldn't fetch product ${productId}`
@@ -69,7 +72,7 @@ export async function getProductWithAvailability(productId: string) {
 /**
  * Returns the last created reservation given a product id
  */
-export async function getLastProductReservation(productId) {
+export async function getLastProductReservation(productId: string) {
   const pb = await pocketbase();
   const reservation = await pb
     .collection("reservations")
@@ -80,7 +83,10 @@ export async function getLastProductReservation(productId) {
 /**
  * Updates the created reservation given a product id
  */
-export async function updateLastProductReservation(productId, data) {
+export async function updateLastProductReservation(
+  productId: string,
+  data: Record<string, unknown>
+) {
   const pb = await pocketbase();
   const reservation = await getLastProductReservation(productId);
   try {

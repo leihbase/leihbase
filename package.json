@@ -4,11 +4,17 @@
   "scripts": {
     "dev": "pnpm --filter @leihbase/web run dev",
     "test": "pnpm --filter @leihbase/tests run test",
-    "prettier": "pnpm exec prettier . --write"
+    "typecheck": "pnpm run typecheck:web && pnpm run typecheck:hooks && pnpm run typecheck:tests",
+    "typecheck:web": "pnpm --filter @leihbase/web run typecheck",
+    "typecheck:hooks": "tsc -p pocketbase/jsconfig.json --noEmit",
+    "typecheck:tests": "pnpm --filter @leihbase/tests run typecheck",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-    "prettier": "3.8.1"
+    "prettier": "3.8.1",
+    "typescript": "catalog:"
   },
   "packageManager": "pnpm@12.3.4"
 }

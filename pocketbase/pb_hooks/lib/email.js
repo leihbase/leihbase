@@ -92,7 +92,7 @@ const emailTemplateVars = {
  */
 function formatDate(date, locale) {
   if (!date) return "";
-  if (locale === 'de') {
+  if (locale === "de") {
     return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
   }
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
@@ -106,7 +106,7 @@ function formatDate(date, locale) {
  */
 function formatCurrency(n, locale) {
   if (!n) return "";
-  if (locale === 'de') {
+  if (locale === "de") {
     return `${Math.round(n)}€`;
   } else {
     return `€${Math.round(n)}`;
@@ -188,7 +188,7 @@ function getEmailTemplate(locationId, templateName, locale) {
   const templates = $app.findRecordsByFilter(
     "email_templates",
     `location = {:locationId} && name = {:templateName} && locale = {:locale} && enabled = true`,
-    '',
+    "",
     1,
     0,
     {
@@ -311,7 +311,8 @@ function generatePreviewVars(locale) {
 function filterTemplateVars(templateName, allVars) {
   const templateVars = emailTemplateVars[templateName];
   if (!templateVars) return {};
-  
+
+  /** @type {Record<string, string>} */
   const filtered = {};
   for (const varName of templateVars) {
     if (allVars[varName] !== undefined) {
@@ -330,19 +331,19 @@ function filterTemplateVars(templateName, allVars) {
  */
 function getPreviewTemplate(templateName, locale, locationId = null) {
   let template = null;
-  
+
   if (locationId) {
     template = getEmailTemplate(locationId, templateName, locale);
   }
-  
+
   if (!template) {
     template = getDefaultTemplate(templateName, locale);
   }
-  
+
   if (!template) {
     return null;
   }
-  
+
   return {
     subject: template.subject,
     html: template.html,
@@ -360,7 +361,7 @@ function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
   const locale = $os.getenv("CONFIG_LOCALE") || "en";
   const allPreviewVars = generatePreviewVars(locale);
   const templateVars = filterTemplateVars(templateName, allPreviewVars);
-  
+
   return {
     subject: renderTemplate(templateSubject, templateVars),
     html: renderTemplate(templateHtml, templateVars),

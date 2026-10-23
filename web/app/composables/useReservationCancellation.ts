@@ -1,5 +1,5 @@
-import type { Reservation } from "@@/models/reservation";
 import type { Location } from "@@/models/location";
+import type { Reservation } from "@@/models/reservation";
 
 export enum ReservationCancellationStatus {
   Default = "default",
@@ -14,7 +14,7 @@ export function useReservationCancellation(
   onCancel: () => void
 ) {
   const { pb } = usePocketbase();
-  const { t } = useI18n();
+  const { t } = useI18n({ useScope: "global" });
 
   const message = ref();
   const status = ref<ReservationCancellationStatus>(

@@ -32,7 +32,7 @@ onRecordEnrich(({ record, requestInfo, next }) => {
     );
 
     record.withCustomData(true);
-    $app.expandRecord(record, ["location"], null);
+    $app.expandRecord(record, ["location"]);
     const location = record.expandedOne("location");
 
     if (location.get("reservation_system") === "multiple") {
@@ -52,7 +52,10 @@ onRecordEnrich(({ record, requestInfo, next }) => {
       }
     } else {
       // For single system, include unreturned reservations as active
-      record.set("computedIsAvailable", !hasActiveReservation(record.id, null, true));
+      record.set(
+        "computedIsAvailable",
+        !hasActiveReservation(record.id, undefined, true)
+      );
     }
   }
 
