@@ -115,14 +115,10 @@ const products = computed(() => {
     ?.filter((r) => !!r && !!r.expand?.product)
     .reduce<{ [s: string]: { product: RecordModel; count: number } }>(
       (map, reservation) => {
-        if (reservation?.expand?.product) {
-          map[reservation.expand.product.id] = map[
-            reservation.expand.product.id
-          ] || {
-            product: reservation.expand.product,
-            count: 0,
-          };
-          map[reservation.expand.product.id].count++;
+        const product = reservation?.expand?.product;
+        if (product) {
+          const entry = (map[product.id] ??= { product, count: 0 });
+          entry.count++;
         }
         return map;
       },

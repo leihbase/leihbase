@@ -3,7 +3,7 @@ export function useIsSticky(element: Ref<HTMLElement>) {
   onMounted(() => {
     const observer = new IntersectionObserver(
       ([e]) => {
-        isSticky.value = e.intersectionRatio < 1;
+        isSticky.value = !!e && e.intersectionRatio < 1;
       },
       { threshold: [1] }
     );

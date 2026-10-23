@@ -105,6 +105,7 @@ import ProductImage from "@/components/ProductImage.vue";
 import ReservationsBox from "@/components/ReservationsBox.vue";
 import { getLocationBySlug } from "@/composables/location";
 import { Lock } from "@iconoir/vue";
+import type { RecordModel } from "pocketbase";
 
 const { t } = useI18n({ useScope: "local" });
 const config = useRuntimeConfig();
@@ -146,7 +147,7 @@ const { reservations, refresh: refreshReservations } =
 
 const breadcrumb = computed<BreadcrumbList[]>(() => [
   { label: location.value?.name, href: `/l/${location.value?.slug}` },
-  (product.value?.expand?.categories ?? []).map((category) => ({
+  (product.value?.expand?.categories ?? []).map((category: RecordModel) => ({
     label: category.name_de,
     href: `/l/${location.value?.slug}?category=${category.id}`,
   })),
