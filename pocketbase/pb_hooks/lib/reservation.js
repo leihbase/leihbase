@@ -95,78 +95,9 @@ function removeSentEmail(reservation, type) {
   return reservation;
 }
 
-/**
- * Generates a start/end reservation reminder email
- * @param {core.Record} reservation
- * @param {'start'|'end'} type
- * @returns { { to: { address: string }[], subject: string, html: string } }
- */
-function getReminderEmail(reservation, type) {
-  const locale = $os.getenv("CONFIG_LOCALE") || "en";
-  /** @type {typeof import('./emails.en')} */
-  const {
-    reservationStartReminderEmail,
-    reservationEndReminderEmail,
-  } = require(`${__hooks}/lib/emails.${locale}`);
-  const { getOpeningHoursDay } = require(`${__hooks}/lib/openingHours`);
-
-  $app.expandRecord(reservation, ["location", "user", "product"], null);
-  const location = reservation.expandedOne("location");
-  const product = reservation.expandedOne("product");
-  const user = reservation.expandedOne("user");
-  const start = new Date(reservation.get("start").string().split(" ")[0]);
-  const end = new Date(reservation.get("end").string().split(" ")[0]);
-
-  const startOpenHours = getOpeningHoursDay(
-    JSON.parse(location.get("opening_hours")),
-    start
-  );
-  const endOpenHours = getOpeningHoursDay(
-    JSON.parse(location.get("opening_hours")),
-    end
-  );
-
-  if (type === "start") {
-    return {
-      to: [{ address: user.getString("email") }],
-      ...reservationStartReminderEmail({
-        userName: user.get("name"),
-        locationName: location.get("name"),
-        productName: product.get("name"),
-        start,
-        startHour:
-          startOpenHours && startOpenHours.length > 0
-            ? startOpenHours[0].from
-            : null,
-        endHour:
-          startOpenHours && startOpenHours.length > 0
-            ? startOpenHours[0].to
-            : null,
-      }),
-    };
-  } else if (type === "end") {
-    return {
-      to: [{ address: user.get("email") }],
-      ...reservationEndReminderEmail({
-        userName: user.get("name"),
-        locationName: location.get("name"),
-        productName: product.get("name"),
-        end,
-        startHour:
-          endOpenHours && endOpenHours.length > 0 ? endOpenHours[0].from : null,
-        endHour:
-          endOpenHours && endOpenHours.length > 0 ? endOpenHours[0].to : null,
-      }),
-    };
-  } else {
-    throw new Error(`[reservation] unknown reminder email type: ${type}`);
-  }
-}
-
 module.exports = {
   validateStartEnd,
   hasOverlappingReservations,
   saveSentEmail,
   removeSentEmail,
-  getReminderEmail,
 };
