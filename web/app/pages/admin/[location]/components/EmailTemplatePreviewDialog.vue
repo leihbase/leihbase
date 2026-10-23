@@ -18,7 +18,7 @@ import { useI18n } from "vue-i18n";
 
 const { t, locale } = useI18n({ useScope: "local" });
 
-const open = defineModel<boolean>("open");
+const open = defineModel<boolean>("open", { default: false });
 
 const props = defineProps<{
   subject: string;

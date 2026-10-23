@@ -62,7 +62,7 @@ withDefaults(
 
 const emit = defineEmits<{ close: [] }>();
 
-const open = defineModel<boolean>("open");
+const open = defineModel<boolean>("open", { default: false });
 watch(open, (newValue) => {
   if (!dialog.value) {
     throw new Error("Can't open Dialog, no 'dialog' found");

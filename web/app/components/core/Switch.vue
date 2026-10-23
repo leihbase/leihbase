@@ -30,7 +30,7 @@
 import { Check } from "@iconoir/vue";
 import FormLabel from "./FormLabel.vue";
 
-const model = defineModel<boolean>();
+const model = defineModel<boolean>({ default: false });
 const props = withDefaults(
   defineProps<{
     id: string;
