@@ -14,7 +14,7 @@
   >
     <header>
       <div class="title">
-        <Heading is="h2" size="lg" :id="id + '-title'" gap>{{ title }}</Heading>
+        <Heading is="h2" size="lg" :id="id + '-title'">{{ title }}</Heading>
         <button @click="close">
           <span class="sr-only">{{ t("close") }}</span>
           <Xmark />

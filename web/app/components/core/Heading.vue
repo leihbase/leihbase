@@ -5,11 +5,24 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import type { HTMLAttributes } from "vue";
+
+/**
+ * Native attributes (e.g. `id`, `data-testid`) which fall through to the root
+ * element. Only used for type checking, see `@vue-ignore`.
+ */
+interface NativeAttributes extends HTMLAttributes {
+  // data-* attributes, camelized by Vue
+  [dataAttribute: `data${Capitalize<string>}`]: unknown;
+}
+
+interface Props extends /* @vue-ignore */ NativeAttributes {
   is: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
   size: "sm" | "md" | "lg" | "xl";
   cap?: boolean;
-}>();
+}
+
+defineProps<Props>();
 </script>
 
 <style scoped>
