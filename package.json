@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "pnpm --filter @leihbase/web run dev",
     "test": "pnpm --filter @leihbase/tests run test",
+    "typecheck": "pnpm --filter @leihbase/web run typecheck",
     "prettier": "pnpm exec prettier . --write"
   },
   "devDependencies": {
