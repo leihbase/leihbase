@@ -89,9 +89,13 @@ admin interface are automatically written as migration files to
 $ pnpm format
 # Check formatting
 $ pnpm format:check
-# Typecheck the front-end
+# Typecheck the front-end and PocketBase hooks
 $ pnpm typecheck
 ```
+
+The PocketBase hooks are typechecked using JSDoc and the types PocketBase
+generates in `pocketbase/pb_data/types.d.ts` on start. After upgrading
+PocketBase (`PB_VERSION`), start it once and commit the regenerated types.
 
 ## Pull requests
 

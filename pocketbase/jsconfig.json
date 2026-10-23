@@ -2,7 +2,8 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES6",
-    "checkJs": true
+    "checkJs": true,
+    "strict": true
   },
   "include": ["pb_hooks/**/*"]
 }
