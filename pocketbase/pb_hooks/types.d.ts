@@ -6,6 +6,14 @@ type TemplateName =
   | "cancellation_confirmation"
   | "reservation_cancellation_location";
 
+/**
+ * Opening hours of a location, see `OpeningHours` in web/lib/openingHours.ts
+ */
+type OpeningHours = {
+  days: { [day: string]: { from: string; to: string }[] };
+  except?: { dates: string[] };
+};
+
 declare namespace core {
   interface App {
     /**

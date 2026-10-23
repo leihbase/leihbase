@@ -312,6 +312,7 @@ function filterTemplateVars(templateName, allVars) {
   const templateVars = emailTemplateVars[templateName];
   if (!templateVars) return {};
 
+  /** @type {Record<string, string>} */
   const filtered = {};
   for (const varName of templateVars) {
     if (allVars[varName] !== undefined) {
