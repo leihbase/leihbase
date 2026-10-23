@@ -1,16 +1,13 @@
 <template>
   <div class="step">
     <p>{{ t("intro", { location: location.name }) }}</p>
-    <Scrollable class="borrow-agreement">
       <div
         v-html="borrowAgreement.content"
-        class="content"
+      class="borrow-agreement rich-text"
         data-testid="borrow-agreement-content"
       ></div>
-    </Scrollable>
     <Checkbox
       id="borrow-agreement-accept"
-      v-model="accepted"
       data-testid="borrow-agreement-checkbox"
       required
     >
@@ -23,14 +20,11 @@
 import type { BorrowAgreement } from "~~/models/borrowAgreement.js";
 import type { Location } from "~~/models/location.js";
 import Checkbox from "../core/Checkbox.vue";
-import Scrollable from "../core/Scrollable.vue";
 
 defineProps<{
   location: Location;
   borrowAgreement: BorrowAgreement;
 }>();
-
-const accepted = defineModel<boolean>("accepted", { default: false });
 
 const { t } = useI18n({ useScope: "local" });
 </script>
@@ -44,18 +38,18 @@ const { t } = useI18n({ useScope: "local" });
   flex-direction: column;
   gap: 1.25rem;
 }
-.step p {
-  margin: 0;
-}
 .borrow-agreement {
   // Grow its height on mobile to fill dialog
   flex: 1 1 0;
 
   min-height: 10rem;
+  overflow-y: auto;
   padding: 1rem 1.25rem;
   border: 1px solid var(--input-border-color);
   border-radius: var(--border-radius);
   background-color: var(--input-background-color);
+  font-size: 0.9375rem;
+  line-height: 1.6;
 
   @media screen and (min-width: breakpoints.$breakpoint-sm) {
     flex: none;
