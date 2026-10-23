@@ -33,6 +33,21 @@ function hasActiveReservationForProduct(user, product, reservation) {
   return records.length > 0;
 }
 
+/**
+ * Checks if a user has accepted the given borrow agreement.
+ * @param {core.Record} user
+ * @param {string} borrowAgreement
+ * @returns {boolean}
+ */
+function hasAcceptedBorrowAgreement(user, borrowAgreement) {
+  return (
+    user
+      .getStringSlice("accepted_borrow_agreements")
+      .indexOf(borrowAgreement) !== -1
+  );
+}
+
 module.exports = {
   hasActiveReservationForProduct,
+  hasAcceptedBorrowAgreement,
 };
