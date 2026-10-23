@@ -135,32 +135,28 @@ onRecordCreateRequest((e) => {
   const reservationUser = record.getString("user")
     ? $app.findRecordById("users", record.getString("user"))
     : null;
-  const hasAcceptedBefore =
+  let hasAccepted =
     !!borrowAgreement &&
     !!reservationUser &&
     hasAcceptedBorrowAgreement(reservationUser, borrowAgreement);
-  // Only the user themselves can accept the borrow agreement
-  const isAcceptingBorrowAgreement =
-    !!borrowAgreement &&
-    !hasAcceptedBefore &&
-    !!reservationUser &&
-    requestUser?.id === reservationUser.id &&
-    record.getString("borrow_agreement") === borrowAgreement;
-  if (
-    borrowAgreement &&
-    !hasAcceptedBefore &&
-    !isAcceptingBorrowAgreement &&
-    !isSuperuser &&
-    !isAdmin &&
-    !isLocationUser
-  ) {
-    throw new BadRequestError("Borrow_agreement_not_accepted.");
+  let isAcceptingBorrowAgreement = false;
+  if (borrowAgreement && reservationUser && !hasAccepted) {
+    // Only the user themselves can accept the borrow agreement
+    isAcceptingBorrowAgreement =
+      requestUser?.id === reservationUser.id &&
+      record.getString("borrow_agreement") === borrowAgreement;
+    if (
+      !isAcceptingBorrowAgreement &&
+      !isSuperuser &&
+      !isAdmin &&
+      !isLocationUser
+    ) {
+      throw new BadRequestError("Borrow_agreement_not_accepted.");
+    }
+    hasAccepted = isAcceptingBorrowAgreement;
   }
   // Store the borrow agreement the reservation was made under
-  record.set(
-    "borrow_agreement",
-    hasAcceptedBefore || isAcceptingBorrowAgreement ? borrowAgreement : ""
-  );
+  record.set("borrow_agreement", hasAccepted ? borrowAgreement : "");
 
   // Strip html out of message field
   // https://stackoverflow.com/a/51208595
