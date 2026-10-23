@@ -227,6 +227,34 @@ select {
   background-color: var(--input-disabled-background-color);
 }
 
+// Content written with the rich text editor (RichTextarea). Also applied to the
+// editor itself, so the content looks the same while editing.
+.rich-text,
+.ql-container.ql-snow .ql-editor {
+  h3,
+  h4 {
+    margin: 1.5rem 0 0.5rem;
+    line-height: 1.15;
+    font-weight: var(--font-weight-bold);
+  }
+  h3 {
+    font-size: 1.125rem;
+  }
+  h4 {
+    font-size: 1rem;
+  }
+  p,
+  ol,
+  ul {
+    margin-bottom: 0.5rem;
+  }
+  li {
+    margin-bottom: 0.25rem;
+  }
+  > :first-child {
+    margin-top: 0;
+  }
+}
 .sr-only {
   position: absolute;
   width: 1px;

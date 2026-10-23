@@ -1,11 +1,11 @@
 <template>
   <div class="step">
     <p>{{ t("intro", { location: location.name }) }}</p>
-      <div
-        v-html="borrowAgreement.content"
+    <div
+      v-html="borrowAgreement.content"
       class="borrow-agreement rich-text"
-        data-testid="borrow-agreement-content"
-      ></div>
+      data-testid="borrow-agreement-content"
+    ></div>
     <Checkbox
       id="borrow-agreement-accept"
       data-testid="borrow-agreement-checkbox"
@@ -57,41 +57,6 @@ const { t } = useI18n({ useScope: "local" });
     // Clamp between min and max height
     height: clamp(10rem, 100dvh - 26rem, 21.5rem);
   }
-}
-.content {
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--text-color);
-}
-.content :deep(h3),
-.content :deep(h4) {
-  margin: 1.5rem 0 0.5rem;
-  line-height: 1.15;
-  font-weight: var(--font-weight-bold);
-  color: var(--text-color);
-}
-.content :deep(h3) {
-  font-size: 1.125rem;
-}
-.content :deep(h4) {
-  font-size: 1rem;
-}
-.content :deep(p) {
-  margin-bottom: 0.5rem;
-}
-.content :deep(ol),
-.content :deep(ul) {
-  padding-left: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-.content :deep(li[data-list="bullet"]) {
-  list-style-type: disc;
-}
-.content :deep(li) {
-  margin-bottom: 0.25rem;
-}
-.content :deep(> :first-child) {
-  margin-top: 0;
 }
 </style>
 
