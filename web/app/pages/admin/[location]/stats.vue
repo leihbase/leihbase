@@ -69,13 +69,13 @@ const { t } = useI18n({
 const route = useRoute();
 const { pb } = usePocketbase();
 
-const slug = route.params.location;
+const slug = route.params.location as string;
 
 const dateStart = ref<Date | undefined>(subtractDays(new Date(Date.now()), 30));
 const dateEnd = ref<Date | undefined>(new Date(Date.now()));
 
 const location = await useLocation({
-  slug: Array.isArray(slug) ? slug[0] : slug,
+  slug,
 });
 
 if (!location.value || !location.value.id) {

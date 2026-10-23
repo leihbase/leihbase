@@ -96,7 +96,7 @@ const { t } = useI18n({
   useScope: "local",
 });
 
-const slug = route.params.location;
+const slug = route.params.location as string;
 
 const reservationDrawerOpen = ref(false);
 const selectedReservation = ref<Reservation | null>(null);
@@ -106,7 +106,7 @@ const reservationUpdate = createEventHook();
 const { getOverdueReservations } = useReservations();
 
 const location = await useLocation({
-  slug: Array.isArray(slug) ? slug[0] : slug,
+  slug,
 });
 
 if (!location.value || !location.value.id) {

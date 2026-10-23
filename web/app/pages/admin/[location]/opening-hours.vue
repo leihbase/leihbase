@@ -139,12 +139,12 @@ const route = useRoute();
 const { pb } = usePocketbase();
 const { loading, update, errors } = usePocketbaseUpdate(pb, "location");
 
-const slug = route.params.location;
+const slug = route.params.location as string;
 const success = ref(false);
 const today = DateTime.now().toISODate()!;
 
 const location = await useLocation({
-  slug: Array.isArray(slug) ? slug[0] : slug,
+  slug,
 });
 
 if (!location.value || !location.value.id) {
