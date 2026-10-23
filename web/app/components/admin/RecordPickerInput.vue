@@ -30,6 +30,7 @@
       :multiple="multiple || false"
       :selected="records"
       :title="label"
+      :filter="filter"
       @select="handleSelect"
     />
   </Teleport>
@@ -65,6 +66,7 @@ const props = defineProps<{
   dataTestid?: string;
   multiple?: Multiple;
   description?: string;
+  filter?: string;
 }>();
 
 const showRecordPicker = ref(false);

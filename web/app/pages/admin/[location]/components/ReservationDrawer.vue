@@ -27,6 +27,7 @@
         :label="t('product')"
         collection="products"
         :columns="['name']"
+        :filter="pb.filter('location = {:location}', { location: location.id })"
         v-model="productId"
         required
       />
