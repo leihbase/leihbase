@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { ClientResponseError } from "pocketbase";
-import type { OpeningHours } from "../../web/lib/openingHours";
+import type { OpeningHours } from "../../web/models/openingHours";
 import { createLocation, DEFAULT_OPENING_HOURS } from "../lib/location";
 import { createUser, DEFAULT_PASSWORD } from "../lib/user";
 import { pocketbase } from "../services/pocketbase";
