@@ -56,7 +56,7 @@ function hasOverlappingReservations(reservation, allowSameDay) {
     reservation.get("id")
       ? `id != {:id} && product = {:product} && cancelled != true && ${startEndComparison}`
       : `product = {:product} && cancelled != true && ${startEndComparison}`,
-    null,
+    "",
     1,
     0,
     {

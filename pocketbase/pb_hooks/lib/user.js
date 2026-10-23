@@ -20,7 +20,7 @@ function hasActiveReservationForProduct(user, product, reservation) {
     reservation.get("id")
       ? `id != {:id} && user = {:user} && product = {:product} && end > {:endOfToday} && cancelled != true`
       : `user = {:user} && product = {:product} && end > {:endOfToday} && cancelled != true`,
-    null,
+    "",
     1,
     0,
     {

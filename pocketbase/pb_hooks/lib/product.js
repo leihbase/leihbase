@@ -25,7 +25,7 @@ function hasActiveReservation(
     ]
       .filter((v) => !!v)
       .join(" && "),
-    null,
+    "",
     1,
     0,
     {
@@ -50,7 +50,7 @@ function getActiveReservationsForDateRange(product, startDate, endDate) {
   return $app.findRecordsByFilter(
     "reservations",
     "cancelled != true && product = {:product} && start < {:endOfEndDate} && end >= {:startOfStartDate}",
-    null,
+    "",
     1,
     0,
     {

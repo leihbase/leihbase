@@ -23,9 +23,9 @@ onRecordCreateRequest((e) => {
   const requireUser = $os.getenv("CONFIG_RESERVATION_REQUIRE_USER") !== "false";
 
   // Store location of product in reservation
-  $app.expandRecord(record, ["product"], null);
+  $app.expandRecord(record, ["product"]);
   const product = record.expandedOne("product");
-  $app.expandRecord(product, ["location"], null);
+  $app.expandRecord(product, ["location"]);
   const location = product.expandedOne("location");
   const isAdmin = requestUser && requestUser.get("role") === "admin";
   const isLocationUser =
@@ -153,7 +153,7 @@ onRecordUpdateRequest((e) => {
   const isSuperuser = e.hasSuperuserAuth();
   const start = new Date(record.get("start").string().split(" ")[0]);
   const end = new Date(record.get("end").string().split(" ")[0]);
-  $app.expandRecord(record, ["location"], null);
+  $app.expandRecord(record, ["location"]);
   const location = record.expandedOne("location");
   const isAdmin = requestUser && requestUser.get("role") === "admin";
   const isLocationUser =
@@ -235,7 +235,7 @@ onRecordCreateRequest((e) => {
   }
 
   const requestUser = e.auth;
-  $app.expandRecord(record, ["location"], null);
+  $app.expandRecord(record, ["location"]);
   const location = record.expandedOne("location");
 
   if (!record.get("send_confirmation")) {
@@ -248,7 +248,7 @@ onRecordCreateRequest((e) => {
   // also the user involved in the reservation
   // https://pocketbase.io/docs/js-routing/#retrieving-the-current-auth-state
 
-  $app.expandRecord(record, ["product", "user"], null);
+  $app.expandRecord(record, ["product", "user"]);
 
   const product = record.expandedOne("product");
   const productName = product.get("name");
@@ -347,7 +347,7 @@ onRecordUpdateRequest((e) => {
 
   // Reservation got cancelled, send confirmations
   if (!originalRecord.getBool("cancelled") && record.getBool("cancelled")) {
-    $app.expandRecord(record, ["product", "location", "user"], null);
+    $app.expandRecord(record, ["product", "location", "user"]);
     const product = record.expandedOne("product");
     const location = record.expandedOne("location");
     const productName = product.get("name");
