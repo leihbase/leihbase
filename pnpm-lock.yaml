@@ -146,6 +146,9 @@ importers:
       taze:
         specifier: ^0.18.0
         version: 0.18.0(supports-color@10.2.2)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   web:
     dependencies:

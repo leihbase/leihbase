@@ -4,9 +4,10 @@
   "scripts": {
     "dev": "pnpm --filter @leihbase/web run dev",
     "test": "pnpm --filter @leihbase/tests run test",
-    "typecheck": "pnpm run typecheck:web && pnpm run typecheck:hooks",
+    "typecheck": "pnpm run typecheck:web && pnpm run typecheck:hooks && pnpm run typecheck:tests",
     "typecheck:web": "pnpm --filter @leihbase/web run typecheck",
     "typecheck:hooks": "tsc -p pocketbase/jsconfig.json --noEmit",
+    "typecheck:tests": "pnpm --filter @leihbase/tests run typecheck",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
   },

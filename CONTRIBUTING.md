@@ -89,7 +89,7 @@ admin interface are automatically written as migration files to
 $ pnpm format
 # Check formatting
 $ pnpm format:check
-# Typecheck the front-end and PocketBase hooks
+# Typecheck the front-end, PocketBase hooks and tests
 $ pnpm typecheck
 ```
 
