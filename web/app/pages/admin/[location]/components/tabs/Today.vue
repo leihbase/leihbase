@@ -29,7 +29,7 @@
         :label="t('show_cancelled')"
         orientation="horizontal"
         v-model="showCancelled"
-        @change="refresh()"
+        @update:model-value="refresh()"
       />
     </template>
   </TabHeader>

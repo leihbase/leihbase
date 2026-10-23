@@ -33,7 +33,8 @@
         :autocomplete="autocomplete"
         v-model="model"
         :class="{ 'lb-input': true, 'has-prefix': !!$slots.prefix }"
-        @blur="$emit('blur')"
+        @input="emit('input', $event)"
+        @blur="emit('blur')"
       />
     </div>
     <p v-if="error" :id="`${id}-error`" class="error">
@@ -48,7 +49,7 @@
 <script lang="ts" setup>
 import FormLabel from "./FormLabel.vue";
 
-const emits = defineEmits(["blur"]);
+const emit = defineEmits<{ input: [Event]; blur: [] }>();
 const model = defineModel();
 const props = withDefaults(
   defineProps<{
