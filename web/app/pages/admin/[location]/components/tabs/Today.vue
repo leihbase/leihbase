@@ -23,11 +23,8 @@
         <ArrowRight class="icon" />
       </button>
       <!-- Show cancelled switch -->
-      <Switch
+      <ShowCancelledSwitch
         id="show-cancelled"
-        class="show-cancelled"
-        :label="t('show_cancelled')"
-        orientation="horizontal"
         v-model="showCancelled"
         @update:model-value="refresh()"
       />
@@ -62,10 +59,10 @@ import type { Reservation } from "@@/models/reservation";
 import AdminReservationTable from "@/components/admin/AdminReservationsTable.vue";
 import Heading from "@/components/core/Heading.vue";
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
-import Switch from "@/components/core/Switch.vue";
 import { ArrowLeft, ArrowRight } from "@iconoir/vue";
 import type { EventHookOn } from "@vueuse/core";
 import type { RecordModel } from "pocketbase";
+import ShowCancelledSwitch from "../ShowCancelledSwitch.vue";
 import TabHeader from "../TabHeader.vue";
 
 const { pb } = usePocketbase();
@@ -85,7 +82,7 @@ props.reservationUpdateHook(() => {
 });
 
 const date = ref(new Date(Date.now()));
-const showCancelled = ref(false);
+const showCancelled = useShowCancelled();
 
 const {
   data: reservations,
@@ -122,8 +119,6 @@ function handleDayForward() {
 </script>
 
 <style lang="scss" scoped>
-@use "@/assets/styles/breakpoints.scss";
-
 .title-wrapper {
   min-width: 10rem;
   display: flex;
@@ -144,14 +139,6 @@ h3 {
     height: 1em;
   }
 }
-.show-cancelled {
-  width: auto;
-}
-@media screen and (min-width: breakpoints.$breakpoint-md) {
-  .show-cancelled {
-    margin-left: auto;
-  }
-}
 </style>
 
 <i18n lang="json">
@@ -160,15 +147,13 @@ h3 {
     "today": "today",
     "Today": "Today",
     "no_reservations_on_date": "No reservations starting or ending {date}",
-    "on": "at",
-    "show_cancelled": "Show cancelled"
+    "on": "at"
   },
   "de": {
     "today": "heute",
     "Today": "Heute",
     "no_reservations_on_date": "Es gibt keine Reservierungen, die {date} starten oder enden",
-    "on": "am",
-    "show_cancelled": "Stornierungen anzeigen"
+    "on": "am"
   }
 }
 </i18n>

@@ -1,5 +1,14 @@
 <template>
-  <TabHeader :title="t('ongoing_title')" />
+  <TabHeader :title="t('ongoing_title')">
+    <template #suffix>
+      <!-- Show cancelled switch -->
+      <ShowCancelledSwitch
+        id="show-cancelled-ongoing"
+        v-model="showCancelled"
+        @update:model-value="refresh()"
+      />
+    </template>
+  </TabHeader>
   <LoadingSpinner v-if="status === 'pending'" />
   <AdminReservationTable
     v-else-if="ongoingReservations && ongoingReservations.length > 0"
@@ -20,6 +29,7 @@ import AdminReservationTable from "@/components/admin/AdminReservationsTable.vue
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import type { EventHookOn } from "@vueuse/core";
 import type { RecordModel } from "pocketbase";
+import ShowCancelledSwitch from "../ShowCancelledSwitch.vue";
 import TabHeader from "../TabHeader.vue";
 
 const { pb } = usePocketbase();
@@ -38,6 +48,8 @@ props.reservationUpdateHook(() => {
   refresh();
 });
 
+const showCancelled = useShowCancelled();
+
 const {
   data: ongoingReservations,
   refresh,
@@ -47,7 +59,7 @@ const {
   async () =>
     pb.collection("reservations").getFullList({
       filter: pb.filter(
-        "location = {:location} && start < @todayStart && end > @todayEnd",
+        `location = {:location} && start < @todayStart && end > @todayEnd ${showCancelled.value ? "" : "&& cancelled = false"}`,
         {
           location: props.location.id,
         }

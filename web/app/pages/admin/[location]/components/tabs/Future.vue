@@ -1,5 +1,14 @@
 <template>
-  <TabHeader :title="t('future_title')" />
+  <TabHeader :title="t('future_title')">
+    <template #suffix>
+      <!-- Show cancelled switch -->
+      <ShowCancelledSwitch
+        id="show-cancelled-future"
+        v-model="showCancelled"
+        @update:model-value="refresh()"
+      />
+    </template>
+  </TabHeader>
   <LoadingSpinner v-if="status === 'pending'" />
   <AdminReservationTable
     v-else-if="futureReservations && futureReservations.length > 0"
@@ -20,6 +29,7 @@ import AdminReservationTable from "@/components/admin/AdminReservationsTable.vue
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import type { EventHookOn } from "@vueuse/core";
 import type { RecordModel } from "pocketbase";
+import ShowCancelledSwitch from "../ShowCancelledSwitch.vue";
 import TabHeader from "../TabHeader.vue";
 
 const { pb } = usePocketbase();
@@ -38,6 +48,8 @@ props.reservationUpdateHook(() => {
 
 const emit = defineEmits<{ select: [reservation: Reservation] }>();
 
+const showCancelled = useShowCancelled();
+
 const {
   data: futureReservations,
   refresh,
@@ -46,9 +58,12 @@ const {
   "admin_future_reservations",
   () =>
     pb.collection("reservations").getFullList({
-      filter: pb.filter("location = {:location} && start > @todayEnd", {
-        location: props.location.id,
-      }),
+      filter: pb.filter(
+        `location = {:location} && start > @todayEnd ${showCancelled.value ? "" : "&& cancelled = false"}`,
+        {
+          location: props.location.id,
+        }
+      ),
       sort: "start",
       expand: "product,user",
       requestKey: "admin_future_reservations",
