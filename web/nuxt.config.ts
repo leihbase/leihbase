@@ -45,6 +45,11 @@ export default defineNuxtConfig({
     },
   },
 
+  build: {
+    // Bundle Iconoir, otherwise it fails during SSR in production
+    transpile: ["@iconoir/vue"],
+  },
+
   modules: ["@pinia/nuxt", "./modules/pocketbase", "@nuxtjs/i18n"],
 
   i18n: {
