@@ -31,7 +31,6 @@ defineProps<{
 .checkbox {
   border: 0;
   padding: 0;
-  margin: 0;
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;

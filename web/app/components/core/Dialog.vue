@@ -7,7 +7,6 @@
       open,
       'was-open': wasOpen,
       inset,
-      'has-footer': !!$slots.footer,
       [`size-${size}`]: true,
     }"
     :aria-labelledby="id + '-title'"
@@ -149,12 +148,12 @@ dialog {
     footer {
       padding: 1.5rem 2rem;
     }
-    &.has-footer .body {
+    &:has(> footer) .body {
       padding-bottom: 1.5rem;
     }
   }
   // Let the body shrink and scroll, so the footer stays in view
-  &.has-footer .body {
+  &:has(> footer) .body {
     min-height: 0;
   }
 
