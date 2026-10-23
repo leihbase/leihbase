@@ -65,7 +65,7 @@ import Container from "@/components/core/Container.vue";
 import Heading from "@/components/core/Heading.vue";
 import Input from "@/components/core/Input.vue";
 import { PageAlertType } from "@/components/page-alert/PageAlert.model";
-import type { User } from "~~/models/User";
+import type { User } from "~~/models/user";
 
 useHead({
   title: `Login`,
