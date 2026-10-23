@@ -1,5 +1,5 @@
-import type { OpeningHours } from "~~/lib/openingHours";
 import type { RecordModel } from "pocketbase";
+import type { OpeningHours } from "./openingHours";
 
 export type Location = RecordModel & {
   id: string;

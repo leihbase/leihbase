@@ -1,23 +1,12 @@
 import { DateTime } from "luxon";
+import type {
+  OpeningHours,
+  OpeningHoursDays,
+  OpeningHoursRange,
+} from "../models/openingHours";
 import { formatDate, getStartOfDay } from "./date";
 
-export type OpeningHoursRange = {
-  from: string;
-  to: string;
-};
-
-type OpeningHoursDays = {
-  [key: string]: OpeningHoursRange[];
-};
-
-type OpeningHoursExcept = {
-  dates: string[];
-};
-
-export type OpeningHours = {
-  days: OpeningHoursDays;
-  except: OpeningHoursExcept;
-};
+export type { OpeningHours, OpeningHoursRange } from "../models/openingHours";
 
 /**
  * Week days in the order they are displayed, starting on Monday.
