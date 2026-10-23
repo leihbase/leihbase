@@ -7,6 +7,7 @@
       open,
       'was-open': wasOpen,
       inset,
+      'has-footer': !!$slots.footer,
       [`size-${size}`]: true,
     }"
     :aria-labelledby="id + '-title'"
@@ -25,6 +26,9 @@
     <div class="body">
       <slot></slot>
     </div>
+    <footer v-if="$slots.footer">
+      <slot name="footer"></slot>
+    </footer>
   </dialog>
 </template>
 
@@ -142,6 +146,16 @@ dialog {
     .body {
       padding-bottom: 2rem;
     }
+    footer {
+      padding: 1.5rem 2rem;
+    }
+    &.has-footer .body {
+      padding-bottom: 1.5rem;
+    }
+  }
+  // Let the body shrink and scroll, so the footer stays in view
+  &.has-footer .body {
+    min-height: 0;
   }
 
   &.size-md {
@@ -200,7 +214,19 @@ header {
   }
 }
 .body {
+  // Fill the height of the dialog
+  flex: 1 1 auto;
   overflow-y: auto;
+}
+footer {
+  border-top: 1px solid var(--input-border-color);
+}
+</style>
+
+<style>
+/* Prevent scrolling the page behind an open dialog */
+html:has(dialog.dialog[open]) {
+  overflow: hidden;
 }
 </style>
 
