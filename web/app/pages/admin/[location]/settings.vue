@@ -112,6 +112,28 @@
       </AdminSection>
 
       <AdminSection
+        :title="t('borrow-agreement.title')"
+        :description="t('borrow-agreement.description')"
+      >
+        <RichTextarea
+          :label="t('borrow-agreement.label')"
+          v-model="borrowAgreementContent"
+          :headings="[3, 4]"
+          height="24rem"
+          data-testid="borrow-agreement-input"
+          class="max-w"
+        />
+        <Switch
+          v-if="borrowAgreement"
+          id="borrow-agreement-minor-edit"
+          v-model="isBorrowAgreementMinorEdit"
+          :label="t('borrow-agreement.minor-edit.label')"
+          :description="t('borrow-agreement.minor-edit.description')"
+          data-testid="borrow-agreement-minor-edit"
+        />
+      </AdminSection>
+
+      <AdminSection
         :title="t('email_settings')"
         :description="t('email_settings_description')"
       >
@@ -158,6 +180,7 @@ import RadioBox from "@/components/core/RadioBox.vue";
 import RichTextarea from "@/components/core/RichTextarea.vue";
 import Switch from "@/components/core/Switch.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
+import type { BorrowAgreement } from "~~/models/borrowAgreement";
 import { ClientResponseError } from "pocketbase";
 import AdminHeader from "./components/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
@@ -169,6 +192,7 @@ const { loading, update, errors } = usePocketbaseUpdate(pb, "location");
 
 const slug = route.params.location as string;
 const success = ref(false);
+const isBorrowAgreementMinorEdit = ref(false);
 
 const location = await useLocation({
   slug,
@@ -181,17 +205,66 @@ if (!location.value || !location.value.id) {
   });
 }
 
+const { data: borrowAgreement } = await useAsyncData(
+  "admin_location_borrow_agreement",
+  async () =>
+    location.value?.borrow_agreement
+      ? await pb
+          .collection("borrow_agreements")
+          .getOne<BorrowAgreement>(location.value.borrow_agreement)
+      : null
+);
+const borrowAgreementContent = ref<string | undefined>(
+  borrowAgreement.value?.content
+);
+
 useHead({
   title: `${t("title")} | ${location.value.name}`,
 });
 
+/**
+ * Saves the borrow agreement content. A minor edit updates the current borrow
+ * agreement in place, otherwise a new borrow agreement is created, which users
+ * have to accept again. Returns the id of the current borrow agreement.
+ */
+async function saveBorrowAgreement() {
+  const content = borrowAgreementContent.value || "";
+  if (content === (borrowAgreement.value?.content || "")) {
+    return borrowAgreement.value?.id || "";
+  }
+  if (!content) {
+    borrowAgreement.value = null;
+    return "";
+  }
+  if (isBorrowAgreementMinorEdit.value && borrowAgreement.value) {
+    borrowAgreement.value = await pb
+      .collection("borrow_agreements")
+      .update<BorrowAgreement>(borrowAgreement.value.id, { content });
+  } else {
+    borrowAgreement.value = await pb
+      .collection("borrow_agreements")
+      .create<BorrowAgreement>({ location: location.value!.id, content });
+  }
+  return borrowAgreement.value.id;
+}
+
+/**
+ * Save the admin settings
+ */
 async function handleSubmit(e: SubmitEvent) {
+  // Get the form data
   const data = new FormData(e.target as HTMLFormElement);
+
+  // Set 'allow_same_day_reservations' as boolean field explicitly to 'true' or 'false'
   data.set(
     "allow_same_day_reservations",
     data.get("allow_same_day_reservations") ? "true" : "false"
   );
+
   try {
+    // First store the borrow_agreement (when changed), then send the id of the (new) borrow agreement along
+    data.set("borrow_agreement", await saveBorrowAgreement());
+    isBorrowAgreementMinorEdit.value = false;
     location.value = await update(location.value!.id, data);
     success.value = true;
   } catch (e) {
@@ -249,6 +322,15 @@ async function handleSubmit(e: SubmitEvent) {
       "label": "Same day reservations",
       "description": "Allow a new reservation to start on the same day as the previous reservation ends"
     },
+    "borrow-agreement": {
+      "title": "Borrowing terms",
+      "description": "Users have to accept the borrowing terms before their first reservation at this location. Leave empty to not require borrowing terms.",
+      "label": "Borrowing terms",
+      "minor-edit": {
+        "label": "Minor edit",
+        "description": "Users who accepted the borrowing terms don't have to accept them again. Only use this for small corrections, like typos. Without this, all users have to accept the changed borrowing terms."
+      }
+    },
     "email_settings": "Email",
     "email_settings_description": "Contact address of the location, and the emails sent to borrowers.",
     "manage_email_templates": "Configure email templates",
@@ -288,6 +370,15 @@ async function handleSubmit(e: SubmitEvent) {
     "allow-same-day-reservations": {
       "label": "Reservierungen am selben Tag",
       "description": "Ermöglicht den Beginn einer neuen Reservierung am selben Tag, an dem die vorherige Reservierung endet."
+    },
+    "borrow-agreement": {
+      "title": "Leihbedingungen",
+      "description": "Nutzer müssen die Leihbedingungen vor ihrer ersten Reservierung an diesem Standort akzeptieren. Leer lassen, um keine Leihbedingungen zu verlangen.",
+      "label": "Leihbedingungen",
+      "minor-edit": {
+        "label": "Kleine Änderung",
+        "description": "Nutzer, die die Leihbedingungen akzeptiert haben, müssen sie nicht erneut akzeptieren. Nur für kleine Korrekturen wie Tippfehler verwenden. Ohne diese Option müssen alle Nutzer die geänderten Leihbedingungen erneut akzeptieren."
+      }
     },
     "email_settings": "E-Mail",
     "email_settings_description": "Kontaktadresse des Standorts und die E-Mails an Ausleihende.",

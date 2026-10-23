@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { login } from "../lib/login";
 import {
   createProduct,
@@ -6,58 +6,10 @@ import {
   navigateToProductPage,
   updateLastProductReservation,
 } from "../lib/product";
+import { reserve } from "../lib/reservation";
 import { createUser } from "../lib/user";
 import { uniqueId, waitForClientMount } from "../lib/utils";
 import { pocketbase } from "../services/pocketbase";
-
-async function reserve(
-  page: Page,
-  startIndex: number,
-  endIndex: number,
-  navigateToNextMonth = true
-) {
-  // Click reserve
-  await waitForClientMount(page.getByTestId("reserve-button"));
-  await page.getByTestId("reserve-button").click();
-  // Reserve
-  await expect(page.getByTestId("opening-hours")).toBeVisible();
-  // enter start
-  await page.getByTestId("start-input").click();
-  await expect(page.getByTestId("start-input-calendar")).toBeVisible();
-  // go to next month to be sure we're not trying to reserve at the end
-  // of this month, as it might result in no date buttons being available
-  if (navigateToNextMonth) {
-    await page
-      .getByTestId("start-input-calendar")
-      .locator("div button")
-      .nth(1)
-      .click({ force: true });
-  }
-  await page
-    .getByTestId("start-input-calendar")
-    .locator("shadow=calendar-month >> td button:not([aria-disabled=true])")
-    .nth(startIndex)
-    .click();
-  // enter end
-  await page.getByTestId("end-input").click();
-  await expect(page.getByTestId("end-input-calendar")).toBeVisible();
-  // go to next month to be sure we're not trying to reserve at the end
-  // of this month, as it might result in no date buttons being available
-  if (navigateToNextMonth) {
-    await page
-      .getByTestId("end-input-calendar")
-      .locator("div button")
-      .nth(1)
-      .click({ force: true });
-  }
-  await page
-    .getByTestId("end-input-calendar")
-    .locator("shadow=calendar-month >> td button:not([aria-disabled=true])")
-    .nth(endIndex)
-    .click();
-  // submit
-  await page.getByTestId("reserve-submit").click();
-}
 
 test.describe("reservation", () => {
   test("visitor can reserve a product", async ({ page }) => {

@@ -7,7 +7,10 @@ onRecordCreateRequest((e) => {
     `${__hooks}/lib/reservation`
   );
   /** @type {typeof import('./lib/user')} */
-  const { hasActiveReservationForProduct } = require(`${__hooks}/lib/user`);
+  const {
+    hasActiveReservationForProduct,
+    hasAcceptedBorrowAgreement,
+  } = require(`${__hooks}/lib/user`);
   /** @type {typeof import('./lib/product')} */
   const { hasActiveReservation } = require(`${__hooks}/lib/product`);
 
@@ -126,6 +129,35 @@ onRecordCreateRequest((e) => {
     throw new BadRequestError("Overlapping_reservation.");
   }
 
+  // Require the borrow agreement of the location to be accepted by the user,
+  // either before or by sending its id along with this reservation
+  const borrowAgreement = location.getString("borrow_agreement");
+  const reservationUser = record.getString("user")
+    ? $app.findRecordById("users", record.getString("user"))
+    : null;
+  let hasAccepted =
+    !!borrowAgreement &&
+    !!reservationUser &&
+    hasAcceptedBorrowAgreement(reservationUser, borrowAgreement);
+  let isAcceptingBorrowAgreement = false;
+  if (borrowAgreement && reservationUser && !hasAccepted) {
+    // Only the user themselves can accept the borrow agreement
+    isAcceptingBorrowAgreement =
+      requestUser?.id === reservationUser.id &&
+      record.getString("borrow_agreement") === borrowAgreement;
+    if (
+      !isAcceptingBorrowAgreement &&
+      !isSuperuser &&
+      !isAdmin &&
+      !isLocationUser
+    ) {
+      throw new BadRequestError("Borrow_agreement_not_accepted.");
+    }
+    hasAccepted = isAcceptingBorrowAgreement;
+  }
+  // Store the borrow agreement the reservation was made under
+  record.set("borrow_agreement", hasAccepted ? borrowAgreement : "");
+
   // Strip html out of message field
   // https://stackoverflow.com/a/51208595
   record.set(
@@ -134,6 +166,13 @@ onRecordCreateRequest((e) => {
   );
 
   e.next();
+
+  // Store the acceptance of the borrow agreement on the user, after the
+  // reservation has been created successfully
+  if (isAcceptingBorrowAgreement && reservationUser) {
+    reservationUser.set("accepted_borrow_agreements+", borrowAgreement);
+    $app.save(reservationUser);
+  }
 }, "reservations");
 
 onRecordUpdateRequest((e) => {
@@ -208,6 +247,14 @@ onRecordUpdateRequest((e) => {
     !!locationConfig.allow_same_day_reservations;
   if (hasOverlappingReservations(record, allowSameDayReservations)) {
     throw new BadRequestError("Overlapping_reservation.");
+  }
+
+  // The borrow agreement a reservation was made under can't be changed
+  if (!isSuperuser) {
+    record.set(
+      "borrow_agreement",
+      record.original().getString("borrow_agreement")
+    );
   }
 
   e.next();
