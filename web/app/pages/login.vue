@@ -4,7 +4,7 @@
       <Heading is="h1" size="xl" cap data-testid="login-h1">
         {{ t("title") }}
       </Heading>
-      <i18n-t keypath="text" tag="p" for="signup_text">
+      <i18n-t keypath="text" tag="p">
         <NuxtLink to="/signup" data-testid="signup-link">
           {{ t("signup_text") }}
         </NuxtLink>
@@ -26,7 +26,6 @@
           name="password"
           data-testid="password-input"
           required
-          password-toggle
           v-model="password"
         />
         <Alert
@@ -35,7 +34,7 @@
           class="error"
           data-testid="login-error"
         >
-          <i18n-t keypath="error" tag="span" for="error_signup">
+          <i18n-t keypath="error" tag="span">
             <NuxtLink to="/signup">{{ t("error_signup") }}</NuxtLink>
           </i18n-t>
         </Alert>

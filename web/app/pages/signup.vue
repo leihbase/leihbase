@@ -4,7 +4,7 @@
       <Heading is="h1" size="xl" cap data-testid="signup-h1">
         {{ t("title") }}
       </Heading>
-      <i18n-t keypath="text" tag="p" for="login_text">
+      <i18n-t keypath="text" tag="p">
         <NuxtLink to="/login">{{ t("login_text") }}</NuxtLink>
       </i18n-t>
       <form @submit.prevent="handleSubmit" method="post">
@@ -42,11 +42,7 @@
             required
           />
           <label for="terms-and-conditions">
-            <i18n-t
-              keypath="terms_and_conditions"
-              tag="span"
-              for="terms_and_conditions_link"
-            >
+            <i18n-t keypath="terms_and_conditions" tag="span">
               <NuxtLink target="_blank" :to="leihbase.privacy_policy_link">{{
                 t("terms_and_conditions_link")
               }}</NuxtLink>
