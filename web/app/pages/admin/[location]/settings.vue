@@ -131,6 +131,14 @@
           :description="t('borrow-agreement.minor-edit.description')"
           data-testid="borrow-agreement-minor-edit"
         />
+        <Switch
+          v-if="borrowAgreementContent"
+          id="borrow-agreement-optional"
+          v-model="isBorrowAgreementOptional"
+          :label="t('borrow-agreement.optional.label')"
+          :description="t('borrow-agreement.optional.description')"
+          data-testid="borrow-agreement-optional"
+        />
       </AdminSection>
 
       <AdminSection
@@ -217,6 +225,7 @@ const { data: borrowAgreement } = await useAsyncData(
 const borrowAgreementContent = ref<string | undefined>(
   borrowAgreement.value?.content
 );
+const isBorrowAgreementOptional = ref(location.value.borrow_agreement_optional);
 
 useHead({
   title: `${t("title")} | ${location.value.name}`,
@@ -259,6 +268,10 @@ async function handleSubmit(e: SubmitEvent) {
   data.set(
     "allow_same_day_reservations",
     data.get("allow_same_day_reservations") ? "true" : "false"
+  );
+  data.set(
+    "borrow_agreement_optional",
+    isBorrowAgreementOptional.value ? "true" : "false"
   );
 
   try {
@@ -324,11 +337,15 @@ async function handleSubmit(e: SubmitEvent) {
     },
     "borrow-agreement": {
       "title": "Borrowing terms",
-      "description": "Users have to accept the borrowing terms before their first reservation at this location. Leave empty to not require borrowing terms.",
+      "description": "Users have to accept the borrowing terms of this location once. Leave empty to not use borrowing terms.",
       "label": "Borrowing terms",
       "minor-edit": {
         "label": "Minor edit",
         "description": "Users who accepted the borrowing terms don't have to accept them again. Only use this for small corrections, like typos. Without this, all users have to accept the changed borrowing terms."
+      },
+      "optional": {
+        "label": "Allow accepting later",
+        "description": "Users can reserve without accepting the borrowing terms, and accept them later or in the store. Without this, users have to accept the borrowing terms before reserving."
       }
     },
     "email_settings": "Email",
@@ -373,11 +390,15 @@ async function handleSubmit(e: SubmitEvent) {
     },
     "borrow-agreement": {
       "title": "Leihbedingungen",
-      "description": "Nutzer müssen die Leihbedingungen vor ihrer ersten Reservierung an diesem Standort akzeptieren. Leer lassen, um keine Leihbedingungen zu verlangen.",
+      "description": "Nutzer müssen die Leihbedingungen dieses Standorts einmalig akzeptieren. Leer lassen, um keine Leihbedingungen zu verwenden.",
       "label": "Leihbedingungen",
       "minor-edit": {
         "label": "Kleine Änderung",
         "description": "Nutzer, die die Leihbedingungen akzeptiert haben, müssen sie nicht erneut akzeptieren. Nur für kleine Korrekturen wie Tippfehler verwenden. Ohne diese Option müssen alle Nutzer die geänderten Leihbedingungen erneut akzeptieren."
+      },
+      "optional": {
+        "label": "Später akzeptieren erlauben",
+        "description": "Nutzer können reservieren, ohne die Leihbedingungen zu akzeptieren, und sie später oder vor Ort akzeptieren. Ohne diese Option müssen Nutzer die Leihbedingungen vor dem Reservieren akzeptieren."
       }
     },
     "email_settings": "E-Mail",

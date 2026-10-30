@@ -129,21 +129,24 @@ onRecordCreateRequest((e) => {
     throw new BadRequestError("Overlapping_reservation.");
   }
 
-  // Require the borrow agreement of the location to be accepted by the user,
-  // either before or by sending its id along with this reservation
+  // Unless optional for the location, the borrow agreement has to be accepted
+  // by the user, either before or by sending its id along with this reservation. Keep
+  // this check after all other validation: the reservation dialog relies on
+  // this error meaning the reservation is otherwise valid.
   const borrowAgreement = location.getString("borrow_agreement");
   const reservationUser = record.getString("user");
-  const requiresAcceptance =
+  const isAcceptanceMissing =
     !!borrowAgreement &&
     !!reservationUser &&
     !hasAcceptedBorrowAgreement(reservationUser, borrowAgreement);
   // Only the user themselves can accept the borrow agreement
   const isAcceptingBorrowAgreement =
-    requiresAcceptance &&
+    isAcceptanceMissing &&
     requestUser?.id === reservationUser &&
     e.requestInfo().body.borrow_agreement === borrowAgreement;
   if (
-    requiresAcceptance &&
+    isAcceptanceMissing &&
+    !location.getBool("borrow_agreement_optional") &&
     !isAcceptingBorrowAgreement &&
     !isSuperuser &&
     !isAdmin &&

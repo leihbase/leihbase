@@ -185,6 +185,68 @@ test.describe("borrow agreement", () => {
   });
 });
 
+test.describe("optional borrow agreement", () => {
+  /**
+   * Same as `setup`, with the borrow agreement of the location set as optional
+   */
+  async function setupOptional() {
+    const data = await setup();
+    const pb = await pocketbase();
+    await pb
+      .collection("location")
+      .update(data.location.id, { borrow_agreement_optional: true });
+    return data;
+  }
+
+  test("the borrow agreement is required by default", async () => {
+    const { location, userPb } = await setup();
+
+    const publicLocation = await userPb
+      .collection("public_locations")
+      .getOne(location.id);
+    expect(publicLocation.borrow_agreement_optional).toBe(false);
+  });
+
+  test("a reservation can be created without accepting the borrow agreement", async () => {
+    const { location, product, user, userPb } = await setupOptional();
+
+    await expect(reserve(userPb, user, product, [1, 2])).resolves.toBeDefined();
+    expect(await getBorrowAgreementAcceptances(user.id)).toHaveLength(0);
+
+    const publicLocation = await userPb
+      .collection("public_locations")
+      .getOne(location.id);
+    expect(publicLocation.borrow_agreement_optional).toBe(true);
+  });
+
+  test("the borrow agreement can still be accepted along with a reservation", async () => {
+    const { borrowAgreement, product, user, userPb } = await setupOptional();
+
+    await reserve(userPb, user, product, [1, 2], borrowAgreement);
+    const acceptances = await getBorrowAgreementAcceptances(user.id);
+    expect(acceptances.map((a) => a.borrow_agreement)).toEqual([
+      borrowAgreement.id,
+    ]);
+  });
+
+  test("only admins can make the borrow agreement optional", async () => {
+    const { location } = await setup();
+    const { pb: managerPb } = await createStaff("manager", [location.id]);
+    const { pb: adminPb } = await createStaff("admin");
+
+    await expect(
+      managerPb
+        .collection("location")
+        .update(location.id, { borrow_agreement_optional: true })
+    ).rejects.toThrow(ClientResponseError);
+    await expect(
+      adminPb
+        .collection("location")
+        .update(location.id, { borrow_agreement_optional: true })
+    ).resolves.toBeDefined();
+  });
+});
+
 test.describe("borrow agreement acceptance", () => {
   test("a user can accept the current borrow agreement directly", async () => {
     const { borrowAgreement, product, user, userPb } = await setup();
