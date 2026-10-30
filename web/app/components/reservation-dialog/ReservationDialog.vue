@@ -57,7 +57,10 @@
 </template>
 
 <script setup lang="ts">
-import type { BorrowAgreement } from "~~/models/borrowAgreement.js";
+import type {
+  BorrowAgreement,
+  BorrowAgreementAcceptance,
+} from "~~/models/borrowAgreement.js";
 import type { Location } from "~~/models/location.js";
 import type { Reservation } from "~~/models/reservation.js";
 import { ClientResponseError } from "pocketbase";
@@ -86,16 +89,12 @@ const isSubmittingReservation = ref(false);
 // Borrow agreement
 const step = ref<"dates" | "agreement">("dates");
 const borrowAgreement = ref<BorrowAgreement>();
-const requiresBorrowAgreement = computed(
-  () =>
-    !!location.value?.borrow_agreement &&
-    !(user.value?.accepted_borrow_agreements || []).includes(
-      location.value.borrow_agreement
-    )
-);
+const requiresBorrowAgreement = ref(false);
 
 watch(isOpen, (newValue) => {
-  if (!newValue) {
+  if (newValue) {
+    checkBorrowAgreementAcceptance();
+  } else {
     start.value = undefined;
     end.value = undefined;
     step.value = "dates";
@@ -103,6 +102,35 @@ watch(isOpen, (newValue) => {
     reservationCreationError.value = undefined;
   }
 });
+
+/**
+ * Checks if the user has to accept the current borrow agreement of the
+ * location. When this fails the reservation is submitted without accepting, and
+ * the server rejects it if accepting is required.
+ */
+async function checkBorrowAgreementAcceptance() {
+  requiresBorrowAgreement.value = false;
+  if (!location.value?.borrow_agreement || !user.value?.id) {
+    return;
+  }
+  try {
+    const acceptances = await pb
+      .collection("borrow_agreement_acceptances")
+      .getList<BorrowAgreementAcceptance>(1, 1, {
+        filter: pb.filter(
+          "user = {:user} && borrow_agreement = {:borrowAgreement}",
+          {
+            user: user.value.id,
+            borrowAgreement: location.value.borrow_agreement,
+          }
+        ),
+        skipTotal: true,
+      });
+    requiresBorrowAgreement.value = acceptances.items.length === 0;
+  } catch (e) {
+    console.error("Failed to check borrow agreement acceptance", e);
+  }
+}
 
 /**
  * Shows the current borrow agreement of the location, to be accepted before
@@ -234,11 +262,7 @@ async function onSubmit() {
     return;
   }
 
-  // Refresh the user, to include newly accepted borrow agreements
-  await Promise.all([
-    userStore.fetchUserReservations(),
-    pb.collection("users").authRefresh(),
-  ]);
+  await userStore.fetchUserReservations();
   nuxtApp.callHook("app:user:reservation:create", reservation);
   isSubmittingReservation.value = false;
   isOpen.value = false;
