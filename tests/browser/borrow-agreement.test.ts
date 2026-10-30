@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { createBorrowAgreement } from "../lib/borrowAgreement";
+import {
+  createBorrowAgreement,
+  getBorrowAgreementAcceptances,
+} from "../lib/borrowAgreement";
 import { createLocation } from "../lib/location";
 import { login } from "../lib/login";
 import { createProduct } from "../lib/product";
@@ -35,9 +38,8 @@ test.describe("borrow agreement", () => {
     await page.getByTestId("reserve-submit").click();
     await expect(page.getByTestId("opening-hours")).toBeHidden();
 
-    const pb = await pocketbase();
-    const updatedUser = await pb.collection("users").getOne(user.id);
-    expect(updatedUser.accepted_borrow_agreements).toEqual([
+    const acceptances = await getBorrowAgreementAcceptances(user.id);
+    expect(acceptances.map((a) => a.borrow_agreement)).toEqual([
       borrowAgreement.id,
     ]);
 
@@ -46,6 +48,7 @@ test.describe("borrow agreement", () => {
     await reserve(page, 0, 1);
     await expect(page.getByTestId("opening-hours")).toBeHidden();
     await expect(page.getByTestId("borrow-agreement-content")).toBeHidden();
+    const pb = await pocketbase();
     const reservations = await pb.collection("reservations").getFullList({
       filter: pb.filter("user = {:user}", { user: user.id }),
     });

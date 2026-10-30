@@ -19,3 +19,13 @@ export async function createBorrowAgreement(
     .update(location.id, { borrow_agreement: borrowAgreement.id });
   return borrowAgreement;
 }
+
+/**
+ * Returns the borrow agreement acceptances of the user
+ */
+export async function getBorrowAgreementAcceptances(userId: string) {
+  const pb = await pocketbase();
+  return pb.collection("borrow_agreement_acceptances").getFullList({
+    filter: pb.filter("user = {:user}", { user: userId }),
+  });
+}
