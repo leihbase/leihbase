@@ -35,16 +35,20 @@ function hasActiveReservationForProduct(user, product, reservation) {
 
 /**
  * Checks if a user has accepted the given borrow agreement.
- * @param {core.Record} user
+ * @param {string} user
  * @param {string} borrowAgreement
  * @returns {boolean}
  */
 function hasAcceptedBorrowAgreement(user, borrowAgreement) {
-  return (
-    user
-      .getStringSlice("accepted_borrow_agreements")
-      .indexOf(borrowAgreement) !== -1
+  const records = $app.findRecordsByFilter(
+    "borrow_agreement_acceptances",
+    "user = {:user} && borrow_agreement = {:borrowAgreement}",
+    "",
+    1,
+    0,
+    { user, borrowAgreement }
   );
+  return records.length > 0;
 }
 
 module.exports = {
