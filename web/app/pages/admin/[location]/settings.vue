@@ -124,7 +124,9 @@
           class="max-w"
         />
         <Switch
-          v-if="borrowAgreement"
+          v-if="
+            borrowAgreement && borrowAgreementContent && isBorrowAgreementEdited
+          "
           id="borrow-agreement-minor-edit"
           v-model="isBorrowAgreementMinorEdit"
           :label="t('borrow-agreement.minor-edit.label')"
@@ -225,6 +227,12 @@ const { data: borrowAgreement } = await useAsyncData(
 const borrowAgreementContent = ref<string | undefined>(
   borrowAgreement.value?.content
 );
+// If the borrow agreement has been edited since loading or saving, even when
+// the content ended up the same
+const isBorrowAgreementEdited = ref(false);
+watch(borrowAgreementContent, () => {
+  isBorrowAgreementEdited.value = true;
+});
 const isBorrowAgreementOptional = ref(location.value.borrow_agreement_optional);
 
 useHead({
@@ -278,6 +286,7 @@ async function handleSubmit(e: SubmitEvent) {
     // First store the borrow_agreement (when changed), then send the id of the (new) borrow agreement along
     data.set("borrow_agreement", await saveBorrowAgreement());
     isBorrowAgreementMinorEdit.value = false;
+    isBorrowAgreementEdited.value = false;
     location.value = await update(location.value!.id, data);
     success.value = true;
   } catch (e) {
@@ -345,7 +354,7 @@ async function handleSubmit(e: SubmitEvent) {
       },
       "optional": {
         "label": "Allow accepting later",
-        "description": "Users can reserve without accepting the borrowing terms, and accept them later or in the store. Without this, users have to accept the borrowing terms before reserving."
+        "description": "Users can reserve without accepting the borrowing terms, and accept them later or in the store."
       }
     },
     "email_settings": "Email",
@@ -398,7 +407,7 @@ async function handleSubmit(e: SubmitEvent) {
       },
       "optional": {
         "label": "Später akzeptieren erlauben",
-        "description": "Nutzer können reservieren, ohne die Leihbedingungen zu akzeptieren, und sie später oder vor Ort akzeptieren. Ohne diese Option müssen Nutzer die Leihbedingungen vor dem Reservieren akzeptieren."
+        "description": "Nutzer können reservieren, ohne die Leihbedingungen zu akzeptieren, und sie später oder vor Ort akzeptieren."
       }
     },
     "email_settings": "E-Mail",
