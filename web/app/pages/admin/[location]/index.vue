@@ -103,7 +103,7 @@ const { data: overdueReservations } = await useAdminReservations(
 );
 
 function handleReservationUpdate() {
-  refreshAdminReservations();
+  refreshAdminReservations(location.value!);
 }
 
 function handleReservationSelect(reservation: Reservation) {

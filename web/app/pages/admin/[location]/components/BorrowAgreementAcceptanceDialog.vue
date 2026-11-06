@@ -64,7 +64,7 @@ async function handleConfirmClick() {
     }
     action.value = null;
     // Update the status in the reservation tables
-    refreshAdminReservations();
+    refreshAdminReservations(props.location);
   } catch (e) {
     error.value = t("error");
   } finally {

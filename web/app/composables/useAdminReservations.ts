@@ -17,13 +17,13 @@ const TABS: AdminReservationsTab[] = [
   "past",
 ];
 
-function getKey(tab: AdminReservationsTab) {
-  return `admin_reservations_${tab}`;
+function getKey(location: Location, tab: AdminReservationsTab) {
+  return `admin_reservations_${location.id}_${tab}`;
 }
 
 /**
  * Loads the reservations of a tab of the admin overview. Tabs using the same
- * `tab` share their data, and are refreshed with `refreshAdminReservations`.
+ * `location` and `tab` share their data, and are refreshed with `refreshAdminReservations`.
  */
 export function useAdminReservations(
   location: Location,
@@ -74,7 +74,7 @@ export function useAdminReservations(
   }
 
   return useAsyncData<Reservation[]>(
-    getKey(tab),
+    getKey(location, tab),
     async () => {
       const { filter, sort, limit } = getQuery();
       const options = {
@@ -87,7 +87,7 @@ export function useAdminReservations(
         }),
         sort,
         expand: "product,user,user.borrow_agreement_acceptances_via_user",
-        requestKey: getKey(tab),
+        requestKey: getKey(location, tab),
       };
       return limit
         ? (
@@ -109,8 +109,8 @@ export function useAdminReservations(
 }
 
 /**
- * Refreshes the reservations of all tabs of the admin overview
+ * Refreshes the reservations of all tabs of the admin overview of the location
  */
-export function refreshAdminReservations() {
-  return refreshNuxtData(TABS.map(getKey));
+export function refreshAdminReservations(location: Location) {
+  return refreshNuxtData(TABS.map((tab) => getKey(location, tab)));
 }

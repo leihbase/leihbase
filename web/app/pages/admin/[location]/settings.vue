@@ -216,7 +216,7 @@ if (!location.value || !location.value.id) {
 }
 
 const { data: borrowAgreement } = await useAsyncData(
-  "admin_location_borrow_agreement",
+  `admin_location_borrow_agreement_${slug}`,
   async () =>
     location.value?.borrow_agreement
       ? await pb

@@ -6,7 +6,7 @@ export async function useLocation<T extends RecordModel = RecordModel>({
   slug: string;
 }) {
   const { pb } = usePocketbase();
-  const { data: location } = await useAsyncData("admin_location", () =>
+  const { data: location } = await useAsyncData(`admin_location_${slug}`, () =>
     pb
       .collection("location")
       .getFirstListItem<T>(pb.filter("slug = {:slug}", { slug }))
