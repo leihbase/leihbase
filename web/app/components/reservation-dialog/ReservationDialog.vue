@@ -1,6 +1,7 @@
 <template>
   <Dialog v-model:open="isOpen" inset :title="t('reserve')">
     <form v-if="product && location" :id="formId" @submit.prevent="onSubmit">
+      <!-- Step 1: product, date & message -->
       <ReservationDatesStep
         v-if="step === 'dates'"
         :location="location"
@@ -9,8 +10,16 @@
         v-model:end="end"
         v-model:message="message"
       />
-      <ReservationBorrowAgreementStep
-        v-if="step === 'agreement' && borrowAgreement"
+      <!-- Step 2.A: accept required borrow agreement  -->
+      <ReservationRequiredBorrowAgreementStep
+        v-if="step === 'required-agreement' && borrowAgreement"
+        :key="borrowAgreement.id"
+        :location="location"
+        :borrow-agreement="borrowAgreement"
+      />
+      <!-- Step 2.B: accept or skip optional borrow agreement  -->
+      <ReservationOptionalBorrowAgreementStep
+        v-if="step === 'optional-agreement' && borrowAgreement"
         :key="borrowAgreement.id"
         :location="location"
         :borrow-agreement="borrowAgreement"
@@ -18,18 +27,20 @@
     </form>
     <template #footer>
       <div class="footer">
+        <!-- Error message -->
         <Alert
-          v-if="reservationCreationError"
+          v-if="error"
           variant="error"
           data-testid="reservation-form-error"
           class="alert"
         >
-          {{ reservationCreationError }}
+          {{ error }}
         </Alert>
 
         <div class="buttons">
+          <!-- Back button -->
           <Button
-            v-if="step === 'agreement'"
+            v-if="step === 'required-agreement'"
             variant="secondary"
             size="lg"
             data-testid="reserve-back"
@@ -37,18 +48,25 @@
           >
             {{ t("back_button") }}
           </Button>
+          <!-- Skip button -->
           <Button
-            :loading="isSubmittingReservation"
+            v-if="step === 'optional-agreement'"
+            variant="secondary"
+            size="lg"
+            data-testid="borrow-agreement-later"
+            @click="isOpen = false"
+          >
+            {{ t("accept_later_button") }}
+          </Button>
+          <!-- Submit button -->
+          <Button
+            :loading="isSubmitting"
             size="lg"
             type="submit"
             :form="formId"
             data-testid="reserve-submit"
           >
-            {{
-              step === "dates" && requiresBorrowAgreement
-                ? t("continue_button")
-                : t("reserve_now_button")
-            }}
+            {{ submitButtonLabel }}
           </Button>
         </div>
       </div>
@@ -57,22 +75,23 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  BorrowAgreement,
-  BorrowAgreementAcceptance,
-} from "~~/models/borrowAgreement.js";
+import type { BorrowAgreement } from "~~/models/borrowAgreement.js";
 import type { Location } from "~~/models/location.js";
+import type { Reservation } from "~~/models/reservation.js";
 import Alert from "../core/Alert.vue";
 import Button from "../core/Button.vue";
 import Dialog from "../core/Dialog.vue";
-import ReservationBorrowAgreementStep from "./ReservationBorrowAgreementStep.vue";
 import ReservationDatesStep from "./ReservationDatesStep.vue";
+import ReservationOptionalBorrowAgreementStep from "./ReservationOptionalBorrowAgreementStep.vue";
+import ReservationRequiredBorrowAgreementStep from "./ReservationRequiredBorrowAgreementStep.vue";
 
 const { pb, user } = usePocketbase();
 const { t } = useI18n({ useScope: "local" });
 const nuxtApp = useNuxtApp();
 const userStore = useUserStore();
 const { createReservation } = useCreateReservation();
+const { hasAcceptedBorrowAgreement, acceptBorrowAgreement } =
+  useBorrowAgreementAcceptance();
 
 const { isOpen, product, location } = useReservationDialog();
 const formId = useId();
@@ -82,124 +101,210 @@ const start = ref<Date>();
 const end = ref<Date>();
 const message = ref<string>();
 
-const reservationCreationError = ref<string>();
-const isSubmittingReservation = ref(false);
+const step = ref<"dates" | "required-agreement" | "optional-agreement">(
+  "dates"
+);
+const error = ref<string>();
+const isSubmitting = ref(false);
 
-// Borrow agreement
-const step = ref<"dates" | "agreement">("dates");
+// Borrow agreement shown in the agreement steps
 const borrowAgreement = ref<BorrowAgreement>();
-const requiresBorrowAgreement = ref(false);
+// If the user should accept the current borrow agreement
+const needsAcceptance = ref(false);
 
-watch(isOpen, (newValue) => {
+const submitButtonLabel = computed(() => {
+  switch (step.value) {
+    case "dates":
+      return needsAcceptance.value && !location.value?.borrow_agreement_optional
+        ? t("continue_button")
+        : t("reserve_now_button");
+    case "required-agreement":
+      return t("reserve_now_button");
+    case "optional-agreement":
+      return t("accept_button");
+  }
+});
+
+watch(isOpen, async (newValue) => {
   if (newValue) {
-    checkBorrowAgreementAcceptance();
+    // Assume no acceptance is needed
+    needsAcceptance.value = false;
+
+    // If the location has a borrow agreement
+    if (location.value?.borrow_agreement && user.value?.id) {
+      // Needs acceptance when not accepted before
+      needsAcceptance.value =
+        (await hasAcceptedBorrowAgreement(
+          user.value.id,
+          location.value.borrow_agreement
+        )) === false;
+    }
   } else {
+    // Reset the dialog
     start.value = undefined;
     end.value = undefined;
     step.value = "dates";
     borrowAgreement.value = undefined;
-    reservationCreationError.value = undefined;
+    error.value = undefined;
   }
 });
 
-/**
- * Checks if the user has to accept the current borrow agreement of the
- * location. When this fails the reservation is submitted without accepting, and
- * the server rejects it if accepting is required.
- */
-async function checkBorrowAgreementAcceptance() {
-  requiresBorrowAgreement.value = false;
-  if (!location.value?.borrow_agreement || !user.value?.id) {
-    return;
-  }
-  try {
-    const acceptances = await pb
-      .collection("borrow_agreement_acceptances")
-      .getList<BorrowAgreementAcceptance>(1, 1, {
-        filter: pb.filter(
-          "user = {:user} && borrow_agreement = {:borrowAgreement}",
-          {
-            user: user.value.id,
-            borrowAgreement: location.value.borrow_agreement,
-          }
-        ),
-        skipTotal: true,
-      });
-    requiresBorrowAgreement.value = acceptances.items.length === 0;
-  } catch (e) {
-    console.error("Failed to check borrow agreement acceptance", e);
-  }
-}
-
-/**
- * Shows the current borrow agreement of the location, to be accepted before
- * creating the reservation
- */
-async function showBorrowAgreement() {
-  if (!location.value?.borrow_agreement) {
-    return;
-  }
-  isSubmittingReservation.value = true;
-  try {
-    borrowAgreement.value = await pb
-      .collection("borrow_agreements")
-      .getOne<BorrowAgreement>(location.value.borrow_agreement);
-    step.value = "agreement";
-  } catch (e) {
-    reservationCreationError.value = t("errors.borrow_agreement_load");
-  } finally {
-    isSubmittingReservation.value = false;
-  }
-}
-
 async function onSubmit() {
-  if (!location.value || !product.value) {
-    console.error("Can't create reservation, no location or product defined");
-    return;
+  error.value = undefined;
+  isSubmitting.value = true;
+  try {
+    switch (step.value) {
+      case "dates":
+        return await submitDatesStep();
+      case "required-agreement":
+        return await submitRequiredAgreementStep();
+      case "optional-agreement":
+        return await submitOptionalAgreementStep();
+    }
+  } finally {
+    isSubmitting.value = false;
   }
-  if (!user.value?.id) {
-    console.error("Can't create reservation, no user id defined");
+}
+
+/**
+ * Reserve
+ */
+async function submitDatesStep() {
+  const result = await createReservation(location.value!, reservationData());
+
+  // Expected error when the borrow agreement is required
+  if (result.status === "borrow_agreement_not_accepted") {
+    borrowAgreement.value = await loadBorrowAgreement();
+    // Show the borrow agreement acceptance step
+    if (borrowAgreement.value) {
+      step.value = "required-agreement";
+    }
     return;
   }
 
-  reservationCreationError.value = undefined;
-
-  // Show the borrow agreement first, if it has not been accepted before
-  if (step.value === "dates" && requiresBorrowAgreement.value) {
-    await showBorrowAgreement();
+  // Error: show it
+  if (result.status === "error") {
+    error.value = result.message;
     return;
   }
 
-  isSubmittingReservation.value = true;
-  const result = await createReservation(location.value, {
-    user: user.value.id,
-    product: product.value.id,
+  // Reserved
+  await handleReservationCreated(result.reservation);
+
+  // Optional borrow agreement not accepted: offer accepting it
+  if (needsAcceptance.value) {
+    borrowAgreement.value = await loadBorrowAgreement();
+    if (borrowAgreement.value) {
+      step.value = "optional-agreement";
+      return;
+    }
+  }
+
+  isOpen.value = false;
+}
+
+/**
+ * Reserve & accept
+ */
+async function submitRequiredAgreementStep() {
+  const result = await createReservation(
+    location.value!,
+    reservationData(borrowAgreement.value?.id)
+  );
+
+  // Borrow agreement changed in the meantime: show the current one
+  if (result.status === "borrow_agreement_not_accepted") {
+    await reloadBorrowAgreement();
+    return;
+  }
+
+  // Error: show it
+  if (result.status === "error") {
+    error.value = result.message;
+    return;
+  }
+
+  // Reserved
+  await handleReservationCreated(result.reservation);
+  isOpen.value = false;
+}
+
+/**
+ * Accept the optional borrow agreement
+ */
+async function submitOptionalAgreementStep() {
+  const result = await acceptBorrowAgreement(
+    user.value!.id,
+    borrowAgreement.value!.id
+  );
+
+  // Borrow agreement changed: show the current one
+  if (result.status === "not_current") {
+    await reloadBorrowAgreement();
+    return;
+  }
+
+  // Error: show it
+  if (result.status === "error") {
+    error.value = result.message;
+    return;
+  }
+
+  isOpen.value = false;
+}
+
+/**
+ * The reservation data of the fields, optionally accepting the borrow agreement
+ */
+function reservationData(acceptedBorrowAgreement?: string) {
+  return {
+    user: user.value!.id,
+    product: product.value!.id,
     start: start.value,
     end: end.value,
     message: message.value,
-    // Only set when the borrow agreement step has been shown
-    borrow_agreement: borrowAgreement.value?.id,
-  });
+    borrow_agreement: acceptedBorrowAgreement,
+  };
+}
 
-  if (result.status === "borrow_agreement_not_accepted") {
-    // The borrow agreement has changed in the meantime, show the current one
-    location.value = await pb
-      .collection("public_locations")
-      .getOne<Location>(location.value.id);
-    await showBorrowAgreement();
-    reservationCreationError.value = t("errors.borrow_agreement_changed");
-    return;
-  }
-  if (result.status === "error") {
-    isSubmittingReservation.value = false;
-    reservationCreationError.value = result.message;
-    return;
-  }
-
+/**
+ * Updates the reservations of the user, and the page
+ */
+async function handleReservationCreated(reservation: Reservation) {
   await userStore.fetchUserReservations();
-  nuxtApp.callHook("app:user:reservation:create", result.reservation);
-  isSubmittingReservation.value = false;
-  isOpen.value = false;
+  nuxtApp.callHook("app:user:reservation:create", reservation);
+}
+
+/**
+ * Loads the current borrow agreement of the location, shows an error when this
+ * fails
+ */
+async function loadBorrowAgreement() {
+  if (!location.value?.borrow_agreement) {
+    return undefined;
+  }
+  try {
+    return await pb
+      .collection("borrow_agreements")
+      .getOne<BorrowAgreement>(location.value.borrow_agreement);
+  } catch (e) {
+    error.value = t("errors.borrow_agreement_load");
+    return undefined;
+  }
+}
+
+/**
+ * Reloads the location and its current borrow agreement, after the borrow
+ * agreement has changed in the meantime
+ */
+async function reloadBorrowAgreement() {
+  location.value = await pb
+    .collection("public_locations")
+    .getOne<Location>(location.value!.id);
+  borrowAgreement.value = await loadBorrowAgreement();
+  if (borrowAgreement.value) {
+    error.value = t("errors.borrow_agreement_changed");
+  }
 }
 </script>
 
@@ -240,6 +345,8 @@ form {
     "reserve_now_button": "Reserve now",
     "continue_button": "Continue to borrowing terms",
     "back_button": "Back",
+    "accept_button": "Accept borrowing terms",
+    "accept_later_button": "Accept later",
     "errors": {
       "borrow_agreement_changed": "The borrowing terms have changed, please read and accept them.",
       "borrow_agreement_load": "Something went wrong while loading the borrowing terms, please try again."
@@ -250,6 +357,8 @@ form {
     "reserve_now_button": "Jetzt reservieren",
     "continue_button": "Weiter zu den Leihbedingungen",
     "back_button": "Zurück",
+    "accept_button": "Leihbedingungen akzeptieren",
+    "accept_later_button": "Später akzeptieren",
     "errors": {
       "borrow_agreement_changed": "Die Leihbedingungen haben sich geändert, bitte lies und akzeptiere sie.",
       "borrow_agreement_load": "Beim Laden der Leihbedingungen ist ein Fehler aufgetreten, bitte versuche es erneut."

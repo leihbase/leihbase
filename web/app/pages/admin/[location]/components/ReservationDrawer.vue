@@ -381,7 +381,7 @@ footer {
       "start_before_today": "The start of the reservation is before today.",
       "end_before_today": "The end of the reservation is before today.",
       "start_and_end_equal": "The start and end of the reservation can't be on the same day.",
-      "end_before_start": "The end can't be befor the start of the reservation.",
+      "end_before_start": "The end can't be before the start of the reservation.",
       "general": "Something went wrong while creating the reservation, please try again."
     }
   },
