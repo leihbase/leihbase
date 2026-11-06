@@ -61,7 +61,23 @@
               {{ reservation.expand.product.name }}
             </NuxtLink>
           </td>
-          <td>{{ reservation.expand?.user?.name }}</td>
+          <td>
+            <span class="user">
+              {{ reservation.expand?.user?.name }}
+              <!-- Show red icon when the borrow agreement has not been accepted yet -->
+              <span
+                v-if="getAcceptance(reservation) === null"
+                class="not-accepted"
+                :title="t('borrow_agreement_not_accepted')"
+                data-testid="borrow-agreement-not-accepted"
+              >
+                <PageEdit aria-hidden="true" />
+                <span class="sr-only">
+                  {{ t("borrow_agreement_not_accepted") }}
+                </span>
+              </span>
+            </span>
+          </td>
           <td>
             <Check v-if="reservation.started" class="check" />
             <Xmark v-else class="xmark" />
@@ -85,8 +101,9 @@
 <script setup lang="ts">
 import { formatCurrency } from "@@/lib/currency";
 import { formatDate, isSameDate } from "@@/lib/date";
+import type { Location } from "@@/models/location";
 import type { Reservation } from "@@/models/reservation";
-import { Check, MessageText, Xmark } from "@iconoir/vue";
+import { Check, MessageText, PageEdit, Xmark } from "@iconoir/vue";
 import HorizontalScroll from "../core/HorizontalScroll.vue";
 import Tooltip from "../core/Tooltip.vue";
 
@@ -95,12 +112,16 @@ const { t, locale } = useI18n({
 });
 const emit = defineEmits<{ select: [reservation: Reservation] }>();
 
-defineProps<{
+const props = defineProps<{
+  location: Location;
   reservations: Reservation[];
   date?: Date;
   highlightDate: "start" | "end" | "date" | "both" | "overdue";
   showWarning?: (r: Reservation) => boolean;
 }>();
+
+const { getFromReservation: getAcceptance } =
+  useAdminBorrowAgreementAcceptances(props.location);
 
 function handleReservationClick(reservation: Reservation) {
   emit("select", reservation);
@@ -149,6 +170,20 @@ tbody tr:hover {
 .xmark {
   stroke-width: 0.75px;
 }
+.user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.not-accepted {
+  display: inline-flex;
+  color: rgb(172, 19, 19);
+  svg {
+    flex-shrink: 0;
+    width: 1.1em;
+    height: 1.1em;
+  }
+}
 .note-icon {
   width: 1.1em;
   height: 1.1em;
@@ -178,7 +213,8 @@ sl-tooltip :deep(ol) {
     "picked_up": "Picked Up",
     "returned": "Returned",
     "deposit": "Deposit",
-    "note": "Note"
+    "note": "Note",
+    "borrow_agreement_not_accepted": "Borrowing terms not accepted"
   },
   "de": {
     "start": "Start",
@@ -188,7 +224,8 @@ sl-tooltip :deep(ol) {
     "picked_up": "Abgeholt",
     "returned": "Zurückgegeben",
     "deposit": "Pfand",
-    "note": "Notiz"
+    "note": "Notiz",
+    "borrow_agreement_not_accepted": "Leihbedingungen nicht akzeptiert"
   }
 }
 </i18n>

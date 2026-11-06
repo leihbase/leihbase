@@ -1,9 +1,12 @@
 <template>
   <Drawer :headerOffset="false" inset v-model:open="open">
     <header>
+      <!-- Title -->
       <Heading is="h2" size="lg" cap>{{
         state === "new" ? t("new") : t("edit")
       }}</Heading>
+
+      <!-- Actions -->
       <div class="buttons">
         <Button
           v-if="state === 'edit'"
@@ -18,10 +21,14 @@
         </Button>
       </div>
     </header>
+
+    <!-- Cancelation status warning -->
     <Alert v-if="props.reservation?.cancelled" variant="warning">{{
       t("reservation_is_cancelled")
     }}</Alert>
+
     <form @submit.prevent="handleSubmit">
+      <!-- Product picker -->
       <RecordPickerInput
         id="reservation-drawer-product-input"
         :label="t('product')"
@@ -31,6 +38,7 @@
         v-model="productId"
         required
       />
+      <!-- User picker -->
       <RecordPickerInput
         id="reservation-drawer-user-input"
         :label="t('user')"
@@ -38,6 +46,33 @@
         :columns="['name', 'email']"
         v-model="userId"
       />
+
+      <!-- Borrow agreement acceptance status -->
+      <div
+        v-if="location.borrow_agreement && userId"
+        class="box borrow-agreement"
+        data-testid="reservation-drawer-borrow-agreement"
+      >
+        <strong>{{ t("borrow_agreement.title") }}</strong>
+        <LoadingSpinner v-if="acceptance === undefined" size="sm" />
+        <div v-else class="row">
+          <p :class="['status', acceptance ? 'accepted' : 'not-accepted']">
+            <PageEdit aria-hidden="true" />
+            {{ acceptanceStatus }}
+          </p>
+          <Button
+            v-if="acceptanceAction"
+            variant="outline"
+            size="sm"
+            :data-testid="`reservation-drawer-borrow-agreement-${acceptanceAction}`"
+            @click="acceptanceDialog = acceptanceAction"
+          >
+            {{ t(`borrow_agreement.${acceptanceAction}`) }}
+          </Button>
+        </div>
+      </div>
+
+      <!-- Dates -->
       <DateInput
         id="reservation-drawer-start-input"
         :label="t('start')"
@@ -50,6 +85,8 @@
         v-model="end"
         required
       />
+
+      <!-- Started/ended -->
       <Switch
         id="reservation-drawer-started-input"
         :label="t('collected')"
@@ -60,6 +97,7 @@
         :label="t('returned')"
         v-model="ended"
       />
+
       <!-- Deposit -->
       <!-- Show as description the default deposit of this product (when known) -->
       <Input
@@ -80,17 +118,23 @@
       >
         <template #prefix>€</template>
       </Input>
+
+      <!-- Notes -->
       <RichTextarea
         id="reservation-drawer-note-input"
         :label="t('note')"
         v-model="note"
       />
+
+      <!-- Cancelled -->
       <Switch
         id="reservation-drawer-cancelled-input"
         :label="t('cancelled')"
         v-model="cancelled"
       />
-      <div class="sent-emails">
+
+      <!-- Sent emails -->
+      <div class="box sent-emails">
         <strong>{{ t("sent_emails") }}</strong>
         <ul
           v-if="
@@ -106,7 +150,11 @@
           {{ t("sent_emails_none") }}
         </p>
       </div>
+
+      <!-- Error status -->
       <Alert v-if="error" variant="error">{{ error }}</Alert>
+
+      <!-- Submit/cancel -->
       <footer>
         <Button :loading="isSubmitting" type="submit">{{ t("save") }}</Button>
         <Button variant="secondary" @click="handleCancelClick">{{
@@ -115,6 +163,7 @@
       </footer>
     </form>
   </Drawer>
+
   <!-- Removal confirmation dialog -->
   <Dialog
     v-model:open="removeDialogOpen"
@@ -131,10 +180,23 @@
       </Button>
     </footer>
   </Dialog>
+
+  <!-- Borrow agreement acceptance confirmation dialog -->
+  <BorrowAgreementAcceptanceDialog
+    v-if="userId"
+    v-model:action="acceptanceDialog"
+    :location="location"
+    :user="userId"
+    :acceptance="acceptance"
+    @change="(newAcceptance) => (acceptance = newAcceptance)"
+  />
 </template>
 
 <script lang="ts" setup>
 import { formatCurrency } from "@@/lib/currency";
+import { formatDate } from "@@/lib/date";
+import type { BorrowAgreementAcceptance } from "@@/models/borrowAgreement";
+import type { Location } from "@@/models/location";
 import type { Reservation } from "@@/models/reservation";
 import RecordPickerInput from "@/components/admin/RecordPickerInput.vue";
 import Alert from "@/components/core/Alert.vue";
@@ -144,10 +206,11 @@ import Dialog from "@/components/core/Dialog.vue";
 import Drawer from "@/components/core/Drawer.vue";
 import Heading from "@/components/core/Heading.vue";
 import Input from "@/components/core/Input.vue";
+import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import RichTextarea from "@/components/core/RichTextarea.vue";
 import Switch from "@/components/core/Switch.vue";
-import { Mail, Trash, Xmark } from "@iconoir/vue";
-import type { RecordModel } from "pocketbase";
+import { Mail, PageEdit, Trash, Xmark } from "@iconoir/vue";
+import BorrowAgreementAcceptanceDialog from "./BorrowAgreementAcceptanceDialog.vue";
 
 const { pb } = usePocketbase();
 const { t, locale } = useI18n({
@@ -156,7 +219,7 @@ const { t, locale } = useI18n({
 
 const props = defineProps<{
   state: "new" | "edit";
-  location: RecordModel;
+  location: Location;
   reservation: Reservation | null;
 }>();
 const open = defineModel("open");
@@ -295,6 +358,49 @@ async function handleRemoveDialogConfirmClick() {
 function handleRemoveDialogCancelClick() {
   removeDialogOpen.value = false;
 }
+
+// Borrow agreement acceptance of the selected user, `undefined` while loading
+const { fetch: fetchAcceptance } = useAdminBorrowAgreementAcceptances(
+  props.location
+);
+const acceptance = ref<BorrowAgreementAcceptance | null>();
+watch([open, userId], async ([isOpen, user]) => {
+  if (!isOpen) return;
+  acceptance.value = undefined;
+  try {
+    const result = await fetchAcceptance(user);
+    // Ignore the result when another user has been selected in the meantime
+    if (user === userId.value) {
+      acceptance.value = result;
+    }
+  } catch (e) {
+    console.error("Error loading borrow agreement acceptance", e);
+  }
+});
+
+const acceptanceStatus = computed(() => {
+  if (!acceptance.value) {
+    return t("borrow_agreement.not_accepted");
+  }
+  return t(
+    acceptance.value.recorded_by
+      ? "borrow_agreement.accepted_in_store"
+      : "borrow_agreement.accepted",
+    { date: formatDate(acceptance.value.created, "DD.MM.YYYY", locale.value) }
+  );
+});
+
+// Action of the button next to the status: record when not accepted, or remove
+// when recorded in the store (e.g. by mistake)
+const acceptanceAction = computed(() => {
+  if (!acceptance.value) {
+    return "record";
+  }
+  return acceptance.value.recorded_by ? "remove" : null;
+});
+
+// Acceptance action to confirm in the dialog
+const acceptanceDialog = ref<"record" | "remove" | null>(null);
 </script>
 
 <style scoped>
@@ -322,11 +428,43 @@ footer {
 .remove-dialog-text {
   margin-bottom: 1.666rem;
 }
-.sent-emails {
+.box {
   width: 100%;
   background-color: var(--surface-neutral-color);
   padding: 1rem;
   border-radius: var(--border-radius);
+}
+.borrow-agreement {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+/* Status with its button next to it, wrapping when there is no room */
+.borrow-agreement .row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.borrow-agreement p {
+  margin: 0;
+}
+.borrow-agreement .status {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.borrow-agreement .status svg {
+  flex-shrink: 0;
+  width: 1.1em;
+  height: 1.1em;
+}
+.borrow-agreement .accepted svg {
+  color: #15b845;
+}
+.borrow-agreement .not-accepted svg {
+  color: rgb(172, 19, 19);
 }
 .sent-emails ul {
   list-style: none;
@@ -370,6 +508,14 @@ footer {
     "email_confirmation": "Reservation confirmation",
     "email_start_reminder": "Reservation start reminder",
     "email_end_reminder": "Reservation end reminder",
+    "borrow_agreement": {
+      "title": "Borrowing terms",
+      "accepted": "Accepted online on {date}",
+      "accepted_in_store": "Accepted in the store on {date}",
+      "not_accepted": "Not accepted yet",
+      "record": "Record acceptance in store",
+      "remove": "Remove acceptance"
+    },
     "remove_dialog": {
       "title": "Remove reservieration",
       "text": "Are you sure you want to remove this reservation? There is no way to undo this.",
@@ -406,6 +552,14 @@ footer {
     "email_confirmation": "Reservierungsbestätigung",
     "email_start_reminder": "Erinnerung: Abholung",
     "email_end_reminder": "Erinnerung: Zurückbringen",
+    "borrow_agreement": {
+      "title": "Leihbedingungen",
+      "accepted": "Online akzeptiert am {date}",
+      "accepted_in_store": "Vor Ort akzeptiert am {date}",
+      "not_accepted": "Noch nicht akzeptiert",
+      "record": "Akzeptanz vor Ort erfassen",
+      "remove": "Akzeptanz entfernen"
+    },
     "remove_dialog": {
       "title": "Reservierung entfernen",
       "text": "Bist du sicher, dass du diese Reservierung endgültig entfernen möchtest?",

@@ -38,30 +38,37 @@ export function useAdminReservations(
     const notCancelled = showCancelled.value ? "" : "&& cancelled = false";
     switch (tab) {
       case "overdue":
-        // Always without cancelled reservations
+        // Reservations that are not cancelled,
+        // and which are past their start date without being started,
+        // or past their end date without being ended
         return {
           filter:
             "cancelled = false && ((start < @todayStart && started = false) || (end < @todayStart && ended = false))",
           sort: "end",
         };
       case "today":
+        // Reservations starting or ending on the selected day
         return {
           filter: `((start >= {:dateStart} && start <= {:dateEnd}) || (end >= {:dateStart} && end <= {:dateEnd})) ${notCancelled}`,
           sort: "start",
         };
       case "ongoing":
+        // Reservations where the start date is before today,
+        // and the end date after today
         return {
           filter: `start < @todayStart && end > @todayEnd ${notCancelled}`,
           sort: "end",
         };
       case "future":
+        // Reservations where the start date is later than today
         return { filter: `start > @todayEnd ${notCancelled}`, sort: "start" };
       case "past":
-        // Only the most recent ones
+        // Reservations where the end is before today,
+        // max 100
         return {
           filter: `end < @todayStart ${notCancelled}`,
           sort: "-end",
-          limit: 50,
+          limit: 100,
         };
     }
   }
@@ -79,7 +86,7 @@ export function useAdminReservations(
           }),
         }),
         sort,
-        expand: "product,user",
+        expand: "product,user,user.borrow_agreement_acceptances_via_user",
         requestKey: getKey(tab),
       };
       return limit

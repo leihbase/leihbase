@@ -9,6 +9,7 @@
   <AdminReservationTable
     v-else-if="pastReservations && pastReservations.length > 0"
     :reservations="pastReservations"
+    :location="location"
     highlight-date="both"
     @select="(reservation) => emit('select', reservation)"
   />
@@ -48,11 +49,11 @@ const { data: pastReservations, status } = await useAdminReservations(
 <i18n lang="json">
 {
   "en": {
-    "past_title": "Past Reservations (last 50)",
+    "past_title": "Past Reservations (last 100)",
     "no_past_reservations": "No past reservations"
   },
   "de": {
-    "past_title": "Vergangene Reservierungen (letzte 50)",
+    "past_title": "Vergangene Reservierungen (letzte 100)",
     "no_past_reservations": "Keine vergangene Reservierungen"
   }
 }

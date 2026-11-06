@@ -9,6 +9,7 @@
   <AdminReservationTable
     v-else-if="futureReservations && futureReservations.length > 0"
     :reservations="futureReservations"
+    :location="location"
     highlight-date="start"
     @select="(reservation) => emit('select', reservation)"
   />

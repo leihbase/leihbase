@@ -12,6 +12,7 @@
   <AdminReservationTable
     v-else-if="ongoingReservations && ongoingReservations.length > 0"
     :reservations="ongoingReservations"
+    :location="location"
     highlight-date="end"
     @select="(reservation) => emit('select', reservation)"
   />

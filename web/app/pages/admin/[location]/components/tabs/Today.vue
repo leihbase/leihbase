@@ -30,6 +30,7 @@
   <AdminReservationTable
     v-if="status !== 'pending' && reservations && reservations.length > 0"
     :reservations="reservations"
+    :location="location"
     :date="date"
     highlight-date="date"
     :show-warning="(r) => new Date(r.end) < startOfUTCDate(date)"
