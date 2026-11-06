@@ -343,7 +343,7 @@ test.describe("borrow agreement acceptance", () => {
     }
   });
 
-  test("acceptances can't be updated, and only be deleted by staff of the location", async () => {
+  test("acceptances can't be updated, and only be deleted by managers of the location when recorded in the store", async () => {
     const { location, borrowAgreement, user, userPb } = await setup();
     const { user: manager, pb: managerPb } = await createStaff("manager", [
       location.id,
@@ -358,8 +358,21 @@ test.describe("borrow agreement acceptance", () => {
     await expect(
       userPb.collection("borrow_agreement_acceptances").delete(acceptance.id)
     ).rejects.toThrow(ClientResponseError);
+    // Accepted online by the user themselves
     await expect(
       managerPb.collection("borrow_agreement_acceptances").delete(acceptance.id)
+    ).rejects.toThrow(ClientResponseError);
+
+    const otherUser = await createUser();
+    const recordedAcceptance = await accept(
+      managerPb,
+      otherUser,
+      borrowAgreement
+    );
+    await expect(
+      managerPb
+        .collection("borrow_agreement_acceptances")
+        .delete(recordedAcceptance.id)
     ).resolves.toBe(true);
   });
 });
