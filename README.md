@@ -8,6 +8,7 @@ people can borrow items instead of buying them.
 
 - 🏪 Webshop-style catalog of borrowable products, with category filtering
 - 🎫 Online reservations, with user sign-up/login
+- 📜 Borrowing terms per location, accepted online or in the store
 - 👷 Admin section to manage products, reservations and statistics across
   multiple locations
 - 📧 Email confirmations and pickup/return reminders, with customizable
