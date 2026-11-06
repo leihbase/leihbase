@@ -165,14 +165,25 @@ onRecordCreateRequest((e) => {
   e.next();
 
   // Store the acceptance of the borrow agreement, after the reservation has
-  // been created successfully
-  if (isAcceptingBorrowAgreement) {
-    const acceptance = new Record(
-      $app.findCollectionByNameOrId("borrow_agreement_acceptances")
-    );
-    acceptance.set("user", reservationUser);
-    acceptance.set("borrow_agreement", borrowAgreement);
-    $app.save(acceptance);
+  // been created successfully. The reservation is already saved, so don't fail
+  // the request when this fails (e.g. when accepted concurrently).
+  if (
+    isAcceptingBorrowAgreement &&
+    !hasAcceptedBorrowAgreement(reservationUser, borrowAgreement)
+  ) {
+    try {
+      const acceptance = new Record(
+        $app.findCollectionByNameOrId("borrow_agreement_acceptances")
+      );
+      acceptance.set("user", reservationUser);
+      acceptance.set("borrow_agreement", borrowAgreement);
+      $app.save(acceptance);
+    } catch (err) {
+      console.error(
+        "[reservation] Failed to store borrow agreement acceptance:",
+        err
+      );
+    }
   }
 }, "reservations");
 
