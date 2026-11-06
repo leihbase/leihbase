@@ -193,10 +193,15 @@ Links shown on the location page.
 
 Admins can define borrowing terms per location in the admin section (Settings >
 Borrowing terms). Users have to accept them before their first reservation at
-the location. With 'allow accepting later' enabled, users can reserve without
-accepting them, and accept them later or in the store. When the borrowing terms
-are changed, users have to accept them again, unless the change is saved as a
-'minor edit'.
+the location.
+
+With 'allow accepting later' enabled, users can reserve without accepting them,
+and accept them later or in the store. When the borrowing terms are changed,
+users have to accept them again.
+
+The reservations overview shows which users haven't accepted the current
+borrowing terms, and managers and admins can record an acceptance in the store
+from the reservation.
 
 #### Opening Hours
 
