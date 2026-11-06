@@ -55,6 +55,10 @@ export function useBorrowAgreementAcceptance() {
       ) {
         return { status: "not_current" };
       }
+      // Already accepted in the meantime (e.g. in another tab)
+      if (await hasAcceptedBorrowAgreement(user, borrowAgreement)) {
+        return { status: "accepted" };
+      }
       return {
         status: "error",
         message: t("borrow_agreement_acceptance_error"),
