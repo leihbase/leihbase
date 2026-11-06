@@ -60,11 +60,14 @@ test.describe("reservation", () => {
       firstUserPassword,
       false
     );
-    const firstReservations = await firstUserPb
-      .collection("reservations")
-      .getFullList();
-    // Expect the user to have 1 reservation
-    expect(firstReservations.length).toBe(1);
+    // Expect the user to have 1 reservation, once the reservation request has
+    // finished
+    await expect
+      .poll(
+        async () =>
+          (await firstUserPb.collection("reservations").getFullList()).length
+      )
+      .toBe(1);
 
     // Create second user
     const secondUserEmail = `b-${uniqueId()}@example.com`;
