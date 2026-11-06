@@ -2,11 +2,7 @@
   <TabHeader :title="t('future_title')">
     <template #suffix>
       <!-- Show cancelled switch -->
-      <ShowCancelledSwitch
-        id="show-cancelled-future"
-        v-model="showCancelled"
-        @update:model-value="refresh()"
-      />
+      <ShowCancelledSwitch id="show-cancelled-future" v-model="showCancelled" />
     </template>
   </TabHeader>
   <LoadingSpinner v-if="status === 'pending'" />
@@ -24,51 +20,28 @@
 </template>
 
 <script lang="ts" setup>
+import type { Location } from "@@/models/location";
 import type { Reservation } from "@@/models/reservation";
 import AdminReservationTable from "@/components/admin/AdminReservationsTable.vue";
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
-import type { EventHookOn } from "@vueuse/core";
-import type { RecordModel } from "pocketbase";
 import ShowCancelledSwitch from "../ShowCancelledSwitch.vue";
 import TabHeader from "../TabHeader.vue";
 
-const { pb } = usePocketbase();
 const { t } = useI18n({
   useScope: "local",
 });
 
 const props = defineProps<{
-  location: RecordModel;
-  reservationUpdateHook: EventHookOn;
+  location: Location;
 }>();
-
-props.reservationUpdateHook(() => {
-  refresh();
-});
 
 const emit = defineEmits<{ select: [reservation: Reservation] }>();
 
 const showCancelled = useShowCancelled();
 
-const {
-  data: futureReservations,
-  refresh,
-  status,
-} = await useAsyncData<Reservation[]>(
-  "admin_future_reservations",
-  () =>
-    pb.collection("reservations").getFullList({
-      filter: pb.filter(
-        `location = {:location} && start > @todayEnd ${showCancelled.value ? "" : "&& cancelled = false"}`,
-        {
-          location: props.location.id,
-        }
-      ),
-      sort: "start",
-      expand: "product,user",
-      requestKey: "admin_future_reservations",
-    }),
-  { lazy: true }
+const { data: futureReservations, status } = await useAdminReservations(
+  props.location,
+  "future"
 );
 </script>
 
