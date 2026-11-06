@@ -54,7 +54,10 @@
         data-testid="reservation-drawer-borrow-agreement"
       >
         <strong>{{ t("borrow_agreement.title") }}</strong>
-        <LoadingSpinner v-if="acceptance === undefined" size="sm" />
+        <p v-if="acceptanceLoadError" class="load-error">
+          {{ t("borrow_agreement.load_error") }}
+        </p>
+        <LoadingSpinner v-else-if="acceptance === undefined" size="sm" />
         <div v-else class="row">
           <p :class="['status', acceptance ? 'accepted' : 'not-accepted']">
             <PageEdit aria-hidden="true" />
@@ -364,9 +367,11 @@ const { fetch: fetchAcceptance } = useAdminBorrowAgreementAcceptances(
   props.location
 );
 const acceptance = ref<BorrowAgreementAcceptance | null>();
+const acceptanceLoadError = ref(false);
 watch([open, userId], async ([isOpen, user]) => {
   if (!isOpen) return;
   acceptance.value = undefined;
+  acceptanceLoadError.value = false;
   try {
     const result = await fetchAcceptance(user);
     // Ignore the result when another user has been selected in the meantime
@@ -375,6 +380,9 @@ watch([open, userId], async ([isOpen, user]) => {
     }
   } catch (e) {
     console.error("Error loading borrow agreement acceptance", e);
+    if (user === userId.value) {
+      acceptanceLoadError.value = true;
+    }
   }
 });
 
@@ -450,6 +458,9 @@ footer {
 .borrow-agreement p {
   margin: 0;
 }
+.borrow-agreement .load-error {
+  color: rgb(172, 19, 19);
+}
 .borrow-agreement .status {
   display: flex;
   align-items: center;
@@ -514,7 +525,8 @@ footer {
       "accepted_in_store": "Accepted in the store on {date}",
       "not_accepted": "Not accepted yet",
       "record": "Record acceptance in store",
-      "remove": "Remove acceptance"
+      "remove": "Remove acceptance",
+      "load_error": "Could not load the acceptance status, please try again."
     },
     "remove_dialog": {
       "title": "Remove reservieration",
@@ -558,7 +570,8 @@ footer {
       "accepted_in_store": "Vor Ort akzeptiert am {date}",
       "not_accepted": "Noch nicht akzeptiert",
       "record": "Akzeptanz vor Ort erfassen",
-      "remove": "Akzeptanz entfernen"
+      "remove": "Akzeptanz entfernen",
+      "load_error": "Der Akzeptanzstatus konnte nicht geladen werden, bitte versuche es erneut."
     },
     "remove_dialog": {
       "title": "Reservierung entfernen",
