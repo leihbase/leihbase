@@ -83,3 +83,12 @@ export async function reserve(
   // submit
   await page.getByTestId("reserve-submit").click();
 }
+
+/**
+ * Closes the reservation dialog after a successful reservation
+ */
+export async function closeReservationDialog(page: Page) {
+  await expect(page.getByTestId("reservation-success")).toBeVisible();
+  await page.getByTestId("reservation-close").click();
+  await expect(page.getByTestId("reservation-success")).toBeHidden();
+}

@@ -6,7 +6,11 @@ import {
 import { createLocation } from "../lib/location";
 import { login } from "../lib/login";
 import { createProduct } from "../lib/product";
-import { createReservation, reserve } from "../lib/reservation";
+import {
+  closeReservationDialog,
+  createReservation,
+  reserve,
+} from "../lib/reservation";
 import { createUser, DEFAULT_PASSWORD } from "../lib/user";
 import { getFutureDate, uniqueId, waitForHydration } from "../lib/utils";
 import { pocketbase } from "../services/pocketbase";
@@ -70,7 +74,7 @@ test.describe("borrow agreement", () => {
     await expect(page.getByTestId("opening-hours")).toBeHidden();
     await page.getByTestId("borrow-agreement-checkbox").check();
     await page.getByTestId("reserve-submit").click();
-    await expect(page.getByTestId("opening-hours")).toBeHidden();
+    await closeReservationDialog(page);
 
     const acceptances = await getBorrowAgreementAcceptances(user.id);
     expect(acceptances.map((a) => a.borrow_agreement)).toEqual([
@@ -80,8 +84,9 @@ test.describe("borrow agreement", () => {
     // Second reservation doesn't show the borrow agreement again
     await page.goto(`/l/${location.slug}/p/${secondProduct.id}`);
     await reserve(page, 0, 1);
-    await expect(page.getByTestId("opening-hours")).toBeHidden();
+    await expect(page.getByTestId("reservation-success")).toBeVisible();
     await expect(page.getByTestId("borrow-agreement-content")).toBeHidden();
+    await closeReservationDialog(page);
     const pb = await pocketbase();
     const reservations = await pb.collection("reservations").getFullList({
       filter: pb.filter("user = {:user}", { user: user.id }),
@@ -121,6 +126,14 @@ test.describe("borrow agreement", () => {
       "Return items clean."
     );
     await expect(page.getByTestId("borrow-agreement-checkbox")).toBeHidden();
+    // Shows that the reservation succeeded, and that the dialog is now about
+    // the borrow agreement
+    await expect(page.getByTestId("reservation-success")).toContainText(
+      product.name
+    );
+    await expect(
+      page.getByRole("dialog").getByRole("heading", { level: 2 })
+    ).toHaveText(/Borrowing terms|Leihbedingungen/);
     // The reservation has already been created
     expect(await getReservations(user.id)).toHaveLength(1);
 

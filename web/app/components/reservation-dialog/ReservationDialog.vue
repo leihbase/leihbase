@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model:open="isOpen" inset :title="t('reserve')">
+  <Dialog v-model:open="isOpen" inset :title="title">
     <form v-if="product && location" :id="formId" @submit.prevent="onSubmit">
       <!-- Step 1: product, date & message -->
       <ReservationDatesStep
@@ -19,13 +19,23 @@
       />
       <!-- Step 2.B: accept or skip optional borrow agreement  -->
       <ReservationOptionalBorrowAgreementStep
-        v-if="step === 'optional-agreement' && borrowAgreement"
+        v-if="step === 'optional-agreement' && borrowAgreement && reservation"
         :key="borrowAgreement.id"
         :location="location"
+        :product="product"
+        :reservation="reservation"
         :borrow-agreement="borrowAgreement"
       />
+      <!-- Step 3: reserved -->
+      <ReservationDoneStep
+        v-if="step === 'done' && reservation"
+        :product="product"
+        :reservation="reservation"
+        @close="isOpen = false"
+      />
     </form>
-    <template #footer>
+    <!-- The done step has its own close button -->
+    <template v-if="step !== 'done'" #footer>
       <div class="footer">
         <!-- Error message -->
         <Alert
@@ -82,6 +92,7 @@ import Alert from "../core/Alert.vue";
 import Button from "../core/Button.vue";
 import Dialog from "../core/Dialog.vue";
 import ReservationDatesStep from "./ReservationDatesStep.vue";
+import ReservationDoneStep from "./ReservationDoneStep.vue";
 import ReservationOptionalBorrowAgreementStep from "./ReservationOptionalBorrowAgreementStep.vue";
 import ReservationRequiredBorrowAgreementStep from "./ReservationRequiredBorrowAgreementStep.vue";
 
@@ -101,9 +112,9 @@ const start = ref<Date>();
 const end = ref<Date>();
 const message = ref<string>();
 
-const step = ref<"dates" | "required-agreement" | "optional-agreement">(
-  "dates"
-);
+const step = ref<
+  "dates" | "required-agreement" | "optional-agreement" | "done"
+>("dates");
 const error = ref<string>();
 const isSubmitting = ref(false);
 
@@ -111,6 +122,15 @@ const isSubmitting = ref(false);
 const borrowAgreement = ref<BorrowAgreement>();
 // If the user should accept the current borrow agreement
 const needsAcceptance = ref(false);
+// Reservation created by the dialog, shown once reserved
+const reservation = ref<Reservation>();
+
+// Once reserved, the optional step is only about the borrow agreement
+const title = computed(() =>
+  step.value === "optional-agreement"
+    ? t("borrow_agreement_title")
+    : t("reserve")
+);
 
 const submitButtonLabel = computed(() => {
   switch (step.value) {
@@ -122,6 +142,8 @@ const submitButtonLabel = computed(() => {
       return t("reserve_now_button");
     case "optional-agreement":
       return t("accept_button");
+    default:
+      return undefined;
   }
 });
 
@@ -145,6 +167,7 @@ watch(isOpen, async (newValue) => {
     end.value = undefined;
     step.value = "dates";
     borrowAgreement.value = undefined;
+    reservation.value = undefined;
     error.value = undefined;
   }
 });
@@ -206,7 +229,7 @@ async function submitDatesStep() {
     }
   }
 
-  isOpen.value = false;
+  step.value = "done";
 }
 
 /**
@@ -232,7 +255,7 @@ async function submitRequiredAgreementStep() {
 
   // Reserved
   await handleReservationCreated(result.reservation);
-  isOpen.value = false;
+  step.value = "done";
 }
 
 /**
@@ -276,9 +299,10 @@ function reservationData(acceptedBorrowAgreement?: string) {
 /**
  * Updates the reservations of the user, and the page
  */
-async function handleReservationCreated(reservation: Reservation) {
+async function handleReservationCreated(createdReservation: Reservation) {
+  reservation.value = createdReservation;
   await userStore.fetchUserReservations();
-  nuxtApp.callHook("app:user:reservation:create", reservation);
+  nuxtApp.callHook("app:user:reservation:create", createdReservation);
 }
 
 /**
@@ -360,6 +384,7 @@ form {
 {
   "en": {
     "reserve": "Reserve",
+    "borrow_agreement_title": "Borrowing terms",
     "reserve_now_button": "Reserve now",
     "continue_button": "Continue to borrowing terms",
     "back_button": "Back",
@@ -372,6 +397,7 @@ form {
   },
   "de": {
     "reserve": "Reservieren",
+    "borrow_agreement_title": "Leihbedingungen",
     "reserve_now_button": "Jetzt reservieren",
     "continue_button": "Weiter zu den Leihbedingungen",
     "back_button": "Zurück",
