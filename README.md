@@ -8,6 +8,7 @@ people can borrow items instead of buying them.
 
 - 🏪 Webshop-style catalog of borrowable products, with category filtering
 - 🎫 Online reservations, with user sign-up/login
+- 📜 Borrowing terms per location, accepted online or in the store
 - 👷 Admin section to manage products, reservations and statistics across
   multiple locations
 - 📧 Email confirmations and pickup/return reminders, with customizable
@@ -188,6 +189,20 @@ Links shown on the location page.
   }
 ]
 ```
+
+#### Borrowing terms
+
+Admins can define borrowing terms per location in the admin section (Settings >
+Borrowing terms). Users have to accept them before their first reservation at
+the location.
+
+With 'allow accepting later' enabled, users can reserve without accepting them,
+and accept them later or in the store. When the borrowing terms are changed,
+users have to accept them again.
+
+The reservations overview shows which users haven't accepted the current
+borrowing terms, and managers and admins can record an acceptance in the store
+from the reservation.
 
 #### Opening Hours
 

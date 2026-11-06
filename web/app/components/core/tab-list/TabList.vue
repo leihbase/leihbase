@@ -2,7 +2,7 @@
   <div>
     <nav>
       <ul class="tablist">
-        <li v-for="tab in tabs">
+        <li v-for="tab in getTabs()" :key="tab.props?.id">
           <button
             :class="activeTabId === tab.props?.id ? 'active' : ''"
             @click="handleClick(tab)"
@@ -19,6 +19,7 @@
 
 <script setup lang="ts">
 import { WarningTriangle } from "@iconoir/vue";
+import { Comment } from "vue";
 import type { TabProps } from "./Tab.model";
 import type Tab from "./Tab.vue";
 
@@ -29,7 +30,6 @@ defineSlots<{
 }>();
 
 const slots = useSlots();
-const tabs = ref<VNode[]>(slots.default ? slots.default() : []);
 const activeTabId = ref<string | null>(props.active);
 const activeTabProps = ref<TabProps | undefined>();
 
@@ -40,11 +40,13 @@ function handleClick(tab: VNode) {
   activeTabProps.value = tab.props as TabProps;
 }
 
-onBeforeMount(() => {
-  if (slots.default) {
-    tabs.value = slots.default();
-  }
-});
+/**
+ * The tabs in the slot, read on every render so tabs shown or hidden later (by
+ * `v-if`) are included, without the placeholders of hidden ones
+ */
+function getTabs() {
+  return (slots.default?.() || []).filter((tab) => tab.type !== Comment);
+}
 </script>
 
 <style lang="scss" scoped>

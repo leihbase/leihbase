@@ -5,7 +5,6 @@
       <ShowCancelledSwitch
         id="show-cancelled-ongoing"
         v-model="showCancelled"
-        @update:model-value="refresh()"
       />
     </template>
   </TabHeader>
@@ -13,6 +12,7 @@
   <AdminReservationTable
     v-else-if="ongoingReservations && ongoingReservations.length > 0"
     :reservations="ongoingReservations"
+    :location="location"
     highlight-date="end"
     @select="(reservation) => emit('select', reservation)"
   />
@@ -24,51 +24,28 @@
 </template>
 
 <script lang="ts" setup>
+import type { Location } from "@@/models/location";
 import type { Reservation } from "@@/models/reservation";
 import AdminReservationTable from "@/components/admin/AdminReservationsTable.vue";
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
-import type { EventHookOn } from "@vueuse/core";
-import type { RecordModel } from "pocketbase";
 import ShowCancelledSwitch from "../ShowCancelledSwitch.vue";
 import TabHeader from "../TabHeader.vue";
 
-const { pb } = usePocketbase();
 const { t } = useI18n({
   useScope: "local",
 });
 
 const props = defineProps<{
-  location: RecordModel;
-  reservationUpdateHook: EventHookOn;
+  location: Location;
 }>();
 
 const emit = defineEmits<{ select: [reservation: Reservation] }>();
 
-props.reservationUpdateHook(() => {
-  refresh();
-});
-
 const showCancelled = useShowCancelled();
 
-const {
-  data: ongoingReservations,
-  refresh,
-  status,
-} = await useAsyncData<Reservation[]>(
-  "admin_ongoing_reservations",
-  async () =>
-    pb.collection("reservations").getFullList({
-      filter: pb.filter(
-        `location = {:location} && start < @todayStart && end > @todayEnd ${showCancelled.value ? "" : "&& cancelled = false"}`,
-        {
-          location: props.location.id,
-        }
-      ),
-      sort: "end",
-      expand: "product,user",
-      requestKey: "admin_ongoing_reservations",
-    }),
-  { lazy: true }
+const { data: ongoingReservations, status } = await useAdminReservations(
+  props.location,
+  "ongoing"
 );
 </script>
 
