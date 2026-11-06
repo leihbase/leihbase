@@ -174,10 +174,16 @@ async function submitDatesStep() {
 
   // Expected error when the borrow agreement is required
   if (result.status === "borrow_agreement_not_accepted") {
+    // The borrow agreement may have been added after loading the location
+    if (!location.value?.borrow_agreement) {
+      await reloadLocation();
+    }
     borrowAgreement.value = await loadBorrowAgreement();
     // Show the borrow agreement acceptance step
     if (borrowAgreement.value) {
       step.value = "required-agreement";
+    } else if (!error.value) {
+      error.value = t("errors.borrow_agreement_load");
     }
     return;
   }
@@ -294,13 +300,25 @@ async function loadBorrowAgreement() {
 }
 
 /**
+ * Reloads the location, to get its current borrow agreement settings. Keeps the
+ * loaded location when this fails.
+ */
+async function reloadLocation() {
+  try {
+    location.value = await pb
+      .collection("public_locations")
+      .getOne<Location>(location.value!.id);
+  } catch (e) {
+    console.error("Failed to reload location", e);
+  }
+}
+
+/**
  * Reloads the location and its current borrow agreement, after the borrow
  * agreement has changed in the meantime
  */
 async function reloadBorrowAgreement() {
-  location.value = await pb
-    .collection("public_locations")
-    .getOne<Location>(location.value!.id);
+  await reloadLocation();
   borrowAgreement.value = await loadBorrowAgreement();
   if (borrowAgreement.value) {
     error.value = t("errors.borrow_agreement_changed");
