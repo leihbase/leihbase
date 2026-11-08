@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import type { Location } from "../../web/models/location";
 import {
   ALL_DAYS_OPENING_HOURS,
   createLocation,
@@ -6,7 +7,6 @@ import {
 } from "../lib/location";
 import { createProduct, getProductWithAvailability } from "../lib/product";
 import { createReservation } from "../lib/reservation";
-import type { Location } from "../../web/models/location";
 import { getFutureDate, getPastDate, getToday, uniqueId } from "../lib/utils";
 import { pocketbase } from "../services/pocketbase";
 
