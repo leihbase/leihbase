@@ -6,7 +6,8 @@ import {
 } from "../lib/location";
 import { createProduct, getProductWithAvailability } from "../lib/product";
 import { createReservation } from "../lib/reservation";
-import { getFutureDate, getPastDate, getToday } from "../lib/utils";
+import type { Location } from "../../web/models/location";
+import { getFutureDate, getPastDate, getToday, uniqueId } from "../lib/utils";
 import { pocketbase } from "../services/pocketbase";
 
 test.describe("product", () => {
@@ -189,6 +190,35 @@ test.describe("product", () => {
       );
       // Expect the product to be unavailable
       expect(productWithAvailability.computedIsAvailable).toBe(false);
+    });
+
+    test("product of location with 'multiple' system and no opening hours shows as unavailable, without breaking the product list", async () => {
+      // Create a location without opening hours, as possible in the admin UI
+      const adminPb = await pocketbase();
+      const id = uniqueId();
+      const location = await adminPb.collection("location").create({
+        active: true,
+        name: `Test Location without opening hours ${id}`,
+        address: "Test Address",
+        email: "location-no-hours@example.com",
+        slug: `test-location-no-hours-${id}`,
+        reservation_system: "multiple",
+        max_reservation_days: 14,
+      });
+      const product = await createProduct(location as Location);
+
+      // Fetch product with availability computation
+      const productWithAvailability = await getProductWithAvailability(
+        product.id
+      );
+      expect(productWithAvailability.computedIsAvailable).toBe(false);
+
+      // Listing products of all locations still works
+      const list = await adminPb.collection("products").getList(1, 24, {
+        filter: "active = true",
+        query: { computeAvailability: true },
+      });
+      expect(list.totalItems).toBeGreaterThan(0);
     });
   });
 });

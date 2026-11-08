@@ -36,7 +36,13 @@ onRecordEnrich(({ record, requestInfo, next }) => {
     const location = record.expandedOne("location");
 
     if (location.get("reservation_system") === "multiple") {
-      const openingHours = JSON.parse(location.get("opening_hours"));
+      const openingHours = parseOpeningHours(location);
+      if (!openingHours) {
+        // Without opening hours, there is no day to pick the product up. Show
+        // it as unavailable, instead of failing the whole product list.
+        record.set("computedIsAvailable", false);
+        return next();
+      }
       const nextOpenDate = getNextOpenDate(openingHours, 0);
       const nextNextOpenDate = getNextOpenDate(openingHours, 1);
       if (nextOpenDate && nextNextOpenDate) {
@@ -60,4 +66,19 @@ onRecordEnrich(({ record, requestInfo, next }) => {
   }
 
   next();
+
+  /**
+   * Returns the opening hours of a location, or null if they are missing or
+   * invalid
+   * @param {core.Record} location
+   */
+  function parseOpeningHours(location) {
+    try {
+      const raw = location.getString("opening_hours");
+      const openingHours = raw ? JSON.parse(raw) : null;
+      return openingHours && openingHours.days ? openingHours : null;
+    } catch (e) {
+      return null;
+    }
+  }
 }, "products");
