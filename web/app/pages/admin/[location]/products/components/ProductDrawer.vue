@@ -292,7 +292,7 @@ footer {
     "description": "Description",
     "notes": "Admin note",
     "user": "User",
-    "user_description": "User to whom diese product belongs, in case of long term lending.",
+    "user_description": "User to whom this product belongs, in case of long term lending.",
     "save": "Save",
     "cancel": "Cancel",
     "remove_dialog": {
