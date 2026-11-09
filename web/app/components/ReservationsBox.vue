@@ -15,11 +15,13 @@
           v-if="userReservationIds.includes(reservation.id)"
           class="user me"
         >
-          <UserIcon class="user-icon" /> Du
+          <UserIcon class="user-icon" /> {{ t("you") }}
         </span>
       </li>
     </ul>
-    <p v-else><i>Keine kommenden Reservierungen</i></p>
+    <p v-else>
+      <i>{{ t("no_reservations") }}</i>
+    </p>
   </div>
 </template>
 
@@ -30,6 +32,7 @@ import { User as UserIcon } from "@iconoir/vue";
 import Heading from "./core/Heading.vue";
 
 const { locale } = useI18n();
+const { t } = useI18n({ useScope: "local" });
 
 defineProps({
   title: {
@@ -101,3 +104,16 @@ span.user.me {
   margin-right: 0.25em;
 }
 </style>
+
+<i18n lang="json">
+{
+  "en": {
+    "you": "You",
+    "no_reservations": "No upcoming reservations"
+  },
+  "de": {
+    "you": "Du",
+    "no_reservations": "Keine kommenden Reservierungen"
+  }
+}
+</i18n>
