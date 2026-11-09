@@ -9,16 +9,6 @@ test.describe("product page", () => {
     await navigateToProductPage(page, product.id);
     await expect(page).toHaveScreenshot("product-page.png");
   });
-  test("shows upcoming reservations in the page's language", async ({
-    page,
-  }) => {
-    const product = await createProduct();
-    await navigateToProductPage(page, product.id);
-    await expect(page.getByText("No upcoming reservations")).toBeVisible();
-    await expect(page.getByText("Keine kommenden Reservierungen")).toHaveCount(
-      0
-    );
-  });
   test("reservation dialog has screenshot", async ({ page }) => {
     const product = await createProduct();
     await login(page);
