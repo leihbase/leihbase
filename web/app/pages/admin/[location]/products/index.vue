@@ -15,7 +15,6 @@
       v-model:status="status"
       v-model:missing="missing"
       v-model:query="query"
-      @input="handleFilterInput"
     />
 
     <!-- Number of results text / loading state -->
@@ -98,38 +97,38 @@ useHead({
   title: `${t("title")} | ${location.value.name}`,
 });
 
-function handleFilterInput() {
-  nextTick(() => {
-    refresh();
-  });
-}
-
+// Refetch when a filter changes. Watching the values, rather than refreshing on
+// the `input` event, ensures the new value is used: a <select> only updates its
+// v-model on the `change` event, which comes after `input`.
 const {
   data: products,
   refresh,
   status: fetchStatus,
-} = await useAsyncData<Product[]>(() => {
-  const filters = ["location = {:location}"];
-  const params: Record<string, any> = { location: location.value!.id };
-  if (status.value) {
-    filters.push("active = {:active}");
-    params["active"] = status.value === "active" ? true : false;
-  }
-  if (missing.value && missing.value === "photo") {
-    filters.push("images:length = 0");
-  }
-  if (missing.value && missing.value === "description") {
-    filters.push("description = ''");
-  }
-  if (query.value) {
-    filters.push("(name ~ {:query} || description ~ {:query})");
-    params.query = query.value;
-  }
-  return pb.collection("products").getFullList({
-    filter: pb.filter(filters.join(" && "), params),
-    sort: "name",
-  });
-});
+} = await useAsyncData<Product[]>(
+  () => {
+    const filters = ["location = {:location}"];
+    const params: Record<string, any> = { location: location.value!.id };
+    if (status.value) {
+      filters.push("active = {:active}");
+      params["active"] = status.value === "active" ? true : false;
+    }
+    if (missing.value && missing.value === "photo") {
+      filters.push("images:length = 0");
+    }
+    if (missing.value && missing.value === "description") {
+      filters.push("description = ''");
+    }
+    if (query.value) {
+      filters.push("(name ~ {:query} || description ~ {:query})");
+      params.query = query.value;
+    }
+    return pb.collection("products").getFullList({
+      filter: pb.filter(filters.join(" && "), params),
+      sort: "name",
+    });
+  },
+  { watch: [status, missing, query] }
+);
 
 function handleNewProductClick() {
   selectedProduct.value = null;
