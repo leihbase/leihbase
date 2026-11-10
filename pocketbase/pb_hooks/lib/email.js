@@ -106,11 +106,9 @@ function formatDate(date, locale) {
  */
 function formatCurrency(n, locale) {
   if (!n) return "";
-  if (locale === "de") {
-    return `${Math.round(n)}€`;
-  } else {
-    return `€${Math.round(n)}`;
-  }
+  /** @type {typeof import('./currency')} */
+  const { formatAmount } = require(`${__hooks}/lib/currency`);
+  return formatAmount(Math.round(n), locale);
 }
 
 /**

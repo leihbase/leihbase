@@ -34,7 +34,7 @@
         >
           <strong>{{ t("deposit") }}</strong>
           <br />
-          {{ formatCurrency(reservation.deposit, locale) }}
+          {{ formatCurrency(reservation.deposit) }}
         </p>
       </div>
     </div>
@@ -107,7 +107,6 @@
 </template>
 
 <script setup lang="ts">
-import { formatCurrency } from "@@/lib/currency";
 import { formatDate } from "@@/lib/date";
 import { getReservationStatus } from "@@/lib/reservation";
 import type { Location } from "@@/models/location";
@@ -130,6 +129,7 @@ const {
   product: { thumbs },
 } = useAppConfig();
 
+const { formatCurrency } = useCurrency();
 const { t, locale } = useI18n({
   useScope: "local",
 });

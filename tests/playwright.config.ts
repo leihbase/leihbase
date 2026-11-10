@@ -65,6 +65,12 @@ export default defineConfig<ConfigOptions>({
       use: devices["Pixel 5"],
       dependencies: ["setup"],
     },
+    {
+      // Changes settings all other tests rely on, so runs after them
+      name: "Shared settings",
+      testDir: "./shared-settings",
+      dependencies: ["API Tests", "Desktop Chrome", "Mobile Chrome"],
+    },
   ],
 
   /* Run your local dev server before starting the tests */

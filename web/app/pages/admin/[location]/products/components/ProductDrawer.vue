@@ -62,7 +62,7 @@
         :label="t('deposit')"
         v-model="deposit"
       >
-        <template #prefix>€</template>
+        <template #prefix>{{ currencySymbol }}</template>
       </Input>
       <ImageInput
         :label="t('images')"
@@ -133,6 +133,7 @@ import { Eye, Trash, Xmark } from "@iconoir/vue";
 import type { RecordModel } from "pocketbase";
 
 const { pb } = usePocketbase();
+const { symbol: currencySymbol } = useCurrency();
 const { t, locale } = useI18n({
   useScope: "local",
 });

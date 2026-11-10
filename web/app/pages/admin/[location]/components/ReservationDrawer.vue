@@ -73,12 +73,12 @@
           reservation?.expand?.product?.deposit
             ? t('deposit_description', [
                 reservation?.expand?.product?.name,
-                formatCurrency(reservation?.expand?.product?.deposit, locale),
+                formatCurrency(reservation?.expand?.product?.deposit),
               ])
             : ''
         "
       >
-        <template #prefix>€</template>
+        <template #prefix>{{ currencySymbol }}</template>
       </Input>
       <RichTextarea
         id="reservation-drawer-note-input"
@@ -134,7 +134,6 @@
 </template>
 
 <script lang="ts" setup>
-import { formatCurrency } from "@@/lib/currency";
 import type { Reservation } from "@@/models/reservation";
 import RecordPickerInput from "@/components/admin/RecordPickerInput.vue";
 import Alert from "@/components/core/Alert.vue";
@@ -150,7 +149,8 @@ import { Mail, Trash, Xmark } from "@iconoir/vue";
 import type { RecordModel } from "pocketbase";
 
 const { pb } = usePocketbase();
-const { t, locale } = useI18n({
+const { formatCurrency, symbol: currencySymbol } = useCurrency();
+const { t } = useI18n({
   useScope: "local",
 });
 
