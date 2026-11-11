@@ -1,18 +1,14 @@
 <template>
   <HorizontalScroll class="filter-bar">
     <!-- Status filter -->
-    <Select :label="t('status')" orientation="horizontal" v-model="status">
-      <option value="">{{ t("all") }}</option>
+    <Select :label="t('status')" hide-label v-model="status">
+      <option value="" :aria-label="t('all')">{{ t("status") }}</option>
       <option value="active">{{ t("active") }}</option>
       <option value="inactive">{{ t("inactive") }}</option>
     </Select>
     <!-- Completeness filter -->
-    <Select
-      :label="t('missing_info')"
-      orientation="horizontal"
-      v-model="missing"
-    >
-      <option value="">{{ t("all") }}</option>
+    <Select :label="t('missing_info')" hide-label v-model="missing">
+      <option value="" :aria-label="t('all')">{{ t("missing_info") }}</option>
       <option value="photo">{{ t("no_photo") }}</option>
       <option value="description">{{ t("no_description") }}</option>
     </Select>
@@ -60,9 +56,6 @@ const query = defineModel("query");
   margin-bottom: var(--fluid-spacing-8) !important;
   display: flex;
   gap: var(--fluid-spacing-4);
-}
-.filter-bar :deep(label) {
-  white-space: nowrap;
 }
 .text-search {
   width: auto !important;
