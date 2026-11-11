@@ -3,12 +3,15 @@
 onRecordCreateRequest((e) => {
   /** @type {typeof import('./lib/openingHours')} */
   const { assertValidOpeningHours } = require(`${__hooks}/lib/openingHours`);
+  /** @type {typeof import('./lib/location')} */
+  const { assertValidNotifications } = require(`${__hooks}/lib/location`);
 
   if (!e.record) {
     throw new BadRequestError("Record_not_defined.");
   }
 
   assertValidOpeningHours(e.record);
+  assertValidNotifications(e.record);
 
   e.next();
 }, "location");
@@ -16,6 +19,8 @@ onRecordCreateRequest((e) => {
 onRecordUpdateRequest((e) => {
   /** @type {typeof import('./lib/openingHours')} */
   const { assertValidOpeningHours } = require(`${__hooks}/lib/openingHours`);
+  /** @type {typeof import('./lib/location')} */
+  const { assertValidNotifications } = require(`${__hooks}/lib/location`);
 
   // Fields managers (non-admins) are allowed to update on their locations
   const MANAGER_EDITABLE_FIELDS = ["opening_hours"];
@@ -45,6 +50,12 @@ onRecordUpdateRequest((e) => {
   // can still edit other settings of locations with legacy opening hours
   if (body.opening_hours !== undefined) {
     assertValidOpeningHours(record);
+  }
+
+  // Same for notifications, which could previously only be set as free-form
+  // JSON in the PocketBase admin interface
+  if (body.notifications !== undefined) {
+    assertValidNotifications(record);
   }
 
   e.next();
