@@ -169,8 +169,10 @@ enabled, the default template for the configured locale is used.
 
 #### Notifications
 
-Using the following JSON format the email addresses which should receive
-notifications of this location can be configured:
+The email addresses notified about new and cancelled reservations of this
+location can be configured in the admin section (Settings > Email > Notification
+addresses), or in the PocketBase admin interface using the following JSON
+format:
 
 ```json
 ["example@example.com", "sarah@example.com"]

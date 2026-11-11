@@ -11,6 +11,8 @@ export type Location = RecordModel & {
   active: boolean;
   opening_hours: OpeningHours;
   links: { text: string; link: string }[];
+  /** Email addresses notified about new and cancelled reservations */
+  notifications: string[] | null;
   max_reservation_days: number;
   reservation_system: "disabled" | "single" | "multiple";
   reservation_start_limit: number;

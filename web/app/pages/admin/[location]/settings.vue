@@ -126,6 +126,49 @@
           autocomplete="off"
           class="max-w"
         />
+        <fieldset class="notifications max-w">
+          <FormLabel is="legend" hide-required>
+            {{ t("notifications.label") }}
+          </FormLabel>
+          <p class="muted">{{ t("notifications.description") }}</p>
+          <ul v-if="notifications.length > 0" class="notification-list">
+            <li v-for="address in notifications" :key="address">
+              <Chip
+                :remove-label="t('notifications.remove', { address })"
+                data-testid="notification-address"
+                @remove="removeNotification(address)"
+              >
+                {{ address }}
+              </Chip>
+            </li>
+          </ul>
+          <p v-else class="muted" data-testid="notifications-empty">
+            {{ t("notifications.empty") }}
+          </p>
+          <div
+            class="add-notification"
+            @keydown.enter.prevent="addNotification"
+          >
+            <Input
+              v-model="newNotification"
+              type="email"
+              :label="t('notifications.add')"
+              :placeholder="t('notifications.placeholder')"
+              :error="notificationError"
+              autocomplete="off"
+              data-testid="notification-input"
+              hide-label
+            />
+            <Button
+              variant="secondary"
+              :disabled="!newNotification.trim()"
+              data-testid="notification-add"
+              @click="addNotification"
+            >
+              {{ t("notifications.add") }}
+            </Button>
+          </div>
+        </fieldset>
         <div>
           <Link :to="`/admin/${location?.slug}/email-templates`">
             {{ t("manage_email_templates") }}
@@ -151,7 +194,9 @@
 import AdminSection from "@/components/admin/AdminSection.vue";
 import Alert from "@/components/core/Alert.vue";
 import Button from "@/components/core/Button.vue";
+import Chip from "@/components/core/Chip.vue";
 import Container from "@/components/core/Container.vue";
+import FormLabel from "@/components/core/FormLabel.vue";
 import Input from "@/components/core/Input.vue";
 import Link from "@/components/core/Link.vue";
 import RadioBox from "@/components/core/RadioBox.vue";
@@ -185,12 +230,63 @@ useHead({
   title: `${t("title")} | ${location.value.name}`,
 });
 
+// Email addresses notified about new and cancelled reservations
+const notifications = ref<string[]>(
+  Array.isArray(location.value.notifications)
+    ? location.value.notifications
+    : []
+);
+const newNotification = ref("");
+const notificationInvalid = ref(false);
+
+// Intentionally loose, matches the validation in the PocketBase hooks
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const notificationError = computed(() => {
+  if (notificationInvalid.value) return t("notifications.invalid");
+  if (errors.fields["notifications"]) return t("notifications.invalid_saved");
+  return undefined;
+});
+
+/**
+ * Adds the entered address to the list, returns false when it's invalid
+ */
+function addNotification() {
+  const address = newNotification.value.trim();
+  if (!address) return true;
+  if (!EMAIL_REGEX.test(address)) {
+    notificationInvalid.value = true;
+    return false;
+  }
+  const exists = notifications.value.some(
+    (a) => a.toLowerCase() === address.toLowerCase()
+  );
+  if (!exists) {
+    notifications.value = [...notifications.value, address];
+  }
+  newNotification.value = "";
+  notificationInvalid.value = false;
+  return true;
+}
+
+function removeNotification(address: string) {
+  notifications.value = notifications.value.filter((a) => a !== address);
+}
+
+watch(newNotification, () => {
+  notificationInvalid.value = false;
+});
+
 async function handleSubmit(e: SubmitEvent) {
+  // Don't lose an address that was typed, but not added yet
+  if (!addNotification()) return;
+
   const data = new FormData(e.target as HTMLFormElement);
   data.set(
     "allow_same_day_reservations",
     data.get("allow_same_day_reservations") ? "true" : "false"
   );
+  data.set("notifications", JSON.stringify(notifications.value));
   try {
     location.value = await update(location.value!.id, data);
     success.value = true;
@@ -210,6 +306,38 @@ async function handleSubmit(e: SubmitEvent) {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-3);
+}
+.notifications {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.notifications > :deep(.label) {
+  margin-bottom: 0;
+}
+.muted {
+  margin: 0;
+  color: var(--text-color-light);
+}
+.notification-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.add-notification {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+}
+.add-notification > :deep(.root) {
+  flex: 1;
 }
 </style>
 
@@ -252,6 +380,16 @@ async function handleSubmit(e: SubmitEvent) {
     "email_settings": "Email",
     "email_settings_description": "Contact address of the location, and the emails sent to borrowers.",
     "manage_email_templates": "Configure email templates",
+    "notifications": {
+      "label": "Notification addresses",
+      "description": "These addresses get an email when a reservation is made or cancelled.",
+      "empty": "No addresses. Nobody is notified about reservations.",
+      "add": "Add address",
+      "placeholder": "name{'@'}example.com",
+      "remove": "Remove {address}",
+      "invalid": "Please enter a valid email address.",
+      "invalid_saved": "One of the addresses is invalid, please check them."
+    },
     "success": "Settings saved.",
     "save": "Save"
   },
@@ -292,6 +430,16 @@ async function handleSubmit(e: SubmitEvent) {
     "email_settings": "E-Mail",
     "email_settings_description": "Kontaktadresse des Standorts und die E-Mails an Ausleihende.",
     "manage_email_templates": "E-Mail Vorlage verwalten",
+    "notifications": {
+      "label": "Benachrichtigungsadressen",
+      "description": "Diese Adressen erhalten eine E-Mail, wenn eine Reservierung erstellt oder storniert wird.",
+      "empty": "Keine Adressen. Niemand wird über Reservierungen benachrichtigt.",
+      "add": "Adresse hinzufügen",
+      "placeholder": "name{'@'}beispiel.de",
+      "remove": "{address} entfernen",
+      "invalid": "Bitte gib eine gültige E-Mail-Adresse ein.",
+      "invalid_saved": "Eine der Adressen ist ungültig, bitte überprüfe sie."
+    },
     "success": "Einstellungen gespeichert.",
     "save": "Speichern"
   }

@@ -150,4 +150,72 @@ test.describe("location", () => {
       });
     }
   });
+
+  test.describe("notifications", () => {
+    test("admin can update notification addresses", async () => {
+      const location = await createLocation("multiple");
+      const admin = await createUser(undefined, undefined, "admin");
+      const adminPb = await pocketbase(admin.email, DEFAULT_PASSWORD, false);
+
+      const updated = await adminPb.collection("location").update(location.id, {
+        notifications: ["anna@example.com", "ben@example.com"],
+      });
+      expect(updated.notifications).toEqual([
+        "anna@example.com",
+        "ben@example.com",
+      ]);
+
+      const cleared = await adminPb
+        .collection("location")
+        .update(location.id, { notifications: [] });
+      expect(cleared.notifications).toEqual([]);
+    });
+
+    test("manager cannot update notification addresses", async () => {
+      const location = await createLocation("multiple");
+      const manager = await createUser(undefined, undefined, "manager", [
+        location.id,
+      ]);
+      const managerPb = await pocketbase(
+        manager.email,
+        DEFAULT_PASSWORD,
+        false
+      );
+
+      await expect(
+        managerPb
+          .collection("location")
+          .update(location.id, { notifications: ["anna@example.com"] })
+      ).rejects.toThrow(ClientResponseError);
+    });
+
+    const invalidNotifications: [string, unknown][] = [
+      ["a single string", "anna@example.com"],
+      ["an object", { email: "anna@example.com" }],
+      ["a list of objects", [{ email: "anna@example.com" }]],
+      ["an invalid address", ["anna@example.com", "not-an-email"]],
+      ["comma separated addresses", ["anna@example.com, ben@example.com"]],
+    ];
+
+    for (const [name, notifications] of invalidNotifications) {
+      test(`rejects invalid notifications: ${name}`, async () => {
+        const location = await createLocation("multiple");
+        const admin = await createUser(undefined, undefined, "admin");
+        const adminPb = await pocketbase(admin.email, DEFAULT_PASSWORD, false);
+
+        try {
+          await adminPb
+            .collection("location")
+            .update(location.id, { notifications });
+          throw new Error("Expected update to be rejected");
+        } catch (err) {
+          expect(err).toBeInstanceOf(ClientResponseError);
+          expect((err as ClientResponseError).status).toBe(400);
+          expect(
+            (err as ClientResponseError).response.data.notifications.code
+          ).toBe("invalid_notifications");
+        }
+      });
+    }
+  });
 });

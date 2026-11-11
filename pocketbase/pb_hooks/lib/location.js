@@ -21,6 +21,50 @@ function getNotificationEmailAddresses(locationRecord) {
   return notifications;
 }
 
+// Intentionally loose: something@something.tld, without whitespace
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Validates the notification email addresses of a location, returns an error
+ * message when invalid, or null when valid. Empty notifications are valid.
+ * @param {any} notifications
+ * @returns {string | null}
+ */
+function validateNotifications(notifications) {
+  if (notifications === null || notifications === undefined) {
+    return null;
+  }
+  if (!Array.isArray(notifications)) {
+    return "Notifications should be a list of email addresses.";
+  }
+  for (const address of notifications) {
+    if (typeof address !== "string" || !EMAIL_REGEX.test(address)) {
+      return `Invalid email address '${address}'.`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Throws a BadRequestError when the notification email addresses of a
+ * location record are invalid
+ * @param {core.Record} record
+ */
+function assertValidNotifications(record) {
+  const raw = record.getString("notifications");
+  let error;
+  try {
+    error = validateNotifications(raw ? JSON.parse(raw) : null);
+  } catch (err) {
+    error = "Notifications should be valid JSON.";
+  }
+  if (error) {
+    throw new BadRequestError("Invalid_notifications.", {
+      notifications: new ValidationError("invalid_notifications", error),
+    });
+  }
+}
+
 /**
  *
  * @param {core.Record} location
@@ -149,5 +193,7 @@ function sendReminders(location, type) {
 
 module.exports = {
   getNotificationEmailAddresses,
+  validateNotifications,
+  assertValidNotifications,
   sendReminders,
 };
