@@ -107,12 +107,12 @@ const {
     const params: Record<string, any> = { location: location.value!.id };
     if (status.value) {
       filters.push("active = {:active}");
-      params["active"] = status.value === "active" ? true : false;
+      params.active = status.value === "active";
     }
-    if (missing.value && missing.value === "photo") {
+    if (missing.value === "photo") {
       filters.push("images:length = 0");
     }
-    if (missing.value && missing.value === "description") {
+    if (missing.value === "description") {
       filters.push("description = ''");
     }
     if (query.value) {
