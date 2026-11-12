@@ -47,15 +47,18 @@ export async function createProduct(location?: Location) {
 }
 
 /**
- * Fetches a product with the computeAvailability query to populate computedIsAvailable field
+ * Fetches a product with the computeAvailability query to populate computedIsAvailable field.
+ * Pass another value to test how the query parameter is handled, or null to
+ * leave it out.
  */
-export async function getProductWithAvailability(productId: string) {
+export async function getProductWithAvailability(
+  productId: string,
+  computeAvailability: boolean | string | number | null = true
+) {
   const pb = await pocketbase();
   try {
     const product = await pb.collection("products").getOne(productId, {
-      query: {
-        computeAvailability: true,
-      },
+      query: computeAvailability === null ? {} : { computeAvailability },
     });
     return product;
   } catch (err) {
