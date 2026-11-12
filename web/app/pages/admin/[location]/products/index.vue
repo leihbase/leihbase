@@ -97,9 +97,6 @@ useHead({
   title: `${t("title")} | ${location.value.name}`,
 });
 
-// Refetch when a filter changes. Watching the values, rather than refreshing on
-// the `input` event, ensures the new value is used: a <select> only updates its
-// v-model on the `change` event, which comes after `input`.
 const {
   data: products,
   refresh,
@@ -127,6 +124,7 @@ const {
       sort: "name",
     });
   },
+  // Refetch when a filter changes
   { watch: [status, missing, query] }
 );
 
