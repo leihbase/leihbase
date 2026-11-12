@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { login } from "../lib/login";
 import {
   createProduct,
@@ -6,58 +6,10 @@ import {
   navigateToProductPage,
   updateLastProductReservation,
 } from "../lib/product";
+import { closeReservationDialog, reserve } from "../lib/reservation";
 import { createUser } from "../lib/user";
 import { uniqueId, waitForClientMount } from "../lib/utils";
 import { pocketbase } from "../services/pocketbase";
-
-async function reserve(
-  page: Page,
-  startIndex: number,
-  endIndex: number,
-  navigateToNextMonth = true
-) {
-  // Click reserve
-  await waitForClientMount(page.getByTestId("reserve-button"));
-  await page.getByTestId("reserve-button").click();
-  // Reserve
-  await expect(page.getByTestId("opening-hours")).toBeVisible();
-  // enter start
-  await page.getByTestId("start-input").click();
-  await expect(page.getByTestId("start-input-calendar")).toBeVisible();
-  // go to next month to be sure we're not trying to reserve at the end
-  // of this month, as it might result in no date buttons being available
-  if (navigateToNextMonth) {
-    await page
-      .getByTestId("start-input-calendar")
-      .locator("div button")
-      .nth(1)
-      .click({ force: true });
-  }
-  await page
-    .getByTestId("start-input-calendar")
-    .locator("shadow=calendar-month >> td button:not([aria-disabled=true])")
-    .nth(startIndex)
-    .click();
-  // enter end
-  await page.getByTestId("end-input").click();
-  await expect(page.getByTestId("end-input-calendar")).toBeVisible();
-  // go to next month to be sure we're not trying to reserve at the end
-  // of this month, as it might result in no date buttons being available
-  if (navigateToNextMonth) {
-    await page
-      .getByTestId("end-input-calendar")
-      .locator("div button")
-      .nth(1)
-      .click({ force: true });
-  }
-  await page
-    .getByTestId("end-input-calendar")
-    .locator("shadow=calendar-month >> td button:not([aria-disabled=true])")
-    .nth(endIndex)
-    .click();
-  // submit
-  await page.getByTestId("reserve-submit").click();
-}
 
 test.describe("reservation", () => {
   test("visitor can reserve a product", async ({ page }) => {
@@ -90,8 +42,7 @@ test.describe("reservation", () => {
     // Reserve
     await expect(page.url()).toContain("/l/test-store/p/");
     await reserve(page, 0, 1);
-
-    await expect(page.getByTestId("opening-hours")).toBeHidden();
+    await closeReservationDialog(page);
   });
 
   test("user can't access reservations of others", async ({ page }) => {
@@ -108,11 +59,14 @@ test.describe("reservation", () => {
       firstUserPassword,
       false
     );
-    const firstReservations = await firstUserPb
-      .collection("reservations")
-      .getFullList();
-    // Expect the user to have 1 reservation
-    expect(firstReservations.length).toBe(1);
+    // Expect the user to have 1 reservation, once the reservation request has
+    // finished
+    await expect
+      .poll(
+        async () =>
+          (await firstUserPb.collection("reservations").getFullList()).length
+      )
+      .toBe(1);
 
     // Create second user
     const secondUserEmail = `b-${uniqueId()}@example.com`;
@@ -130,11 +84,24 @@ test.describe("reservation", () => {
     expect(secondReservations.length).toBe(0);
   });
 
+  test("user can open the reservations overview after reserving", async ({
+    page,
+  }) => {
+    const product = await createProduct();
+    await login(page);
+    await navigateToProductPage(page, product.id);
+    await reserve(page, 0, 1);
+    await page.getByTestId("reservation-overview-link").click();
+    await expect(page).toHaveURL(/\/reservations$/);
+    await expect(page.getByTestId("reservation-success")).toBeHidden();
+  });
+
   test("user can't reserve the same product twice", async ({ page }) => {
     const product = await createProduct();
     await login(page);
     await navigateToProductPage(page, product.id);
     await reserve(page, 0, 1);
+    await closeReservationDialog(page);
     await reserve(page, 2, 3);
     await expect(page.getByTestId("reservation-form-error")).toBeVisible();
   });
@@ -146,10 +113,10 @@ test.describe("reservation", () => {
     await login(page);
     await navigateToProductPage(page, product.id);
     await reserve(page, 0, 1);
-    await expect(page.getByTestId("opening-hours")).toBeHidden();
+    await closeReservationDialog(page);
     await updateLastProductReservation(product.id, { cancelled: true });
     await reserve(page, 2, 3);
-    await expect(page.getByTestId("opening-hours")).toBeHidden();
+    await closeReservationDialog(page);
   });
 
   test("user can reserve the same product again, when first reservation is in the past", async ({
@@ -159,7 +126,7 @@ test.describe("reservation", () => {
     await login(page);
     await navigateToProductPage(page, product.id);
     await reserve(page, 0, 1);
-    await expect(page.getByTestId("opening-hours")).toBeHidden();
+    await closeReservationDialog(page);
     const reservation = await getLastProductReservation(product.id);
     await updateLastProductReservation(product.id, {
       start: new Date(
@@ -174,7 +141,7 @@ test.describe("reservation", () => {
       ),
     });
     await reserve(page, 2, 3);
-    await expect(page.getByTestId("opening-hours")).toBeHidden();
+    await closeReservationDialog(page);
   });
 
   test("reservation period can't be longer than location's max_reservation_days", async ({

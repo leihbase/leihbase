@@ -7,7 +7,10 @@ onRecordCreateRequest((e) => {
     `${__hooks}/lib/reservation`
   );
   /** @type {typeof import('./lib/user')} */
-  const { hasActiveReservationForProduct } = require(`${__hooks}/lib/user`);
+  const {
+    hasActiveReservationForProduct,
+    hasAcceptedBorrowAgreement,
+  } = require(`${__hooks}/lib/user`);
   /** @type {typeof import('./lib/product')} */
   const { hasActiveReservation } = require(`${__hooks}/lib/product`);
 
@@ -126,6 +129,32 @@ onRecordCreateRequest((e) => {
     throw new BadRequestError("Overlapping_reservation.");
   }
 
+  // Unless optional for the location, the borrow agreement has to be accepted
+  // by the user, either before or by sending its id along with this reservation. Keep
+  // this check after all other validation: the reservation dialog relies on
+  // this error meaning the reservation is otherwise valid.
+  const borrowAgreement = location.getString("borrow_agreement");
+  const reservationUser = record.getString("user");
+  const isAcceptanceMissing =
+    !!borrowAgreement &&
+    !!reservationUser &&
+    !hasAcceptedBorrowAgreement(reservationUser, borrowAgreement);
+  // Only the user themselves can accept the borrow agreement
+  const isAcceptingBorrowAgreement =
+    isAcceptanceMissing &&
+    requestUser?.id === reservationUser &&
+    e.requestInfo().body.borrow_agreement === borrowAgreement;
+  if (
+    isAcceptanceMissing &&
+    !location.getBool("borrow_agreement_optional") &&
+    !isAcceptingBorrowAgreement &&
+    !isSuperuser &&
+    !isAdmin &&
+    !isLocationUser
+  ) {
+    throw new BadRequestError("Borrow_agreement_not_accepted.");
+  }
+
   // Strip html out of message field
   // https://stackoverflow.com/a/51208595
   record.set(
@@ -134,6 +163,28 @@ onRecordCreateRequest((e) => {
   );
 
   e.next();
+
+  // Store the acceptance of the borrow agreement, after the reservation has
+  // been created successfully. The reservation is already saved, so don't fail
+  // the request when this fails (e.g. when accepted concurrently).
+  if (
+    isAcceptingBorrowAgreement &&
+    !hasAcceptedBorrowAgreement(reservationUser, borrowAgreement)
+  ) {
+    try {
+      const acceptance = new Record(
+        $app.findCollectionByNameOrId("borrow_agreement_acceptances")
+      );
+      acceptance.set("user", reservationUser);
+      acceptance.set("borrow_agreement", borrowAgreement);
+      $app.save(acceptance);
+    } catch (err) {
+      console.error(
+        "[reservation] Failed to store borrow agreement acceptance:",
+        err
+      );
+    }
+  }
 }, "reservations");
 
 onRecordUpdateRequest((e) => {

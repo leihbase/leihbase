@@ -11,53 +11,33 @@
 
     <TabList v-if="location" active="today" class="tablist">
       <Tab
-        v-if="overdueReservations.length > 0"
+        v-if="overdueReservations && overdueReservations.length > 0"
         id="overdue"
         :title="t('tab_overdue')"
         :warning="true"
       >
         <section>
-          <OverdueTab
-            :location="location"
-            :reservation-update-hook="reservationUpdate.on"
-            @select="handleReservationSelect"
-          />
+          <OverdueTab :location="location" @select="handleReservationSelect" />
         </section>
       </Tab>
       <Tab id="today" :title="t('tab_shift')">
         <section>
-          <TodayTab
-            :location="location"
-            :reservation-update-hook="reservationUpdate.on"
-            @select="handleReservationSelect"
-          />
+          <TodayTab :location="location" @select="handleReservationSelect" />
         </section>
       </Tab>
       <Tab id="ongoing" :title="t('tab_ongoing')">
         <section>
-          <OngoingTab
-            :location="location"
-            :reservation-update-hook="reservationUpdate.on"
-            @select="handleReservationSelect"
-          />
+          <OngoingTab :location="location" @select="handleReservationSelect" />
         </section>
       </Tab>
       <Tab id="future" :title="t('tab_future')">
         <section>
-          <FutureTab
-            :location="location"
-            :reservation-update-hook="reservationUpdate.on"
-            @select="handleReservationSelect"
-          />
+          <FutureTab :location="location" @select="handleReservationSelect" />
         </section>
       </Tab>
       <Tab id="past" :title="t('tab_past')">
         <section>
-          <PastTab
-            :location="location"
-            :reservation-update-hook="reservationUpdate.on"
-            @select="handleReservationSelect"
-          />
+          <PastTab :location="location" @select="handleReservationSelect" />
         </section>
       </Tab>
     </TabList>
@@ -74,14 +54,13 @@
 </template>
 
 <script lang="ts" setup>
+import type { Location } from "@@/models/location";
 import type { Reservation } from "@@/models/reservation";
 import Button from "@/components/core/Button.vue";
 import Container from "@/components/core/Container.vue";
 import Tab from "@/components/core/tab-list/Tab.vue";
 import TabList from "@/components/core/tab-list/TabList.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
-import { createEventHook } from "@vueuse/core";
-import type { RecordModel } from "pocketbase";
 import AdminHeader from "./components/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import ReservationDrawer from "./components/ReservationDrawer.vue";
@@ -101,11 +80,7 @@ const slug = route.params.location as string;
 const reservationDrawerOpen = ref(false);
 const selectedReservation = ref<Reservation | null>(null);
 
-const reservationUpdate = createEventHook();
-
-const { getOverdueReservations } = useReservations();
-
-const location = await useLocation({
+const location = await useLocation<Location>({
   slug,
 });
 
@@ -120,11 +95,15 @@ useHead({
   title: `${t("title")} | ${location.value.name}`,
 });
 
-const overdueReservations = ref<RecordModel[]>([]);
-overdueReservations.value = await getOverdueReservations(location.value?.id);
+// Shared with the overdue tab, to only show it when there are overdue
+// reservations
+const { data: overdueReservations } = await useAdminReservations(
+  location.value,
+  "overdue"
+);
 
 function handleReservationUpdate() {
-  reservationUpdate.trigger();
+  refreshAdminReservations(location.value!);
 }
 
 function handleReservationSelect(reservation: Reservation) {

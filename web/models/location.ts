@@ -14,4 +14,6 @@ export type Location = RecordModel & {
   max_reservation_days: number;
   reservation_system: "disabled" | "single" | "multiple";
   reservation_start_limit: number;
+  borrow_agreement: string;
+  borrow_agreement_optional: boolean;
 };
