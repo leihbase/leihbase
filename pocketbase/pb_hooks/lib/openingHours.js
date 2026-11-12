@@ -16,12 +16,22 @@ module.exports = (function () {
   const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
   /**
+   * Returns today at midnight UTC
+   * @returns {Date}
+   */
+  function startOfTodayUTC() {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    return date;
+  }
+
+  /**
    * Returns the opening hours of a given date
    * @param {OpeningHours} openingHours
    * @param {Date} date
    */
   function getOpeningHoursDay(openingHours, date) {
-    return openingHours.days[Days[date.getDay()]];
+    return openingHours.days[Days[date.getUTCDay()]];
   }
 
   /**
@@ -62,13 +72,12 @@ module.exports = (function () {
     const exceptDates = new Set(except?.dates || []);
     const openDays = new Set(Object.keys(days));
 
-    const date = new Date();
-    date.setHours(0, 0, 0, 0);
+    const date = startOfTodayUTC();
 
-    // Check up to 365 days ahead to find the next open day
+    // Check up to `limit` days ahead to find the next open day
     let skipped = 0;
     for (let i = 0; i < limit; i++) {
-      const dayName = Days[date.getDay()];
+      const dayName = Days[date.getUTCDay()];
       const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
 
       if (openDays.has(dayName) && !exceptDates.has(dateStr)) {
@@ -79,7 +88,7 @@ module.exports = (function () {
         }
       }
 
-      date.setDate(date.getDate() + 1);
+      date.setUTCDate(date.getUTCDate() + 1);
     }
 
     return null; // No open day found within limit
@@ -98,10 +107,9 @@ module.exports = (function () {
     const openingHours = parseOpeningHours(location);
 
     if (!openingHours) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = startOfTodayUTC();
       const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
+      tomorrow.setUTCDate(today.getUTCDate() + 1);
       return [today, tomorrow];
     }
 
