@@ -7,6 +7,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-11-12
+
+### Added
+
+- **Borrowing terms:** locations can define a borrowing terms in the admin
+  settings, which users accept when reserving a product. Locations can make
+  acceptance optional, so users can reserve directly and accept the terms later
+  or in the store.
+- **Opening hours management:** managers can edit the opening hours of their
+  locations on a new admin page.
+- "Show cancelled" switch on all admin reservation tabs.
+- Clear feedback in the reservation dialog once a reservation has been created.
+- The admin navigation highlights the active page.
+- Docker images are now also built for `linux/arm64`.
+
+### Fixed
+
+- The admin product filters now work correctly in Webkit based browsers (by
+  @icraig-afk).
+- A location without opening hours is treated as open every day when computing
+  product availability, and no longer crashes the reminder emails (by
+  @icraig-afk).
+- Opening hours dates are handled as UTC days, and week days are shown in the
+  correct order.
+- The admin reservation overview loads faster: record pickers only fetch records
+  when opened, and show a loading state meanwhile.
+- Translated the reservations box (by @icraig-afk).
+
+### Changed
+
+- The README lists all environment variables, and contributing instructions
+  moved to `CONTRIBUTING.md`.
+
 ## [2.6.0] - 2026-10-15
 
 ### Added
@@ -306,6 +339,7 @@ stores.
 - User sign-up and login.
 - Product reservations.
 
+[2.7.0]: https://github.com/leihbase/leihbase/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/leihbase/leihbase/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/leihbase/leihbase/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/leihbase/leihbase/compare/v2.3.0...v2.4.0
