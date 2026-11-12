@@ -18,9 +18,13 @@ export async function navigateToProductPage(page: Page, productId: string) {
 }
 
 /**
- * Creates a new product in the specified location, or the first available location
+ * Creates a new product in the specified location, or the first available location,
+ * optionally overriding the default fields
  */
-export async function createProduct(location?: Location) {
+export async function createProduct(
+  location?: Location,
+  overrides: Record<string, unknown> = {}
+) {
   // Create test product
   const pb = await pocketbase();
   const targetLocation =
@@ -35,6 +39,7 @@ export async function createProduct(location?: Location) {
       location: targetLocation.id,
       deposit: 10,
       description: "<p>Lorem ipsum dolor.</p>",
+      ...overrides,
     });
     return product;
   } catch (err) {
@@ -47,15 +52,18 @@ export async function createProduct(location?: Location) {
 }
 
 /**
- * Fetches a product with the computeAvailability query to populate computedIsAvailable field
+ * Fetches a product with the computeAvailability query to populate computedIsAvailable field.
+ * Pass another value to test how the query parameter is handled, or null to
+ * leave it out.
  */
-export async function getProductWithAvailability(productId: string) {
+export async function getProductWithAvailability(
+  productId: string,
+  computeAvailability: boolean | string | number | null = true
+) {
   const pb = await pocketbase();
   try {
     const product = await pb.collection("products").getOne(productId, {
-      query: {
-        computeAvailability: true,
-      },
+      query: computeAvailability === null ? {} : { computeAvailability },
     });
     return product;
   } catch (err) {

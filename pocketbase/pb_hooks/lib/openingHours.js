@@ -16,12 +16,48 @@ module.exports = (function () {
   const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
   /**
+   * Returns today at midnight UTC
+   * @returns {Date}
+   */
+  function startOfTodayUTC() {
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
+    return date;
+  }
+
+  /**
    * Returns the opening hours of a given date
    * @param {OpeningHours} openingHours
    * @param {Date} date
    */
   function getOpeningHoursDay(openingHours, date) {
-    return openingHours.days[Days[date.getDay()]];
+    return openingHours.days[Days[date.getUTCDay()]];
+  }
+
+  /**
+   * Returns the parsed opening hours of a location record, or null when the
+   * location has no usable opening hours (empty, invalid JSON, or no open days)
+   * @param {core.Record} location
+   * @returns {OpeningHours | null}
+   */
+  function parseOpeningHours(location) {
+    const raw = location.getString("opening_hours");
+    if (!raw) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (
+        !parsed ||
+        typeof parsed.days !== "object" ||
+        Object.keys(parsed.days).length === 0
+      ) {
+        return null;
+      }
+      return parsed;
+    } catch (err) {
+      return null;
+    }
   }
 
   /**
@@ -36,13 +72,12 @@ module.exports = (function () {
     const exceptDates = new Set(except?.dates || []);
     const openDays = new Set(Object.keys(days));
 
-    const date = new Date();
-    date.setHours(0, 0, 0, 0);
+    const date = startOfTodayUTC();
 
-    // Check up to 365 days ahead to find the next open day
+    // Check up to `limit` days ahead to find the next open day
     let skipped = 0;
     for (let i = 0; i < limit; i++) {
-      const dayName = Days[date.getDay()];
+      const dayName = Days[date.getUTCDay()];
       const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
 
       if (openDays.has(dayName) && !exceptDates.has(dateStr)) {
@@ -53,10 +88,34 @@ module.exports = (function () {
         }
       }
 
-      date.setDate(date.getDate() + 1);
+      date.setUTCDate(date.getUTCDate() + 1);
     }
 
     return null; // No open day found within limit
+  }
+
+  /**
+   * Returns the date range used to determine if a product is currently
+   * available: from the next open day until the open day after that.
+   * When the location has no opening hours defined, it is assumed to be open
+   * every day, so the range is today until tomorrow.
+   * Returns null when no open days are found within the lookup limit.
+   * @param {core.Record} location
+   * @returns {[Date, Date] | null}
+   */
+  function getAvailabilityWindow(location) {
+    const openingHours = parseOpeningHours(location);
+
+    if (!openingHours) {
+      const today = startOfTodayUTC();
+      const tomorrow = new Date(today);
+      tomorrow.setUTCDate(today.getUTCDate() + 1);
+      return [today, tomorrow];
+    }
+
+    const start = getNextOpenDate(openingHours, 0);
+    const end = getNextOpenDate(openingHours, 1);
+    return start && end ? [start, end] : null;
   }
 
   /**
@@ -140,6 +199,8 @@ module.exports = (function () {
   return {
     getOpeningHoursDay,
     getNextOpenDate,
+    parseOpeningHours,
+    getAvailabilityWindow,
     validateOpeningHours,
     assertValidOpeningHours,
   };

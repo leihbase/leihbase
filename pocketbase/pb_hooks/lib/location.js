@@ -38,7 +38,9 @@ function sendReminders(location, type) {
     `${__hooks}/lib/email`
   );
   /** @type {typeof import('./openingHours')} */
-  const { getOpeningHoursDay } = require(`${__hooks}/lib/openingHours`);
+  const { getOpeningHoursDay, parseOpeningHours } = require(
+    `${__hooks}/lib/openingHours`
+  );
 
   const locale = $os.getenv("CONFIG_LOCALE") || "en";
 
@@ -89,14 +91,13 @@ function sendReminders(location, type) {
     const end = new Date(reservation.get("end").string().split(" ")[0]);
     const appUrl = $app.settings().meta.appURL;
 
-    const startOpenHours = getOpeningHoursDay(
-      JSON.parse(location.get("opening_hours")),
-      start
-    );
-    const endOpenHours = getOpeningHoursDay(
-      JSON.parse(location.get("opening_hours")),
-      end
-    );
+    const openingHours = parseOpeningHours(location);
+    const startOpenHours = openingHours
+      ? getOpeningHoursDay(openingHours, start)
+      : null;
+    const endOpenHours = openingHours
+      ? getOpeningHoursDay(openingHours, end)
+      : null;
 
     if (type === "start") {
       sendLocationTemplateEmail(

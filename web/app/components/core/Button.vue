@@ -40,7 +40,7 @@ interface NativeAttributes extends ButtonHTMLAttributes {
 interface Props extends /* @vue-ignore */ NativeAttributes {
   to?: string;
   href?: string;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "outline";
   size?: "lg" | "md" | "sm";
   circle?: boolean;
   type?: "submit" | "reset" | "button" | undefined;
@@ -120,6 +120,16 @@ button {
     }
     &:hover {
       outline: 2px solid var(--primary-color);
+    }
+  }
+  &.variant-outline {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 0;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--text-color) 50%, transparent);
+    &:hover {
+      outline: 2px solid var(--primary-color);
+      box-shadow: none;
     }
   }
 
