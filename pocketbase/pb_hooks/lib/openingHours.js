@@ -25,6 +25,32 @@ module.exports = (function () {
   }
 
   /**
+   * Returns the parsed opening hours of a location record, or null when the
+   * location has no usable opening hours (empty, invalid JSON, or no open days)
+   * @param {core.Record} location
+   * @returns {OpeningHours | null}
+   */
+  function parseOpeningHours(location) {
+    const raw = location.getString("opening_hours");
+    if (!raw) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (
+        !parsed ||
+        typeof parsed.days !== "object" ||
+        Object.keys(parsed.days).length === 0
+      ) {
+        return null;
+      }
+      return parsed;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  /**
    * Returns the date of the next open day
    * @param {OpeningHours} openingHours
    * @param {number} [skip=0] - Number of open days to skip
@@ -57,6 +83,31 @@ module.exports = (function () {
     }
 
     return null; // No open day found within limit
+  }
+
+  /**
+   * Returns the date range used to determine if a product is currently
+   * available: from the next open day until the open day after that.
+   * When the location has no opening hours defined, it is assumed to be open
+   * every day, so the range is today until tomorrow.
+   * Returns null when no open days are found within the lookup limit.
+   * @param {core.Record} location
+   * @returns {[Date, Date] | null}
+   */
+  function getAvailabilityWindow(location) {
+    const openingHours = parseOpeningHours(location);
+
+    if (!openingHours) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      return [today, tomorrow];
+    }
+
+    const start = getNextOpenDate(openingHours, 0);
+    const end = getNextOpenDate(openingHours, 1);
+    return start && end ? [start, end] : null;
   }
 
   /**
@@ -140,6 +191,8 @@ module.exports = (function () {
   return {
     getOpeningHoursDay,
     getNextOpenDate,
+    parseOpeningHours,
+    getAvailabilityWindow,
     validateOpeningHours,
     assertValidOpeningHours,
   };

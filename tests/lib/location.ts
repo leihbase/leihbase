@@ -50,7 +50,7 @@ export const ALL_DAYS_OPENING_HOURS: OpeningHours = {
  */
 export async function createLocation(
   reservationSystem: "disabled" | "single" | "multiple",
-  openingHours: OpeningHours = DEFAULT_OPENING_HOURS,
+  openingHours: OpeningHours | null = DEFAULT_OPENING_HOURS,
   reservationStartLimit?: number
 ) {
   const pb = await pocketbase();

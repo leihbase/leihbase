@@ -25,7 +25,7 @@ onRecordEnrich(({ record, requestInfo, next }) => {
   // currently available for borrowing.
   if (Boolean(requestInfo?.query.computeAvailability)) {
     /** @type {typeof import('./lib/openingHours')} */
-    const { getNextOpenDate } = require(`${__hooks}/lib/openingHours`);
+    const { getAvailabilityWindow } = require(`${__hooks}/lib/openingHours`);
     /** @type {typeof import('./lib/product')} */
     const { hasActiveReservation, getActiveReservationsForDateRange } = require(
       `${__hooks}/lib/product`
@@ -36,19 +36,22 @@ onRecordEnrich(({ record, requestInfo, next }) => {
     const location = record.expandedOne("location");
 
     if (location.get("reservation_system") === "multiple") {
-      const openingHours = JSON.parse(location.get("opening_hours"));
-      const nextOpenDate = getNextOpenDate(openingHours, 0);
-      const nextNextOpenDate = getNextOpenDate(openingHours, 1);
-      if (nextOpenDate && nextNextOpenDate) {
+      // Without opening hours the location is assumed to be open every day.
+      // When no open day is found at all, the product can't be picked up, so
+      // it is shown as unavailable.
+      const availabilityWindow = getAvailabilityWindow(location);
+      if (availabilityWindow) {
         const reservations = getActiveReservationsForDateRange(
           record.id,
-          nextOpenDate,
-          nextNextOpenDate
+          availabilityWindow[0],
+          availabilityWindow[1]
         );
         record.set(
           "computedIsAvailable",
-          reservations && reservations.length === 0
+          !!reservations && reservations.length === 0
         );
+      } else {
+        record.set("computedIsAvailable", false);
       }
     } else {
       // For single system, include unreturned reservations as active
