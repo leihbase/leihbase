@@ -20,10 +20,13 @@ onRecordEnrich(({ record, requestInfo, next }) => {
     record.unhide("user");
   }
 
-  // When passing the 'computeAvailability' query parameter:
-  // Populate product data with `computeIsAvailable` showing if the product is
+  // When passing the 'computeAvailability=true' (or '=1') query parameter:
+  // Populate product data with `computedIsAvailable` showing if the product is
   // currently available for borrowing.
-  if (Boolean(requestInfo?.query.computeAvailability)) {
+  const computeAvailability = String(
+    requestInfo?.query.computeAvailability || ""
+  ).toLowerCase();
+  if (computeAvailability === "true" || computeAvailability === "1") {
     /** @type {typeof import('./lib/openingHours')} */
     const { getAvailabilityWindow } = require(`${__hooks}/lib/openingHours`);
     /** @type {typeof import('./lib/product')} */
