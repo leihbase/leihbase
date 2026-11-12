@@ -18,9 +18,13 @@ export async function navigateToProductPage(page: Page, productId: string) {
 }
 
 /**
- * Creates a new product in the specified location, or the first available location
+ * Creates a new product in the specified location, or the first available location,
+ * optionally overriding the default fields
  */
-export async function createProduct(location?: Location) {
+export async function createProduct(
+  location?: Location,
+  overrides: Record<string, unknown> = {}
+) {
   // Create test product
   const pb = await pocketbase();
   const targetLocation =
@@ -35,6 +39,7 @@ export async function createProduct(location?: Location) {
       location: targetLocation.id,
       deposit: 10,
       description: "<p>Lorem ipsum dolor.</p>",
+      ...overrides,
     });
     return product;
   } catch (err) {
