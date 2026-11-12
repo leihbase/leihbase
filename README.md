@@ -207,29 +207,9 @@ from the reservation.
 #### Opening Hours
 
 Managers and admins can edit the opening hours of a location in the admin
-section (Opening hours). They are stored in the following JSON format:
-
-```json
-{
-  "days": {
-    "tuesday": [
-      {
-        "from": "18:00",
-        "to": "19:00"
-      }
-    ],
-    "friday": [
-      {
-        "from": "17:00",
-        "to": "19:00"
-      }
-    ]
-  },
-  "except": {
-    "dates": ["2024-12-25", "2024-12-26", "2024-12-31", "2025-01-01"]
-  }
-}
-```
+section (Opening hours), including closed dates such as holidays. In the
+reservation dialog, pickup and return dates can only be chosen on opening days.
+A location without opening hours is treated as open every day.
 
 ## Contributing
 
