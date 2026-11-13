@@ -130,7 +130,7 @@ import Container from "@/components/core/Container.vue";
 import DateInput from "@/components/core/DateInput.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import { DateTime } from "luxon";
-import AdminHeader from "./components/AdminHeader.vue";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import WeeklyScheduleInput from "./components/WeeklyScheduleInput.vue";
 

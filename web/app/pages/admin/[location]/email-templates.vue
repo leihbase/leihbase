@@ -71,7 +71,7 @@ import Container from "@/components/core/Container.vue";
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import { useI18n } from "vue-i18n";
-import AdminHeader from "./components/AdminHeader.vue";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import EmailTemplateDrawer from "./components/EmailTemplateDrawer.vue";
 

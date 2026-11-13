@@ -60,7 +60,7 @@ import DateInput from "@/components/core/DateInput.vue";
 import Heading from "@/components/core/Heading.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import type { RecordModel } from "pocketbase";
-import AdminHeader from "./components/AdminHeader.vue";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 
 const { t } = useI18n({

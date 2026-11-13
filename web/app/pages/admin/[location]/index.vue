@@ -61,7 +61,7 @@ import Container from "@/components/core/Container.vue";
 import Tab from "@/components/core/tab-list/Tab.vue";
 import TabList from "@/components/core/tab-list/TabList.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
-import AdminHeader from "./components/AdminHeader.vue";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import ReservationDrawer from "./components/ReservationDrawer.vue";
 import FutureTab from "./components/tabs/Future.vue";

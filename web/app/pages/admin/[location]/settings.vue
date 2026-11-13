@@ -192,7 +192,7 @@ import Switch from "@/components/core/Switch.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import type { BorrowAgreement } from "~~/models/borrowAgreement";
 import { ClientResponseError } from "pocketbase";
-import AdminHeader from "./components/AdminHeader.vue";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 
 const { t } = useI18n({ useScope: "local" });

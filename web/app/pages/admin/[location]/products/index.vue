@@ -63,7 +63,7 @@ import Container from "@/components/core/Container.vue";
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import ProductCard from "@/components/ProductCard.vue";
-import AdminHeader from "../components/AdminHeader.vue";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "../components/AdminNav.vue";
 import FilterBar from "./components/FilterBar.vue";
 import ProductDrawer from "./components/ProductDrawer.vue";
