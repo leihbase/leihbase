@@ -10,6 +10,7 @@ migrate(
         id: "text1794200001",
         name: "currency",
         type: "text",
+        help: "Currency of deposits, as an uppercase ISO 4217 code such as EUR, GBP or CHF. Empty means EUR.",
         max: 3,
         pattern: "^[A-Z]{3}$",
       })
