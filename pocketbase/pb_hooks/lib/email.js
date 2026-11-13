@@ -108,7 +108,7 @@ function formatCurrency(n, locale) {
   if (!n) return "";
   /** @type {typeof import('./currency')} */
   const { formatAmount } = require(`${__hooks}/lib/currency`);
-  return formatAmount(Math.round(n), locale);
+  return formatAmount(n, locale);
 }
 
 /**

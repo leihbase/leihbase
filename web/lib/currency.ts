@@ -29,8 +29,21 @@ export function currencySymbol(currency: string = DEFAULT_CURRENCY) {
 }
 
 /**
- * Formats an amount, e.g. "€10" (en) or "10€" (de). Symbols made of letters
- * are separated by a space: "CHF 10" or "10 CHF".
+ * Formats a number without rounding: whole numbers as is ("10"), others with
+ * two decimals ("7.50", or "7,50" in de)
+ */
+function formatNumber(amount: number | string | undefined, locale: string) {
+  const n = Number(amount);
+  if (amount === undefined || amount === "" || !Number.isFinite(n)) {
+    return `${amount ?? ""}`;
+  }
+  const formatted = Number.isInteger(n) ? `${n}` : n.toFixed(2);
+  return locale === "de" ? formatted.replace(".", ",") : formatted;
+}
+
+/**
+ * Formats an amount, e.g. "€10" (en) or "10€" (de), "€7.50" or "7,50€".
+ * Symbols made of letters are separated by a space: "CHF 10" or "10 CHF".
  */
 export function formatCurrency(
   amount: number | string | undefined,
@@ -39,7 +52,8 @@ export function formatCurrency(
 ) {
   const symbol = currencySymbol(currency);
   const separator = /^[a-z]/i.test(symbol) ? " " : "";
+  const number = formatNumber(amount, locale);
   return locale === "de"
-    ? `${amount}${separator}${symbol}`
-    : `${symbol}${separator}${amount}`;
+    ? `${number}${separator}${symbol}`
+    : `${symbol}${separator}${number}`;
 }
