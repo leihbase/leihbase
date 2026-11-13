@@ -8,7 +8,7 @@ export const DEFAULT_CURRENCY = "EUR";
  * Symbols of common currencies. Currencies not listed are shown with their
  * code, e.g. "CAD 10", as their symbol could be ambiguous.
  */
-const SYMBOLS: Record<string, string> = {
+export const SYMBOLS: Record<string, string> = {
   EUR: "€",
   GBP: "£",
   USD: "$",

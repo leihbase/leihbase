@@ -75,6 +75,7 @@ function formatAmount(amount, locale, currency = getCurrency()) {
 }
 
 module.exports = {
+  SYMBOLS,
   currencySymbol,
   formatAmount,
   getCurrency,
