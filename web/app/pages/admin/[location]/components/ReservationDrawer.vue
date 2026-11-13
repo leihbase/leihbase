@@ -114,12 +114,12 @@
           reservation?.expand?.product?.deposit
             ? t('deposit_description', [
                 reservation?.expand?.product?.name,
-                formatCurrency(reservation?.expand?.product?.deposit, locale),
+                formatCurrency(reservation?.expand?.product?.deposit),
               ])
             : ''
         "
       >
-        <template #prefix>€</template>
+        <template #prefix>{{ currencySymbol }}</template>
       </Input>
 
       <!-- Notes -->
@@ -196,7 +196,6 @@
 </template>
 
 <script lang="ts" setup>
-import { formatCurrency } from "@@/lib/currency";
 import { formatDate } from "@@/lib/date";
 import type { BorrowAgreementAcceptance } from "@@/models/borrowAgreement";
 import type { Location } from "@@/models/location";
@@ -216,6 +215,7 @@ import { Mail, PageEdit, Trash, Xmark } from "@iconoir/vue";
 import BorrowAgreementAcceptanceDialog from "./BorrowAgreementAcceptanceDialog.vue";
 
 const { pb } = usePocketbase();
+const { formatCurrency, symbol: currencySymbol } = useCurrency();
 const { t, locale } = useI18n({
   useScope: "local",
 });

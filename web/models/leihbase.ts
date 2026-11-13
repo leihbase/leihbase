@@ -11,4 +11,6 @@ export type Leihbase = RecordModel & {
     link: string;
   }[];
   style?: string;
+  /** ISO 4217 code of the currency of deposits, "EUR" when empty */
+  currency?: string;
 };

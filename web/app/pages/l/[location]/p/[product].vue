@@ -53,7 +53,7 @@
           ></div>
           <!-- Deposit -->
           <KeyValue v-if="product?.deposit" :title="t('deposit')">
-            {{ formatCurrency(product.deposit, locale) }}
+            {{ formatCurrency(product.deposit) }}
           </KeyValue>
         </div>
 
@@ -90,7 +90,6 @@
 </template>
 
 <script lang="ts" setup>
-import { formatCurrency } from "@@/lib/currency";
 import { isToday } from "@@/lib/reservation";
 import AvailabilityBadge from "@/components/AvailabilityBadge.vue";
 import type { BreadcrumbList } from "@/components/core/Breadcrumb.model";
@@ -107,7 +106,8 @@ import { getLocationBySlug } from "@/composables/location";
 import { Lock } from "@iconoir/vue";
 import type { RecordModel } from "pocketbase";
 
-const { t, locale } = useI18n({ useScope: "local" });
+const { formatCurrency } = useCurrency();
+const { t } = useI18n({ useScope: "local" });
 const config = useRuntimeConfig();
 const {
   product: { thumbs },

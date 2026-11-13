@@ -7,6 +7,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Currency setting:** the currency of deposits can be set with the `currency`
+  field on the `leihbase` record, as an ISO 4217 code such as `GBP` or `USD`
+  (defaults to `EUR`).
+
+### Fixed
+
+- Deposits with decimals are shown with two decimals instead of rounded in
+  emails.
+
 ## [2.7.0] - 2026-11-12
 
 ### Added
@@ -339,6 +352,7 @@ stores.
 - User sign-up and login.
 - Product reservations.
 
+[Unreleased]: https://github.com/leihbase/leihbase/compare/v2.7.0...HEAD
 [2.7.0]: https://github.com/leihbase/leihbase/compare/v2.6.0...v2.7.0
 [2.6.0]: https://github.com/leihbase/leihbase/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/leihbase/leihbase/compare/v2.4.0...v2.5.0

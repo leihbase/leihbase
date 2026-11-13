@@ -150,6 +150,8 @@ The single record in the `leihbase` collection contains instance-wide settings:
 - `privacy_policy_link`: if set, users have to accept it when signing up
 - `footer_links`: links shown in the footer, in the same JSON format as location
   [links](#links)
+- `currency`: currency of deposits on the website and in emails, as an ISO 4217
+  code such as `EUR` (the default when empty), `GBP` or `CHF`
 - `style`: CSS variables to theme the front-end, for example:
 
 ```css
