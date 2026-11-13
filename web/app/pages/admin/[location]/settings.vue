@@ -3,7 +3,11 @@
     <PageAlert class="banner" />
 
     <AdminNav v-if="location" :location="location" />
-    <AdminHeader v-if="location" :title="t('title')" :location="location" />
+    <AdminHeader
+      v-if="location"
+      :title="t('title')"
+      :subtitle="location.name"
+    />
 
     <form v-if="location" method="POST" @submit.prevent="handleSubmit">
       <AdminSection
@@ -180,6 +184,7 @@
 </template>
 
 <script setup lang="ts">
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminSection from "@/components/admin/AdminSection.vue";
 import Alert from "@/components/core/Alert.vue";
 import Button from "@/components/core/Button.vue";
@@ -192,7 +197,6 @@ import Switch from "@/components/core/Switch.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import type { BorrowAgreement } from "~~/models/borrowAgreement";
 import { ClientResponseError } from "pocketbase";
-import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 
 const { t } = useI18n({ useScope: "local" });

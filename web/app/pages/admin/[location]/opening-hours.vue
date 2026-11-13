@@ -3,7 +3,11 @@
     <PageAlert class="banner" />
 
     <AdminNav v-if="location" :location="location" />
-    <AdminHeader v-if="location" :title="t('title')" :location="location" />
+    <AdminHeader
+      v-if="location"
+      :title="t('title')"
+      :subtitle="location.name"
+    />
 
     <form v-if="location" method="POST" @submit.prevent="handleSubmit">
       <Alert v-if="!savedOpeningHours" variant="info">
@@ -122,6 +126,7 @@ import {
   type WeeklySchedule,
 } from "@@/lib/openingHours";
 import type { Reservation } from "@@/models/reservation";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminSection from "@/components/admin/AdminSection.vue";
 import Alert from "@/components/core/Alert.vue";
 import Button from "@/components/core/Button.vue";
@@ -130,7 +135,6 @@ import Container from "@/components/core/Container.vue";
 import DateInput from "@/components/core/DateInput.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import { DateTime } from "luxon";
-import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import WeeklyScheduleInput from "./components/WeeklyScheduleInput.vue";
 

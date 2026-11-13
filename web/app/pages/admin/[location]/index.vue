@@ -3,7 +3,7 @@
     <PageAlert class="banner" />
 
     <AdminNav v-if="location" :location="location" />
-    <AdminHeader v-if="location" :title="t('title')" :location="location">
+    <AdminHeader v-if="location" :title="t('title')" :subtitle="location.name">
       <Button @click="handleNewReservationClick">
         {{ t("new_reservation") }}
       </Button>
@@ -56,12 +56,12 @@
 <script lang="ts" setup>
 import type { Location } from "@@/models/location";
 import type { Reservation } from "@@/models/reservation";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import Button from "@/components/core/Button.vue";
 import Container from "@/components/core/Container.vue";
 import Tab from "@/components/core/tab-list/Tab.vue";
 import TabList from "@/components/core/tab-list/TabList.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
-import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import ReservationDrawer from "./components/ReservationDrawer.vue";
 import FutureTab from "./components/tabs/Future.vue";

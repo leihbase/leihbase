@@ -4,7 +4,7 @@
 
     <!-- Header -->
     <AdminNav v-if="location" :location="location" />
-    <AdminHeader v-if="location" :title="t('title')" :location="location">
+    <AdminHeader v-if="location" :title="t('title')" :subtitle="location.name">
       <Button @click="handleNewProductClick">
         {{ t("new_product") }}
       </Button>
@@ -57,13 +57,13 @@
 
 <script setup lang="ts">
 import type { Product } from "@@/models/product";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import Badge from "@/components/core/Badge.vue";
 import Button from "@/components/core/Button.vue";
 import Container from "@/components/core/Container.vue";
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import ProductCard from "@/components/ProductCard.vue";
-import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "../components/AdminNav.vue";
 import FilterBar from "./components/FilterBar.vue";
 import ProductDrawer from "./components/ProductDrawer.vue";

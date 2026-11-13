@@ -3,7 +3,11 @@
     <PageAlert class="banner" />
 
     <AdminNav v-if="location" :location="location" />
-    <AdminHeader v-if="location" :title="t('title')" :location="location" />
+    <AdminHeader
+      v-if="location"
+      :title="t('title')"
+      :subtitle="location.name"
+    />
 
     <div class="dates">
       <DateInput
@@ -55,12 +59,12 @@
 
 <script setup lang="ts">
 import { endOfUTCDate, startOfUTCDate, subtractDays } from "@@/lib/date";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import Container from "@/components/core/Container.vue";
 import DateInput from "@/components/core/DateInput.vue";
 import Heading from "@/components/core/Heading.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import type { RecordModel } from "pocketbase";
-import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 
 const { t } = useI18n({
