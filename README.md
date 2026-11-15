@@ -139,7 +139,8 @@ Users have a `role` which can be set in the PocketBase admin interface in the
 - `user`: can make and manage their own reservations
 - `manager`: can manage the products, reservations and opening hours of the
   locations selected in the user's `manager_locations` field
-- `admin`: can manage all locations, and the email templates
+- `admin`: can manage all locations, the email templates, and the instance
+  settings on the admin overview page
 
 ### Leihbase
 
@@ -151,7 +152,8 @@ The single record in the `leihbase` collection contains instance-wide settings:
 - `footer_links`: links shown in the footer, in the same JSON format as location
   [links](#links)
 - `currency`: currency of deposits on the website and in emails, as an ISO 4217
-  code such as `EUR` (the default when empty), `GBP` or `CHF`
+  code such as `EUR` (the default when empty), `GBP` or `CHF`. Admins can also
+  change it on the settings page of the admin overview (`/admin/settings`)
 - `style`: CSS variables to theme the front-end, for example:
 
 ```css

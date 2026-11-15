@@ -1,12 +1,10 @@
 <template>
   <Container width="lg" centered class="container">
     <PageAlert />
+    <AdminOverviewNav v-if="userStore.isAdmin" />
+    <AdminHeader subtitle="Admin" :title="t('locations')" />
     <div class="grid">
       <div class="lb-stack">
-        <Heading is="h1" size="xl">Admin</Heading>
-        <Heading is="h2" size="lg" class="heading">
-          {{ t("locations") }}
-        </Heading>
         <div v-if="locations && locations.length > 0" class="locations">
           <ul>
             <li v-for="location in locations">
@@ -35,10 +33,11 @@
 </template>
 
 <script lang="ts" setup>
+import AdminHeader from "@/components/admin/AdminHeader.vue";
+import AdminOverviewNav from "@/components/admin/AdminOverviewNav.vue";
 import Badge from "@/components/core/Badge.vue";
 import Button from "@/components/core/Button.vue";
 import Container from "@/components/core/Container.vue";
-import Heading from "@/components/core/Heading.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import type { Location } from "~~/models/location";
 
@@ -50,6 +49,7 @@ useHead({
 
 const { t } = useI18n({ useScope: "local" });
 const { pb, isValid } = usePocketbase();
+const userStore = useUserStore();
 
 if (!isValid.value) {
   // Not authenticated, first login
@@ -73,6 +73,8 @@ if (!locations.value || locations.value.length === 0) {
     statusMessage: "Page Not Found",
   });
 } else if (
+  // Admins stay on the overview, to be able to reach the instance settings
+  !userStore.isAdmin &&
   locations.value &&
   locations.value.length === 1 &&
   locations.value[0]
@@ -95,15 +97,11 @@ if (!locations.value || locations.value.length === 0) {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--fluid-spacing-8);
-  margin-top: var(--fluid-spacing-8);
 }
 @media (min-width: breakpoints.$breakpoint-md) {
   .grid {
     grid-template-columns: 1fr 1fr;
   }
-}
-.locations .heading {
-  margin-top: 0.5rem;
 }
 .locations ul {
   display: flex;
