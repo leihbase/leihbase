@@ -12,7 +12,9 @@
         <LoadingSpinner v-if="status === 'pending'" size="sm" />
         <template v-else>
           {{
-            isToday(date) ? t("Today") : formatDate(date, "ddd, DD.MM", locale)
+            isToday(date)
+              ? t("Today")
+              : formatDate(date, "ddd, DD.MM", dateLocale)
           }}
         </template>
       </Heading>
@@ -43,7 +45,7 @@
         t("no_reservations_on_date", {
           date: isToday(date)
             ? t("today")
-            : t("on") + " " + formatDate(date, "DD.MM.YYYY", locale),
+            : t("on") + " " + formatDate(date, "DD.MM.YYYY", dateLocale),
         })
       }}.
     </i>
@@ -61,9 +63,10 @@ import { ArrowLeft, ArrowRight } from "@iconoir/vue";
 import ShowCancelledSwitch from "../ShowCancelledSwitch.vue";
 import TabHeader from "../TabHeader.vue";
 
-const { t, locale } = useI18n({
+const { t } = useI18n({
   useScope: "local",
 });
+const dateLocale = useDateLocale();
 
 const props = defineProps<{
   location: Location;

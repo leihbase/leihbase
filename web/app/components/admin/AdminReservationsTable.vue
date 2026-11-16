@@ -34,7 +34,7 @@
                   isSameDate(date, new Date(reservation.start))),
             }"
           >
-            {{ formatDate(reservation.start, "ddd, DD.MM", locale) }}
+            {{ formatDate(reservation.start, "ddd, DD.MM", dateLocale) }}
           </td>
           <td
             :class="{
@@ -50,7 +50,7 @@
                   isSameDate(date, new Date(reservation.end))),
             }"
           >
-            {{ formatDate(reservation.end, "ddd, DD.MM", locale) }}
+            {{ formatDate(reservation.end, "ddd, DD.MM", dateLocale) }}
           </td>
           <td>
             <NuxtLink
@@ -107,9 +107,10 @@ import HorizontalScroll from "../core/HorizontalScroll.vue";
 import Tooltip from "../core/Tooltip.vue";
 
 const { formatCurrency } = useCurrency();
-const { t, locale } = useI18n({
+const { t } = useI18n({
   useScope: "local",
 });
+const dateLocale = useDateLocale();
 const emit = defineEmits<{ select: [reservation: Reservation] }>();
 
 const props = defineProps<{

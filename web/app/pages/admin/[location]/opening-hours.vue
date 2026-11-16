@@ -29,7 +29,7 @@
               :remove-label="t('remove_date')"
               @remove="removeClosedDate(date)"
             >
-              {{ formatDate(date, "dd, D MMM YYYY", locale) }}
+              {{ formatDate(date, "dd, D MMM YYYY", dateLocale) }}
             </Chip>
           </li>
         </ul>
@@ -64,7 +64,7 @@
             <p>{{ t("warning") }}</p>
             <ul class="affected">
               <li v-for="item in affectedReservations" :key="item.key">
-                {{ formatDate(item.date, "dd, D MMM YYYY", locale) }}:
+                {{ formatDate(item.date, "dd, D MMM YYYY", dateLocale) }}:
                 {{ t(item.type) }}
                 {{ item.reservation.expand?.product?.name }}
                 <template v-if="item.reservation.expand?.user?.name">
@@ -85,7 +85,7 @@
           v-if="Object.keys(openingHours.days).length > 0"
           class="preview"
           data-testid="opening-hours-preview"
-          v-html="openingHoursToString(openingHours, locale)"
+          v-html="openingHoursToString(openingHours, dateLocale)"
         ></p>
         <p v-else class="preview muted">{{ t("always_closed") }}</p>
       </AdminSection>
@@ -134,7 +134,8 @@ import AdminHeader from "./components/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import WeeklyScheduleInput from "./components/WeeklyScheduleInput.vue";
 
-const { t, locale } = useI18n({ useScope: "local" });
+const { t } = useI18n({ useScope: "local" });
+const dateLocale = useDateLocale();
 const route = useRoute();
 const { pb } = usePocketbase();
 const { loading, update, errors } = usePocketbaseUpdate(pb, "location");

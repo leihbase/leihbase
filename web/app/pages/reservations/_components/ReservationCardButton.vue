@@ -10,9 +10,9 @@
     <div class="details">
       <h2>{{ product?.name }}</h2>
       <p>
-        {{ formatDate(reservation.start, "DD.MM.YYYY", locale) }}
+        {{ formatDate(reservation.start, "DD.MM.YYYY", dateLocale) }}
         -
-        {{ formatDate(reservation.end, "DD.MM.YYYY", locale) }}
+        {{ formatDate(reservation.end, "DD.MM.YYYY", dateLocale) }}
       </p>
       <span class="tag">
         {{ t(getReservationStatus(reservation)) }}
@@ -34,9 +34,10 @@ const {
   product: { thumbs },
 } = useAppConfig();
 
-const { t, locale } = useI18n({
+const { t } = useI18n({
   useScope: "local",
 });
+const dateLocale = useDateLocale();
 
 defineProps<{ reservation: Reservation; product: Product }>();
 const emit = defineEmits<{ click: [event: MouseEvent] }>();

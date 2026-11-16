@@ -5,9 +5,9 @@
       {{ t("reserved", { product: product.name }) }}
     </Heading>
     <p class="dates">
-      {{ formatDate(reservation.start, "dd, D MMM YYYY", locale) }}
+      {{ formatDate(reservation.start, "dd, D MMM YYYY", dateLocale) }}
       –
-      {{ formatDate(reservation.end, "dd, D MMM YYYY", locale) }}
+      {{ formatDate(reservation.end, "dd, D MMM YYYY", dateLocale) }}
     </p>
     <i18n-t keypath="overview" tag="p" class="overview">
       <NuxtLink
@@ -43,7 +43,8 @@ defineProps<{
 }>();
 const emit = defineEmits<{ close: [] }>();
 
-const { t, locale } = useI18n({ useScope: "local" });
+const { t } = useI18n({ useScope: "local" });
+const dateLocale = useDateLocale();
 </script>
 
 <style lang="scss" scoped>

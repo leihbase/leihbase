@@ -92,6 +92,14 @@ const emailTemplateVars = {
  */
 function formatDate(date, locale) {
   if (!date) return "";
+  // English with pounds: the British dd/mm/yy, as on the website (see
+  // dateLocale in web/lib/date.ts)
+  /** @type {typeof import('./currency')} */
+  const { getCurrency } = require(`${__hooks}/lib/currency`);
+  if (locale === "en" && getCurrency() === "GBP") {
+    const pad = (/** @type {number} */ n) => String(n).padStart(2, "0");
+    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${pad(date.getFullYear() % 100)}`;
+  }
   if (locale === "de") {
     return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
   }
