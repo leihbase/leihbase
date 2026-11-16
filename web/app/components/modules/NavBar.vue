@@ -2,7 +2,7 @@
   <header ref="header" :class="{ 'is-sticky': isSticky }">
     <div>
       <NuxtLink to="/" class="logo">
-        <span v-html="(leihbase?.name || '').replace('\n', '<br />')" />
+        {{ leihbase?.name }}
       </NuxtLink>
       <DropdownMenu class="dropdown">
         <DropdownMenuTrigger
@@ -137,6 +137,8 @@ header {
     font-weight: var(--font-weight-black);
     line-height: 1;
     text-decoration: none;
+    // Show line breaks of the name, for example "Leihase\nDemo"
+    white-space: pre-line;
   }
 
   nav {

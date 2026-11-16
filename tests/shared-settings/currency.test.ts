@@ -4,9 +4,9 @@ import { createReservation } from "../lib/reservation";
 import { createUser } from "../lib/user";
 import { pocketbase } from "../services/pocketbase";
 
-// Changes the currency of the whole instance, so runs on its own, after all
-// other tests (see the "Shared settings" project in playwright.config.ts)
-test.describe.configure({ mode: "serial" });
+// Changes settings of the whole instance, so runs on its own, after all other
+// tests, one at a time (see the "Shared settings" project in
+// playwright.config.ts)
 
 test.describe("currency", () => {
   test("deposits are shown in the currency set on the leihbase record", async ({

@@ -14,11 +14,7 @@
           :label="t('current_password')"
           name="oldPassword"
           type="password"
-          :error="
-            errors.fields['oldPassword']
-              ? t(errors.fields['oldPassword'])
-              : undefined
-          "
+          :error="fieldError('oldPassword')"
           required
         />
         <Divider spacing="md" />
@@ -28,9 +24,7 @@
           :label="t('new_password')"
           name="password"
           type="password"
-          :error="
-            errors.fields['password'] ? t(errors.fields['password']) : undefined
-          "
+          :error="fieldError('password')"
           required
         />
         <!-- Confirm new password -->
@@ -39,11 +33,7 @@
           :label="t('confirm_password')"
           name="passwordConfirm"
           type="password"
-          :error="
-            errors.fields['passwordConfirm']
-              ? t(errors.fields['passwordConfirm'])
-              : undefined
-          "
+          :error="fieldError('passwordConfirm')"
           required
         />
         <!-- Buttons -->
@@ -72,7 +62,7 @@ import { ClientResponseError, type RecordModel } from "pocketbase";
 
 const userStore = useUserStore();
 const { pb, isValid, user, logout } = usePocketbase();
-const { loading, update, errors } = usePocketbaseUpdate(pb, "users");
+const { loading, update, fieldError } = usePocketbaseUpdate(pb, "users");
 const { t } = useI18n({
   useScope: "local",
 });

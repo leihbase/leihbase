@@ -76,6 +76,14 @@ mise run test:e2e
 mise run test:e2e:update
 ```
 
+### Test projects
+
+- `tests/api/`: API tests
+- `tests/browser/`: browser tests, run on a desktop and a mobile viewport
+- `tests/shared-settings/`: API and browser tests which change the `leihbase`
+  record (instance settings, such as the currency), which could influence other
+  tests. These tests run after all other tests, one at a time.
+
 ## Database changes
 
 When PocketBase runs locally, changes made to collections in the PocketBase

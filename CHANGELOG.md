@@ -14,14 +14,15 @@ and this project adheres to
 - **Currency setting:** the currency of deposits can be set with the `currency`
   field on the `leihbase` record, as an ISO 4217 code such as `GBP` or `USD`
   (defaults to `EUR`).
-- **British dates:** with the currency `GBP` and English, dates are shown the
-  British way, on the website and in emails: `16/11/26` instead of `11/16/2026`,
-  and `16 Nov 2026` instead of `Nov 16, 2026`.
+- **Instance settings:** admins can change the instance settings on a new
+  settings page in the admin overview (`/admin`).
 
 ### Fixed
 
 - Deposits with decimals are shown with two decimals instead of rounded in
   emails.
+- The reservation details dialog on the reservations page is titled in the
+  user's language, instead of always "Reservierung".
 
 ## [2.7.0] - 2026-11-12
 

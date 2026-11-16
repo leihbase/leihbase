@@ -77,6 +77,9 @@ export default defineI18nConfig(() => {
         validation_required: "This field is required.",
         validation_invalid_old_password: "Wrong password.",
         validation_values_mismatch: "The two fields do not match.",
+        validation_invalid_url: "Enter a valid URL, e.g. https://example.com",
+        // Fallback for PocketBase error codes without a translation
+        validation_invalid: "This value is invalid.",
         email_templates: {
           reservation_confirmation: "Reservation Confirmation (User)",
           reservation_confirmation_location:
@@ -162,6 +165,10 @@ export default defineI18nConfig(() => {
         validation_required: "Dieses Feld ist erforderlich.",
         validation_invalid_old_password: "Falsches Passwort.",
         validation_values_mismatch: "Die zwei Felder stimmen nicht überein.",
+        validation_invalid_url:
+          "Gib eine gültige URL ein, z. B. https://example.com",
+        // Fallback for PocketBase error codes without a translation
+        validation_invalid: "Dieser Wert ist ungültig.",
         email_templates: {
           reservation_confirmation: "Reservierungsbestätigung (Nutzer)",
           reservation_confirmation_location:

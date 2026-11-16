@@ -1,5 +1,5 @@
 <template>
-  <Dialog inset title="Reservierung" v-model:open="open" @close="emit('close')">
+  <Dialog inset :title="t('title')" v-model:open="open" @close="emit('close')">
     <div v-if="reservation && product && location" class="product">
       <img
         :src="`${config.public.pocketbase.clientBaseUrl}/api/files/products/${product.id}/${product.images[0]}${thumbs.sm}`"
@@ -196,6 +196,7 @@ const {
 <i18n lang="json">
 {
   "en": {
+    "title": "Reservation",
     "product": "Product",
     "location": "Location",
     "borrow_period": "Borrow period",
@@ -208,6 +209,7 @@ const {
     "change_period_text": "To update the reservation period, please send an e-mail to {0}."
   },
   "de": {
+    "title": "Reservierung",
     "product": "Gegenstand",
     "location": "Standort",
     "borrow_period": "Leihfrist",

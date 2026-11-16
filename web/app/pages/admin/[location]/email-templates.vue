@@ -3,7 +3,7 @@
     <PageAlert class="banner" />
 
     <AdminNav v-if="location" :location="location" />
-    <AdminHeader v-if="location" :title="t('title')" :location="location">
+    <AdminHeader v-if="location" :title="t('title')" :subtitle="location.name">
       <Button @click="handleNewTemplate">
         {{ t("new_template") }}
       </Button>
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import type { EmailTemplate } from "@@/models/EmailTemplate";
+import AdminHeader from "@/components/admin/AdminHeader.vue";
 import Alert from "@/components/core/Alert.vue";
 import Badge from "@/components/core/Badge.vue";
 import Button from "@/components/core/Button.vue";
@@ -71,7 +72,6 @@ import Container from "@/components/core/Container.vue";
 import LoadingSpinner from "@/components/core/LoadingSpinner.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import { useI18n } from "vue-i18n";
-import AdminHeader from "./components/AdminHeader.vue";
 import AdminNav from "./components/AdminNav.vue";
 import EmailTemplateDrawer from "./components/EmailTemplateDrawer.vue";
 
@@ -79,6 +79,11 @@ const route = useRoute();
 const { t } = useI18n({ useScope: "local" });
 const { t: g } = useI18n({ useScope: "global" });
 const { pb } = usePocketbase();
+
+// Location settings are only available to admins
+if (!useUserStore().isAdmin) {
+  throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
+}
 
 const slug = Array.isArray(route.params.location)
   ? route.params.location[0]

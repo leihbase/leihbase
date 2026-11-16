@@ -29,7 +29,7 @@
       {{ t("opening_hours") }}
     </Button>
     <Button
-      :disabled="!userStore.isAdmin"
+      v-if="userStore.isAdmin"
       variant="secondary"
       :to="`/admin/${location?.slug}/settings`"
       :active="isActive('settings') || isActive('email-templates')"
