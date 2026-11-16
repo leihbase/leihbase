@@ -21,6 +21,8 @@ and this project adheres to
 
 - Deposits with decimals are shown with two decimals instead of rounded in
   emails.
+- The reservation details dialog on the reservations page is titled in the
+  user's language, instead of always "Reservierung".
 
 ## [2.7.0] - 2026-11-12
 
