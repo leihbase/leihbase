@@ -38,17 +38,22 @@ interface NativeAttributes extends SelectHTMLAttributes {
 interface Props extends /* @vue-ignore */ NativeAttributes {
   label: string;
   name?: string;
+  // Initial value, for forms read with FormData instead of v-model
+  value?: string;
   required?: boolean;
   disabled?: boolean;
   hideLabel?: boolean;
   orientation?: "vertical" | "horizontal";
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   orientation: "vertical",
 });
 const id = useId();
 const model = defineModel();
+if (props.value) {
+  model.value = props.value;
+}
 </script>
 
 <style scoped>
