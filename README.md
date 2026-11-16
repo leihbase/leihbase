@@ -151,7 +151,8 @@ The single record in the `leihbase` collection contains instance-wide settings:
 - `footer_links`: links shown in the footer, in the same JSON format as location
   [links](#links)
 - `currency`: currency of deposits on the website and in emails, as an ISO 4217
-  code such as `EUR` (the default when empty), `GBP` or `CHF`
+  code such as `EUR` (the default when empty), `GBP` or `CHF`. With `GBP` and
+  English, dates are shown the British way (`16/11/26`, `16 Nov 2026`)
 - `style`: CSS variables to theme the front-end, for example:
 
 ```css

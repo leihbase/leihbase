@@ -14,6 +14,9 @@ and this project adheres to
 - **Currency setting:** the currency of deposits can be set with the `currency`
   field on the `leihbase` record, as an ISO 4217 code such as `GBP` or `USD`
   (defaults to `EUR`).
+- **British dates:** with the currency `GBP` and English, dates are shown the
+  British way, on the website and in emails: `16/11/26` instead of `11/16/2026`,
+  and `16 Nov 2026` instead of `Nov 16, 2026`.
 
 ### Fixed
 
