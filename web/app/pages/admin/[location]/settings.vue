@@ -18,7 +18,7 @@
           :label="t('name')"
           name="name"
           :value="location.name"
-          :error="errors.fields['name'] ? t(errors.fields['name']) : undefined"
+          :error="fieldError('name')"
           required
           class="max-w"
         />
@@ -26,9 +26,7 @@
           :label="t('address')"
           name="address"
           :value="location.address"
-          :error="
-            errors.fields['address'] ? t(errors.fields['address']) : undefined
-          "
+          :error="fieldError('address')"
           required
           class="max-w"
         />
@@ -36,11 +34,7 @@
           :label="t('description')"
           name="description"
           :value="location.description"
-          :error="
-            errors.fields['description']
-              ? t(errors.fields['description'])
-              : undefined
-          "
+          :error="fieldError('description')"
           class="max-w"
         />
       </AdminSection>
@@ -85,11 +79,7 @@
           :label="t('max-reservation-days.label')"
           :description="t('max-reservation-days.description')"
           :value="location.max_reservation_days"
-          :error="
-            errors.fields['max_reservation_days']
-              ? t(errors.fields['max_reservation_days'])
-              : undefined
-          "
+          :error="fieldError('max_reservation_days')"
           class="max-w"
         />
         <Input
@@ -98,11 +88,7 @@
           :label="t('reservation-start-limit.label')"
           :description="t('reservation-start-limit.description')"
           :value="location.reservation_start_limit"
-          :error="
-            errors.fields['reservation_start_limit']
-              ? t(errors.fields['reservation_start_limit'])
-              : undefined
-          "
+          :error="fieldError('reservation_start_limit')"
           class="max-w"
         />
 
@@ -155,9 +141,7 @@
           :label="t('email')"
           name="email"
           :value="location.email"
-          :error="
-            errors.fields['email'] ? t(errors.fields['email']) : undefined
-          "
+          :error="fieldError('email')"
           required
           autocomplete="off"
           class="max-w"
@@ -202,7 +186,7 @@ import AdminNav from "./components/AdminNav.vue";
 const { t } = useI18n({ useScope: "local" });
 const route = useRoute();
 const { pb } = usePocketbase();
-const { loading, update, errors } = usePocketbaseUpdate(pb, "location");
+const { loading, update, fieldError } = usePocketbaseUpdate(pb, "location");
 
 const slug = route.params.location as string;
 const success = ref(false);
