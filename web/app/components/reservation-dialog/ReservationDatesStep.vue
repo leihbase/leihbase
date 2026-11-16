@@ -9,7 +9,7 @@
       <span>{{ t("opening_hours_of") }} {{ location.name }}:</span>
       <br />
       <span
-        v-html="openingHoursToString(location.opening_hours, locale)"
+        v-html="openingHoursToString(location.opening_hours, formatLocale)"
       ></span>
     </p>
     <Input
@@ -70,7 +70,8 @@ const start = defineModel<Date>("start");
 const end = defineModel<Date>("end");
 const message = defineModel<string>("message");
 
-const { t, locale } = useI18n({ useScope: "local" });
+const { t } = useI18n({ useScope: "local" });
+const formatLocale = useFormatLocale();
 
 const startOfToday = getStartOfDay();
 const closedDates = computed(() =>

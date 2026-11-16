@@ -91,11 +91,20 @@ const emailTemplateVars = {
  * @returns {string}
  */
 function formatDate(date, locale) {
-  if (!date) return "";
-  if (locale === "de") {
-    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-  }
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  /** @type {typeof import('./locale')} */
+  const { formatDate } = require(`${__hooks}/lib/locale`);
+  return formatDate(date, locale);
+}
+
+/**
+ * The language of a locale, e.g. "en-GB" -> "en"
+ * @param {string} locale
+ * @returns {string}
+ */
+function getLanguage(locale) {
+  /** @type {typeof import('./locale')} */
+  const { getLanguage } = require(`${__hooks}/lib/locale`);
+  return getLanguage(locale);
 }
 
 /**
@@ -120,7 +129,7 @@ function formatCurrency(n, locale) {
 function getDefaultTemplate(templateName, locale) {
   try {
     /** @type {typeof import('./emails.en')} */
-    const templates = require(`${__hooks}/lib/emails.${locale}`);
+    const templates = require(`${__hooks}/lib/emails.${getLanguage(locale)}`);
     if (templates[templateName]) {
       return { ...templates[templateName] };
     }
@@ -192,7 +201,7 @@ function getEmailTemplate(locationId, templateName, locale) {
     {
       locationId,
       templateName,
-      locale,
+      locale: getLanguage(locale),
     }
   );
 

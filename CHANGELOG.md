@@ -16,6 +16,10 @@ and this project adheres to
   (defaults to `EUR`).
 - **Instance settings:** admins can change the instance settings on a new
   settings page in the admin overview (`/admin`).
+- **Locales with a region:** `NUXT_PUBLIC_LOCALE` and `CONFIG_LOCALE` can have a
+  region, such as `en-GB` or `de-AT`. Texts use the language, and dates follow
+  the region, on the website and in emails: `16/11/2026` for `en-GB` instead of
+  `11/16/2026`. Without a region, nothing changes.
 
 ### Fixed
 

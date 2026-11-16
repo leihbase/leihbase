@@ -36,7 +36,7 @@
       <div v-if="location?.opening_hours">
         <strong>{{ t("opening_hours") }}:</strong><br />
         <span
-          v-html="openingHoursToString(location?.opening_hours, locale)"
+          v-html="openingHoursToString(location?.opening_hours, formatLocale)"
         ></span>
       </div>
     </header>
@@ -55,9 +55,10 @@ import ProductGrid from "@/components/modules/ProductGrid.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
 import { Internet, MapPin } from "@iconoir/vue";
 
-const { t, locale } = useI18n({
+const { t } = useI18n({
   useScope: "local",
 });
+const formatLocale = useFormatLocale();
 
 const route = useRoute();
 

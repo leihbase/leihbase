@@ -44,6 +44,15 @@ function currencySymbol(currency) {
 }
 
 /**
+ * If a locale is German, with or without a region ("de", "de-AT")
+ * @param {string} locale
+ * @returns {boolean}
+ */
+function isGerman(locale) {
+  return /^de([-_]|$)/i.test(locale || "");
+}
+
+/**
  * Formats a number without rounding: whole numbers as is ("10"), others with
  * two decimals ("7.50", or "7,50" in de)
  * @param {number | string} amount
@@ -54,7 +63,7 @@ function formatNumber(amount, locale) {
   const n = Number(amount);
   if (amount === "" || !Number.isFinite(n)) return `${amount}`;
   const formatted = Number.isInteger(n) ? `${n}` : n.toFixed(2);
-  return locale === "de" ? formatted.replace(".", ",") : formatted;
+  return isGerman(locale) ? formatted.replace(".", ",") : formatted;
 }
 
 /**
@@ -69,7 +78,7 @@ function formatAmount(amount, locale, currency = getCurrency()) {
   const symbol = currencySymbol(currency);
   const separator = /^[a-z]/i.test(symbol) ? " " : "";
   const number = formatNumber(amount, locale);
-  return locale === "de"
+  return isGerman(locale)
     ? `${number}${separator}${symbol}`
     : `${symbol}${separator}${number}`;
 }
