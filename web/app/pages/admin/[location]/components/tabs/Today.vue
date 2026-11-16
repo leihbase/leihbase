@@ -14,7 +14,7 @@
           {{
             isToday(date)
               ? t("Today")
-              : formatDate(date, "ddd, DD.MM", dateLocale)
+              : formatDate(date, "ddd, DD.MM", formatLocale)
           }}
         </template>
       </Heading>
@@ -45,7 +45,7 @@
         t("no_reservations_on_date", {
           date: isToday(date)
             ? t("today")
-            : t("on") + " " + formatDate(date, "DD.MM.YYYY", dateLocale),
+            : t("on") + " " + formatDate(date, "DD.MM.YYYY", formatLocale),
         })
       }}.
     </i>
@@ -66,7 +66,7 @@ import TabHeader from "../TabHeader.vue";
 const { t } = useI18n({
   useScope: "local",
 });
-const dateLocale = useDateLocale();
+const formatLocale = useFormatLocale();
 
 const props = defineProps<{
   location: Location;

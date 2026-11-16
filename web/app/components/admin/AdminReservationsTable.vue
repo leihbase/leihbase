@@ -34,7 +34,7 @@
                   isSameDate(date, new Date(reservation.start))),
             }"
           >
-            {{ formatDate(reservation.start, "ddd, DD.MM", dateLocale) }}
+            {{ formatDate(reservation.start, "ddd, DD.MM", formatLocale) }}
           </td>
           <td
             :class="{
@@ -50,7 +50,7 @@
                   isSameDate(date, new Date(reservation.end))),
             }"
           >
-            {{ formatDate(reservation.end, "ddd, DD.MM", dateLocale) }}
+            {{ formatDate(reservation.end, "ddd, DD.MM", formatLocale) }}
           </td>
           <td>
             <NuxtLink
@@ -110,7 +110,7 @@ const { formatCurrency } = useCurrency();
 const { t } = useI18n({
   useScope: "local",
 });
-const dateLocale = useDateLocale();
+const formatLocale = useFormatLocale();
 const emit = defineEmits<{ select: [reservation: Reservation] }>();
 
 const props = defineProps<{

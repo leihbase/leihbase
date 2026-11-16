@@ -73,24 +73,24 @@ services:
 
 `leihbase-webapp`:
 
-| Variable                                 | Description                                                                   |
-| ---------------------------------------- | ----------------------------------------------------------------------------- |
-| `NUXT_PUBLIC_LOCALE`                     | Language of the front-end: `en` or `de`                                       |
-| `NUXT_PUBLIC_POCKETBASE_SERVER_BASE_URL` | URL used by the webapp server to reach PocketBase (e.g. the internal network) |
-| `NUXT_PUBLIC_POCKETBASE_CLIENT_BASE_URL` | Public URL used by the browser to reach PocketBase                            |
-| `NUXT_PUBLIC_PLAUSIBLE_TRACKING_DOMAIN`  | Optional, enables [Plausible](https://plausible.io/) analytics                |
-| `NUXT_PUBLIC_CAP_INSTANCE_HOST`          | Optional, [Cap](https://trycap.dev) captcha instance host                     |
-| `NUXT_PUBLIC_CAP_SITE_KEY`               | Optional, Cap captcha site key                                                |
+| Variable                                 | Description                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------- |
+| `NUXT_PUBLIC_LOCALE`                     | Language of the front-end: `en` or `de`, optionally with a region for dates (`en-GB`) |
+| `NUXT_PUBLIC_POCKETBASE_SERVER_BASE_URL` | URL used by the webapp server to reach PocketBase (e.g. the internal network)         |
+| `NUXT_PUBLIC_POCKETBASE_CLIENT_BASE_URL` | Public URL used by the browser to reach PocketBase                                    |
+| `NUXT_PUBLIC_PLAUSIBLE_TRACKING_DOMAIN`  | Optional, enables [Plausible](https://plausible.io/) analytics                        |
+| `NUXT_PUBLIC_CAP_INSTANCE_HOST`          | Optional, [Cap](https://trycap.dev) captcha instance host                             |
+| `NUXT_PUBLIC_CAP_SITE_KEY`               | Optional, Cap captcha site key                                                        |
 
 `leihbase-pb`:
 
-| Variable                          | Description                                                                      |
-| --------------------------------- | -------------------------------------------------------------------------------- |
-| `CONFIG_LOCALE`                   | Language of the emails: `en` or `de`                                             |
-| `CONFIG_RESERVATION_REQUIRE_USER` | If a reservation created in the admin section is required to be linked to a user |
-| `CONFIG_CAP_INSTANCE_HOST`        | Optional, Cap captcha instance host                                              |
-| `CONFIG_CAP_SITE_KEY`             | Optional, Cap captcha site key                                                   |
-| `CONFIG_CAP_SECRET_KEY`           | Optional, Cap captcha secret key                                                 |
+| Variable                          | Description                                                                        |
+| --------------------------------- | ---------------------------------------------------------------------------------- |
+| `CONFIG_LOCALE`                   | Language of the emails: `en` or `de`, optionally with a region for dates (`en-GB`) |
+| `CONFIG_RESERVATION_REQUIRE_USER` | If a reservation created in the admin section is required to be linked to a user   |
+| `CONFIG_CAP_INSTANCE_HOST`        | Optional, Cap captcha instance host                                                |
+| `CONFIG_CAP_SITE_KEY`             | Optional, Cap captcha site key                                                     |
+| `CONFIG_CAP_SECRET_KEY`           | Optional, Cap captcha secret key                                                   |
 
 #### Email
 

@@ -22,9 +22,9 @@
         <p>
           <strong>{{ t("borrow_period") }}</strong>
           <br />
-          {{ formatDate(reservation.start, "DD.MM.YYYY", dateLocale) }}
+          {{ formatDate(reservation.start, "DD.MM.YYYY", formatLocale) }}
           -
-          {{ formatDate(reservation.end, "DD.MM.YYYY", dateLocale) }}
+          {{ formatDate(reservation.end, "DD.MM.YYYY", formatLocale) }}
         </p>
         <p
           v-if="
@@ -133,7 +133,7 @@ const { formatCurrency } = useCurrency();
 const { t } = useI18n({
   useScope: "local",
 });
-const dateLocale = useDateLocale();
+const formatLocale = useFormatLocale();
 
 const props = defineProps<{
   reservation?: Reservation;

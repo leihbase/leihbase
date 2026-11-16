@@ -36,7 +36,7 @@
       <div v-if="location?.opening_hours">
         <strong>{{ t("opening_hours") }}:</strong><br />
         <span
-          v-html="openingHoursToString(location?.opening_hours, dateLocale)"
+          v-html="openingHoursToString(location?.opening_hours, formatLocale)"
         ></span>
       </div>
     </header>
@@ -58,7 +58,7 @@ import { Internet, MapPin } from "@iconoir/vue";
 const { t } = useI18n({
   useScope: "local",
 });
-const dateLocale = useDateLocale();
+const formatLocale = useFormatLocale();
 
 const route = useRoute();
 

@@ -219,7 +219,7 @@ const { formatCurrency, symbol: currencySymbol } = useCurrency();
 const { t } = useI18n({
   useScope: "local",
 });
-const dateLocale = useDateLocale();
+const formatLocale = useFormatLocale();
 
 const props = defineProps<{
   state: "new" | "edit";
@@ -399,7 +399,7 @@ const acceptanceStatus = computed(() => {
       date: formatDate(
         acceptance.value.created,
         "DD.MM.YYYY",
-        dateLocale.value
+        formatLocale.value
       ),
     }
   );

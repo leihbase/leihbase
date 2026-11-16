@@ -33,22 +33,9 @@ export function formatDate(
   format: keyof typeof FORMATS,
   locale: string
 ) {
-  const options: DateTimeFormatOptions =
-    locale === "en-GB" && format === "DD.MM.YYYY"
-      ? { ...FORMATS[format], year: "2-digit" } // dd/mm/yy
-      : FORMATS[format];
   return DateTime.fromJSDate(new Date(date), { zone: "utc" })
     .setLocale(locale)
-    .toLocaleString(options);
-}
-
-/**
- * The locale to format dates in. English with pounds (GBP) shows dates the
- * British way (dd/mm/yy, "16 Nov 2026"), instead of the American way.
- * Keep in sync with pocketbase/pb_hooks/lib/email.js, so emails match.
- */
-export function dateLocale(locale: string, currency: string) {
-  return locale === "en" && currency === "GBP" ? "en-GB" : locale;
+    .toLocaleString(FORMATS[format]);
 }
 
 export function isDateOnDays(date: Date, days: string[]) {

@@ -8,8 +8,8 @@
         :class="{ active: isToday(reservation) }"
       >
         <span class="timespan">
-          {{ formatDate(reservation.start, "DD.MM.YYYY", dateLocale) }}
-          - {{ formatDate(reservation.end, "DD.MM.YYYY", dateLocale) }}
+          {{ formatDate(reservation.start, "DD.MM.YYYY", formatLocale) }}
+          - {{ formatDate(reservation.end, "DD.MM.YYYY", formatLocale) }}
         </span>
         <span
           v-if="userReservationIds.includes(reservation.id)"
@@ -31,7 +31,7 @@ import { isToday } from "@@/lib/reservation";
 import { User as UserIcon } from "@iconoir/vue";
 import Heading from "./core/Heading.vue";
 
-const dateLocale = useDateLocale();
+const formatLocale = useFormatLocale();
 const { t } = useI18n({ useScope: "local" });
 
 defineProps({
