@@ -80,6 +80,11 @@ const { t } = useI18n({ useScope: "local" });
 const { t: g } = useI18n({ useScope: "global" });
 const { pb } = usePocketbase();
 
+// Location settings are only available to admins
+if (!useUserStore().isAdmin) {
+  throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
+}
+
 const slug = Array.isArray(route.params.location)
   ? route.params.location[0]
   : route.params.location;

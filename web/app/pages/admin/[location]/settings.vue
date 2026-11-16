@@ -188,6 +188,11 @@ const route = useRoute();
 const { pb } = usePocketbase();
 const { loading, update, fieldError } = usePocketbaseUpdate(pb, "location");
 
+// Location settings are only available to admins
+if (!useUserStore().isAdmin) {
+  throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
+}
+
 const slug = route.params.location as string;
 const success = ref(false);
 const isBorrowAgreementMinorEdit = ref(false);

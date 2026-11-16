@@ -30,7 +30,13 @@ test.describe("instance settings", () => {
     await expect(page).toHaveURL(`/admin/${location.slug}`);
     await expect(page.getByRole("link", { name: "Locations" })).toHaveCount(0);
 
-    const response = await page.goto("/admin/settings");
-    expect(response?.status()).toBe(404);
+    for (const path of [
+      "/admin/settings",
+      `/admin/${location.slug}/settings`,
+      `/admin/${location.slug}/email-templates`,
+    ]) {
+      const response = await page.goto(path);
+      expect(response?.status()).toBe(404);
+    }
   });
 });
