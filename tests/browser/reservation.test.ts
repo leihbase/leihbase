@@ -6,7 +6,11 @@ import {
   navigateToProductPage,
   updateLastProductReservation,
 } from "../lib/product";
-import { closeReservationDialog, reserve } from "../lib/reservation";
+import {
+  closeReservationDialog,
+  createReservation,
+  reserve,
+} from "../lib/reservation";
 import { createUser } from "../lib/user";
 import { uniqueId, waitForClientMount } from "../lib/utils";
 import { pocketbase } from "../services/pocketbase";
@@ -152,5 +156,35 @@ test.describe("reservation", () => {
     await navigateToProductPage(page, product.id);
     await reserve(page, 0, 5);
     await expect(page.getByTestId("reservation-form-error")).toBeVisible();
+  });
+
+  test("the reservation details dialog is in the user's language", async ({
+    page,
+  }) => {
+    const pb = await pocketbase();
+    const user = await createUser();
+    const product = await createProduct();
+    const start = new Date();
+    start.setUTCHours(0, 0, 0, 0);
+    start.setUTCDate(start.getUTCDate() + 7);
+    const end = new Date(start);
+    end.setUTCDate(end.getUTCDate() + 2);
+    await createReservation(pb, {
+      user: user.id,
+      product: product.id,
+      location: product.location,
+      start,
+      end,
+    });
+
+    await login(page, user.email, "123456789");
+    await page.goto("/reservations");
+    await waitForClientMount(page.getByRole("button", { name: product.name }));
+    await page.getByRole("button", { name: product.name }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(
+      dialog.getByText("Reservation", { exact: true })
+    ).toBeVisible();
+    await expect(dialog.getByText("Reservierung")).toHaveCount(0);
   });
 });
