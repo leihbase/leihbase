@@ -12,7 +12,7 @@
           :label="t('name')"
           name="name"
           :value="user!.name"
-          :error="errors.fields['name'] ? t(errors.fields['name']) : undefined"
+          :error="fieldError('name')"
           required
         />
         <!-- Buttons -->
@@ -40,7 +40,7 @@ import { ClientResponseError, type RecordModel } from "pocketbase";
 
 const { pb, isValid, user, logout } = usePocketbase();
 const userStore = useUserStore();
-const { loading, update, errors } = usePocketbaseUpdate(pb, "users");
+const { loading, update, fieldError } = usePocketbaseUpdate(pb, "users");
 const { t } = useI18n({
   useScope: "local",
 });

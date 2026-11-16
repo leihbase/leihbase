@@ -2,7 +2,7 @@
   <header>
     <div>
       <h1>
-        <Heading is="span" size="lg">{{ location?.name }}</Heading>
+        <Heading v-if="subtitle" is="span" size="lg">{{ subtitle }}</Heading>
         <Heading is="span" size="xl">{{ title }}</Heading>
       </h1>
     </div>
@@ -12,9 +12,8 @@
 
 <script setup lang="ts">
 import Heading from "@/components/core/Heading.vue";
-import type { RecordModel } from "pocketbase";
 
-defineProps<{ title: string; location: RecordModel }>();
+defineProps<{ title: string; subtitle?: string }>();
 </script>
 
 <style lang="scss" scoped>

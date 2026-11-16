@@ -6,6 +6,7 @@ type ErrorCode = {
 };
 
 export function usePocketbaseUpdate(pb: Client, collection: string) {
+  const { t, te } = useI18n();
   const loading = ref(false);
   const errors = reactive<{
     general: string;
@@ -54,9 +55,20 @@ export function usePocketbaseUpdate(pb: Client, collection: string) {
     return result;
   }
 
+  /**
+   * Translated error message of a field, from the PocketBase error code, or
+   * undefined when the field has no error
+   */
+  function fieldError(field: string) {
+    const code = errors.fields[field];
+    if (!code) return undefined;
+    return te(code) ? t(code) : t("validation_invalid");
+  }
+
   return {
     loading,
     update,
     errors,
+    fieldError,
   };
 }

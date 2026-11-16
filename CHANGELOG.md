@@ -14,6 +14,8 @@ and this project adheres to
 - **Currency setting:** the currency of deposits can be set with the `currency`
   field on the `leihbase` record, as an ISO 4217 code such as `GBP` or `USD`
   (defaults to `EUR`).
+- **Instance settings:** admins can change the instance settings on a new
+  settings page in the admin overview (`/admin`).
 
 ### Fixed
 

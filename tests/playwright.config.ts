@@ -66,10 +66,13 @@ export default defineConfig<ConfigOptions>({
       dependencies: ["setup"],
     },
     {
-      // Changes settings all other tests rely on, so runs after them
+      // API and browser tests which change the leihbase record (instance
+      // settings) all other tests rely on: runs after all other tests, one
+      // test at a time, so the tests don't change the settings under each other
       name: "Shared settings",
       testDir: "./shared-settings",
       dependencies: ["API Tests", "Desktop Chrome", "Mobile Chrome"],
+      workers: 1,
     },
   ],
 
