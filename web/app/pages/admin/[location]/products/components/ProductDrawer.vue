@@ -52,7 +52,7 @@
         id="product-drawer-categories-input"
         :label="t('categories')"
         collection="categories"
-        :columns="['name_' + locale]"
+        :columns="['name_' + languageOf(locale)]"
         v-model="categories"
         multiple
       />
@@ -118,6 +118,7 @@
 </template>
 
 <script lang="ts" setup>
+import { languageOf } from "@@/lib/locale";
 import type { Product } from "@@/models/product";
 import RecordPickerInput from "@/components/admin/RecordPickerInput.vue";
 import Alert from "@/components/core/Alert.vue";
