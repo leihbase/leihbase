@@ -22,32 +22,40 @@ function getLanguage(locale) {
 }
 
 /**
- * Formats a date for emails. Without a region, as before: "16/11/2026" (en)
- * or "16.11.2026" (de), without leading zeros. With a region, as on the
- * website (formatDate "DD.MM.YYYY" in web/lib/date.ts): "16/11/2026" (en-GB),
- * "11/16/2026" (en-US), "05.01.2026" (de-AT). Keep the two in sync.
+ * Date patterns by locale, or by language when a locale is not listed. They
+ * follow the website (formatDate "DD.MM.YYYY" in web/lib/date.ts), which uses
+ * Intl. PocketBase has no Intl, so keep the two in sync.
+ * @type {Record<string, string>}
+ */
+const DATE_PATTERNS = {
+  "en-US": "MM/DD/YYYY",
+  "en-GB": "DD/MM/YYYY",
+  "en-CA": "YYYY-MM-DD",
+  "en-ZA": "YYYY/MM/DD",
+  en: "DD/MM/YYYY",
+  de: "DD.MM.YYYY",
+};
+
+/**
+ * Formats a date for emails, e.g. "05/01/2026" (en), "01/05/2026" (en-US) or
+ * "05.01.2026" (de)
  * @param {Date} date
  * @param {string} locale
  * @returns {string}
  */
 function formatDate(date, locale) {
   if (!date) return "";
-  const [, region] = String(locale || "").split(/[-_]/);
-  const language = getLanguage(locale);
+  const [language, region = ""] = String(locale || "").split(/[-_]/);
+  const pattern =
+    DATE_PATTERNS[`${language}-${region.toUpperCase()}`] ||
+    DATE_PATTERNS[getLanguage(locale)] ||
+    DATE_PATTERNS.en;
+  const pad = (/** @type {number} */ n) => (n < 10 ? `0${n}` : `${n}`);
   // Dates are stored as UTC midnight
-  const day = date.getUTCDate();
-  const month = date.getUTCMonth() + 1;
-  const year = date.getUTCFullYear();
-  if (!region) {
-    return language === "de"
-      ? `${day}.${month}.${year}`
-      : `${day}/${month}/${year}`;
-  }
-  const dd = String(day).padStart(2, "0");
-  const mm = String(month).padStart(2, "0");
-  if (language === "de") return `${dd}.${mm}.${year}`;
-  if (region.toUpperCase() === "US") return `${mm}/${dd}/${year}`;
-  return `${dd}/${mm}/${year}`;
+  return pattern
+    .replace("DD", pad(date.getUTCDate()))
+    .replace("MM", pad(date.getUTCMonth() + 1))
+    .replace("YYYY", `${date.getUTCFullYear()}`);
 }
 
 module.exports = {

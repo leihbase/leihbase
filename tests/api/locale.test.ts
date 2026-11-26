@@ -48,13 +48,22 @@ test.describe("locales with a region", () => {
     );
   });
 
-  test("dates in emails without a region are unchanged", () => {
-    expect(pbLocale.formatDate(JAN_5, "en")).toBe("5/1/2026");
-    expect(pbLocale.formatDate(JAN_5, "de")).toBe("5.1.2026");
+  test("dates in emails without a region use the language", () => {
+    expect(pbLocale.formatDate(JAN_5, "en")).toBe("05/01/2026");
+    expect(pbLocale.formatDate(JAN_5, "de")).toBe("05.01.2026");
   });
 
   test("dates in emails with a region match the website", () => {
-    for (const locale of ["en-GB", "en-US", "en-AU", "de-DE", "de-AT"]) {
+    for (const locale of [
+      "en-GB",
+      "en-US",
+      "en-AU",
+      "en-CA",
+      "en-ZA",
+      "de-DE",
+      "de-AT",
+      "de-CH",
+    ]) {
       for (const date of [NOV_16, JAN_5]) {
         expect(pbLocale.formatDate(date, locale)).toBe(
           formatDate(date, "DD.MM.YYYY", locale)
