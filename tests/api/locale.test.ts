@@ -48,14 +48,21 @@ test.describe("locales with a region", () => {
     );
   });
 
-  test("dates in emails without a region use the language", () => {
-    expect(pbLocale.formatDate(JAN_5, "en")).toBe("05/01/2026");
+  test("dates in emails have leading zeros", () => {
+    expect(pbLocale.formatDate(JAN_5, "en")).toBe("01/05/2026");
+    expect(pbLocale.formatDate(JAN_5, "en_gb")).toBe("05/01/2026");
     expect(pbLocale.formatDate(JAN_5, "de")).toBe("05.01.2026");
   });
 
-  test("dates in emails with a region match the website", () => {
+  test("dates in emails match the website", () => {
     for (const locale of [
+      "en",
+      "de",
       "en-GB",
+      "en-IE",
+      "en-NZ",
+      "en-IN",
+      "en-PH",
       "en-US",
       "en-AU",
       "en-CA",

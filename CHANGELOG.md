@@ -20,7 +20,9 @@ and this project adheres to
   region, such as `en-GB` or `de-AT`. Texts use the language, and dates follow
   the region, on the website and in emails: `16/11/2026` for `en-GB` instead of
   `11/16/2026`. Dates in emails now have leading zeros: `05.01.2026` instead of
-  `5.1.2026`.
+  `5.1.2026`. English emails without a region show dates like the website:
+  `11/16/2026` instead of `16/11/2026`, set `CONFIG_LOCALE` to `en-GB` to keep
+  the day first.
 
 ### Fixed
 
