@@ -1,12 +1,13 @@
-// Allowed locales for template loading (prevents path traversal)
-const LOCALES = ["en", "de"];
+// Languages with translations, allowed for template loading (prevents path
+// traversal)
+const LANGUAGES = ["en", "de"];
 
 /**
- * @param {string} locale
+ * @param {string} language
  * @returns {boolean}
  */
-function isValidLocale(locale) {
-  return LOCALES.indexOf(locale) !== -1;
+function isValidLanguage(language) {
+  return LANGUAGES.indexOf(language) !== -1;
 }
 
 /**
@@ -70,16 +71,16 @@ function formatDate(date, locale) {
 function getLocale() {
   const locale = $os.getenv("CONFIG_LOCALE");
   if (!locale) return "en";
-  if (isValidLocale(getLanguage(locale))) return locale;
+  if (isValidLanguage(getLanguage(locale))) return locale;
   console.error(
-    `[locale] CONFIG_LOCALE "${locale}" is not supported, using "en". Use one of ${LOCALES.join(", ")}, optionally with a region, for example "en-GB".`
+    `[locale] CONFIG_LOCALE "${locale}" is not supported, using "en". Use one of ${LANGUAGES.join(", ")}, optionally with a region, for example "en-GB".`
   );
   return "en";
 }
 
 module.exports = {
-  LOCALES,
-  isValidLocale,
+  LANGUAGES,
+  isValidLanguage,
   getLanguage,
   getLocale,
   formatDate,
