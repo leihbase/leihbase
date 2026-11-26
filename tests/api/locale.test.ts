@@ -1,8 +1,8 @@
-import { createRequire } from "node:module";
 import { expect, test } from "@playwright/test";
 import { formatCurrency } from "../../web/lib/currency";
 import { formatDate } from "../../web/lib/date";
 import { languageOf } from "../../web/lib/locale";
+import { requireHook } from "../lib/hooks";
 
 /*
  * NUXT_PUBLIC_LOCALE and CONFIG_LOCALE may have a region, e.g. "en-GB". Texts
@@ -10,14 +10,13 @@ import { languageOf } from "../../web/lib/locale";
  * has its own copy of the date formatting.
  */
 
-const require = createRequire(import.meta.url);
-const pbLocale = require("../../pocketbase/pb_hooks/lib/locale.js") as {
+const pbLocale = requireHook<{
   getLanguage: (locale: string) => string;
   formatDate: (date: Date, locale: string) => string;
-};
-const pbCurrency = require("../../pocketbase/pb_hooks/lib/currency.js") as {
+}>("lib/locale");
+const pbCurrency = requireHook<{
   formatAmount: (amount: number, locale: string, currency?: string) => string;
-};
+}>("lib/currency");
 
 const NOV_16 = new Date(Date.UTC(2026, 10, 16));
 const JAN_5 = new Date(Date.UTC(2026, 0, 5));

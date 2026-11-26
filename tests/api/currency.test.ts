@@ -1,6 +1,6 @@
-import { createRequire } from "node:module";
 import { expect, test } from "@playwright/test";
 import { formatCurrency, SYMBOLS } from "../../web/lib/currency";
+import { requireHook } from "../lib/hooks";
 
 /*
  * The back-end (emails) and the web app each have their own copy of the
@@ -9,15 +9,14 @@ import { formatCurrency, SYMBOLS } from "../../web/lib/currency";
  * These tests make sure both copies format amounts the same way.
  */
 
-const require = createRequire(import.meta.url);
-const pbCurrency = require("../../pocketbase/pb_hooks/lib/currency.js") as {
+const pbCurrency = requireHook<{
   SYMBOLS: Record<string, string>;
   formatAmount: (
     amount: number | string,
     locale: string,
     currency?: string
   ) => string;
-};
+}>("lib/currency");
 
 test.describe("currency formatting", () => {
   test("formats whole and decimal amounts", () => {
