@@ -49,17 +49,25 @@ export default defineConfig<ConfigOptions>({
       testMatch: /global\.setup\.ts/,
     },
     {
+      // Testing of back-end and front-end functions, not setup needed
+      name: "Unit Tests",
+      testDir: "./unit",
+    },
+    {
+      // Testing of the Pocketbase REST API
       name: "API Tests",
       testDir: "./api",
       dependencies: ["setup"],
     },
     {
+      // Desktop browser tests
       name: "Desktop Chrome",
       testDir: "./browser",
       use: devices["Desktop Chrome"],
       dependencies: ["setup"],
     },
     {
+      // Mobile browser tests
       name: "Mobile Chrome",
       testDir: "./browser",
       use: devices["Pixel 5"],

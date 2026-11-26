@@ -1,22 +1,19 @@
 import { expect, test } from "@playwright/test";
-import { formatCurrency } from "../../web/lib/currency";
 import { formatDate } from "../../web/lib/date";
 import { languageOf } from "../../web/lib/locale";
 import { requireHook } from "../lib/hooks";
 
 /*
- * NUXT_PUBLIC_LOCALE and CONFIG_LOCALE may have a region, e.g. "en-GB". Texts
- * use the language, dates and numbers the full locale. The back-end (emails)
- * has its own copy of the date formatting.
+ * The back-end and the web app each have their own copy of
+ * date formatting.
+ *
+ * These tests make sure both copies format dates the same way.
  */
 
 const pbLocale = requireHook<{
   getLanguage: (locale: string) => string;
   formatDate: (date: Date, locale: string) => string;
 }>("lib/locale");
-const pbCurrency = requireHook<{
-  formatAmount: (amount: number, locale: string, currency?: string) => string;
-}>("lib/currency");
 
 const NOV_16 = new Date(Date.UTC(2026, 10, 16));
 const JAN_5 = new Date(Date.UTC(2026, 0, 5));
@@ -76,16 +73,6 @@ test.describe("locales with a region", () => {
           formatDate(date, "DD.MM.YYYY", locale)
         );
       }
-    }
-  });
-
-  test("amounts use the language of the locale", () => {
-    for (const [locale, expected] of [
-      ["en-GB", "£7.50"],
-      ["de-AT", "7,50£"],
-    ]) {
-      expect(formatCurrency(7.5, locale!, "GBP")).toBe(expected);
-      expect(pbCurrency.formatAmount(7.5, locale!, "GBP")).toBe(expected);
     }
   });
 });

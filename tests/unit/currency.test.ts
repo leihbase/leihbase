@@ -51,4 +51,14 @@ test.describe("currency formatting", () => {
       }
     }
   });
+
+  test("amounts use the language of the locale", () => {
+    for (const [locale, expected] of [
+      ["en-GB", "£7.50"],
+      ["de-AT", "7,50£"],
+    ]) {
+      expect(formatCurrency(7.5, locale!, "GBP")).toBe(expected);
+      expect(pbCurrency.formatAmount(7.5, locale!, "GBP")).toBe(expected);
+    }
+  });
 });
