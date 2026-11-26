@@ -17,7 +17,7 @@ function isValidLocale(locale) {
  */
 function getLanguage(locale) {
   return String(locale || "")
-    .split(/[-_]/)[0]
+    .split("-")[0]
     .toLowerCase();
 }
 
@@ -48,7 +48,7 @@ const DATE_PATTERNS = {
 function formatDate(date, locale) {
   if (!date) return "";
   const language = getLanguage(locale);
-  const region = (String(locale || "").split(/[-_]/)[1] || "").toUpperCase();
+  const region = (String(locale || "").split("-")[1] || "").toUpperCase();
   const pattern =
     (region &&
       (DATE_PATTERNS[`${language}-${region}`] ||

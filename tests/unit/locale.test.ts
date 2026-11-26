@@ -23,7 +23,6 @@ test.describe("locales with a region", () => {
     for (const [locale, language] of [
       ["en", "en"],
       ["en-GB", "en"],
-      ["en_US", "en"],
       ["de-AT", "de"],
       ["DE-ch", "de"],
     ]) {

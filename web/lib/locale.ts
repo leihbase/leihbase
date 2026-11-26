@@ -3,5 +3,5 @@
  * are chosen by language, dates and numbers are formatted with the full locale.
  */
 export function getLanguage(locale: string) {
-  return (locale || "").split(/[-_]/)[0]!.toLowerCase();
+  return (locale || "").split("-")[0]!.toLowerCase();
 }
