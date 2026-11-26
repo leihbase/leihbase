@@ -19,7 +19,8 @@ and this project adheres to
 - **Locales with a region:** `NUXT_PUBLIC_LOCALE` and `CONFIG_LOCALE` can have a
   region, such as `en-GB` or `de-AT`. Texts use the language, and dates follow
   the region, on the website and in emails: `16/11/2026` for `en-GB` instead of
-  `11/16/2026`. Without a region, nothing changes.
+  `11/16/2026`. Dates in emails now have leading zeros: `05.01.2026` instead of
+  `5.1.2026`.
 
 ### Fixed
 
