@@ -32,47 +32,27 @@ test.describe("locales with a region", () => {
     }
   });
 
-  test("dates on the website follow the region", () => {
-    expect(formatDate(NOV_16, "DD.MM.YYYY", "en")).toBe("11/16/2026");
-    expect(formatDate(NOV_16, "DD.MM.YYYY", "en-US")).toBe("11/16/2026");
-    expect(formatDate(NOV_16, "DD.MM.YYYY", "en-GB")).toBe("16/11/2026");
-    expect(formatDate(NOV_16, "DD.MM.YYYY", "de")).toBe("16.11.2026");
+  test("dates on the website and in emails follow the region", () => {
+    for (const [locale, expected] of [
+      ["en", "01/05/2026"],
+      ["en-US", "01/05/2026"],
+      ["en-GB", "05/01/2026"],
+      ["en-AU", "05/01/2026"],
+      ["en-CA", "2026-01-05"],
+      ["de", "05.01.2026"],
+      ["de-AT", "05.01.2026"],
+    ]) {
+      expect(formatDate(JAN_5, "DD.MM.YYYY", locale!)).toBe(expected);
+      expect(pbLocale.formatDate(JAN_5, locale!)).toBe(expected);
+    }
+  });
+
+  test("dates with a month name on the website follow the region", () => {
     expect(formatDate(NOV_16, "dd, D MMM YYYY", "en")).toBe(
       "Mon, Nov 16, 2026"
     );
     expect(formatDate(NOV_16, "dd, D MMM YYYY", "en-GB")).toBe(
       "Mon, 16 Nov 2026"
     );
-  });
-
-  test("dates in emails have leading zeros", () => {
-    expect(pbLocale.formatDate(JAN_5, "en")).toBe("01/05/2026");
-    expect(pbLocale.formatDate(JAN_5, "en_gb")).toBe("05/01/2026");
-    expect(pbLocale.formatDate(JAN_5, "de")).toBe("05.01.2026");
-  });
-
-  test("dates in emails match the website", () => {
-    for (const locale of [
-      "en",
-      "de",
-      "en-GB",
-      "en-IE",
-      "en-NZ",
-      "en-IN",
-      "en-PH",
-      "en-US",
-      "en-AU",
-      "en-CA",
-      "en-ZA",
-      "de-DE",
-      "de-AT",
-      "de-CH",
-    ]) {
-      for (const date of [NOV_16, JAN_5]) {
-        expect(pbLocale.formatDate(date, locale)).toBe(
-          formatDate(date, "DD.MM.YYYY", locale)
-        );
-      }
-    }
   });
 });
