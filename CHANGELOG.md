@@ -16,6 +16,10 @@ and this project adheres to
   (defaults to `EUR`).
 - **Instance settings:** admins can change the instance settings on a new
   settings page in the admin overview (`/admin`).
+- **Borrowing terms for all locations:** admins can set borrowing terms on the
+  instance settings page, which apply to every location without borrowing terms
+  of its own. Users accept them once for all those locations, and again when
+  they change (unless saved as a minor edit).
 
 ### Fixed
 

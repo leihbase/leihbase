@@ -8,7 +8,8 @@ people can borrow items instead of buying them.
 
 - 🏪 Webshop-style catalog of borrowable products, with category filtering
 - 🎫 Online reservations, with user sign-up/login
-- 📜 Borrowing terms per location, accepted online or in the store
+- 📜 Borrowing terms for all locations or per location, accepted online or in
+  the store
 - 👷 Admin section to manage products, reservations and statistics across
   multiple locations
 - 📧 Email confirmations and pickup/return reminders, with customizable
@@ -153,6 +154,9 @@ The single record in the `leihbase` collection contains instance-wide settings:
   [links](#links)
 - `currency`: currency of deposits on the website and in emails, as an ISO 4217
   code such as `EUR` (the default when empty), `GBP` or `CHF`.
+- `borrow_agreement`: borrowing terms of all locations without borrowing terms
+  of their own, edited in the admin section (Instance settings, see
+  [Borrowing terms](#borrowing-terms)).
 - `style`: CSS variables to theme the front-end, for example:
 
 ```css
@@ -198,6 +202,10 @@ Links shown on the location page.
 Admins can define borrowing terms per location in the admin section (Settings >
 Borrowing terms). Users have to accept them before their first reservation at
 the location.
+
+Borrowing terms for all locations are defined in the instance settings (Admin >
+Instance settings). They apply to every location without borrowing terms of its
+own, and users accept them once for all those locations.
 
 With 'allow accepting later' enabled, users can reserve without accepting them,
 and accept them later or in the store. When the borrowing terms are changed,

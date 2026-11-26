@@ -4,13 +4,16 @@ import type { Reservation } from "@@/models/reservation";
 
 /**
  * Acceptances of the current borrow agreement of the location, for the admin
- * section. An acceptance is `null` when the user hasn't accepted the current
- * borrow agreement but should, and `undefined` when not applicable (the location
- * has no borrow agreement, or there is no user).
+ * section. That is the location's own borrow agreement, or else the
+ * instance-wide one. An acceptance is `null` when the user hasn't accepted the
+ * current borrow agreement but should, and `undefined` when not applicable (no
+ * borrow agreement applies, or there is no user).
  */
 export function useAdminBorrowAgreementAcceptances(location: Location) {
   const { pb } = usePocketbase();
-  const borrowAgreement = location.borrow_agreement;
+  const { leihbase } = useLeihbase();
+  const borrowAgreement =
+    location.borrow_agreement || leihbase?.borrow_agreement || "";
 
   /**
    * The acceptance of the user of the reservation, from its expand
@@ -68,5 +71,5 @@ export function useAdminBorrowAgreementAcceptances(location: Location) {
     await pb.collection("borrow_agreement_acceptances").delete(acceptance.id);
   }
 
-  return { getFromReservation, fetch, record, remove };
+  return { borrowAgreement, getFromReservation, fetch, record, remove };
 }

@@ -105,32 +105,38 @@
         :title="t('borrow-agreement.title')"
         :description="t('borrow-agreement.description')"
       >
-        <RichTextarea
-          :label="t('borrow-agreement.label')"
-          v-model="borrowAgreementContent"
-          :headings="[3, 4]"
-          height="24rem"
-          data-testid="borrow-agreement-input"
-          class="max-w"
-        />
-        <Switch
+        <Alert
           v-if="
-            borrowAgreement && borrowAgreementContent && isBorrowAgreementEdited
+            leihbase?.borrow_agreement && !borrowAgreementEditor?.hasContent
           "
-          id="borrow-agreement-minor-edit"
-          v-model="isBorrowAgreementMinorEdit"
-          :label="t('borrow-agreement.minor-edit.label')"
-          :description="t('borrow-agreement.minor-edit.description')"
-          data-testid="borrow-agreement-minor-edit"
+          variant="info"
+          class="max-w"
+          data-testid="borrow-agreement-instance-info"
+        >
+          <i18n-t keypath="borrow-agreement.uses-instance" tag="span">
+            <Link to="/admin/settings">{{
+              t("borrow-agreement.instance-settings")
+            }}</Link>
+          </i18n-t>
+        </Alert>
+        <BorrowAgreementEditor
+          ref="borrowAgreementEditor"
+          :borrow-agreement="borrowAgreement"
+          :location="location.id"
         />
         <Switch
-          v-if="borrowAgreementContent"
+          v-if="borrowAgreementEditor?.hasContent || leihbase?.borrow_agreement"
           id="borrow-agreement-optional"
           v-model="isBorrowAgreementOptional"
           :label="t('borrow-agreement.optional.label')"
           :description="t('borrow-agreement.optional.description')"
           data-testid="borrow-agreement-optional"
         />
+        <div>
+          <Link to="/admin/settings" data-testid="instance-settings-link">
+            {{ t("borrow-agreement.manage-instance") }}
+          </Link>
+        </div>
       </AdminSection>
 
       <AdminSection
@@ -170,6 +176,7 @@
 <script setup lang="ts">
 import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminSection from "@/components/admin/AdminSection.vue";
+import BorrowAgreementEditor from "@/components/admin/BorrowAgreementEditor.vue";
 import Alert from "@/components/core/Alert.vue";
 import Button from "@/components/core/Button.vue";
 import Container from "@/components/core/Container.vue";
@@ -195,7 +202,8 @@ if (!useUserStore().isAdmin) {
 
 const slug = route.params.location as string;
 const success = ref(false);
-const isBorrowAgreementMinorEdit = ref(false);
+const { leihbase } = useLeihbase();
+const borrowAgreementEditor = ref<InstanceType<typeof BorrowAgreementEditor>>();
 
 const location = await useLocation({
   slug,
@@ -217,46 +225,11 @@ const { data: borrowAgreement } = await useAsyncData(
           .getOne<BorrowAgreement>(location.value.borrow_agreement)
       : null
 );
-const borrowAgreementContent = ref<string | undefined>(
-  borrowAgreement.value?.content
-);
-// If the borrow agreement has been edited since loading or saving, even when
-// the content ended up the same
-const isBorrowAgreementEdited = ref(false);
-watch(borrowAgreementContent, () => {
-  isBorrowAgreementEdited.value = true;
-});
 const isBorrowAgreementOptional = ref(location.value.borrow_agreement_optional);
 
 useHead({
   title: `${t("title")} | ${location.value.name}`,
 });
-
-/**
- * Saves the borrow agreement content. A minor edit updates the current borrow
- * agreement in place, otherwise a new borrow agreement is created, which users
- * have to accept again. Returns the id of the current borrow agreement.
- */
-async function saveBorrowAgreement() {
-  const content = borrowAgreementContent.value || "";
-  if (content === (borrowAgreement.value?.content || "")) {
-    return borrowAgreement.value?.id || "";
-  }
-  if (!content) {
-    borrowAgreement.value = null;
-    return "";
-  }
-  if (isBorrowAgreementMinorEdit.value && borrowAgreement.value) {
-    borrowAgreement.value = await pb
-      .collection("borrow_agreements")
-      .update<BorrowAgreement>(borrowAgreement.value.id, { content });
-  } else {
-    borrowAgreement.value = await pb
-      .collection("borrow_agreements")
-      .create<BorrowAgreement>({ location: location.value!.id, content });
-  }
-  return borrowAgreement.value.id;
-}
 
 /**
  * Save the admin settings
@@ -277,9 +250,10 @@ async function handleSubmit(e: SubmitEvent) {
 
   try {
     // First store the borrow_agreement (when changed), then send the id of the (new) borrow agreement along
-    data.set("borrow_agreement", await saveBorrowAgreement());
-    isBorrowAgreementMinorEdit.value = false;
-    isBorrowAgreementEdited.value = false;
+    if (borrowAgreementEditor.value) {
+      borrowAgreement.value = await borrowAgreementEditor.value.save();
+    }
+    data.set("borrow_agreement", borrowAgreement.value?.id || "");
     location.value = await update(location.value!.id, data);
     success.value = true;
   } catch (e) {
@@ -339,12 +313,10 @@ async function handleSubmit(e: SubmitEvent) {
     },
     "borrow-agreement": {
       "title": "Borrowing terms",
-      "description": "Users have to accept the borrowing terms of this location once. Leave empty to not use borrowing terms.",
-      "label": "Borrowing terms",
-      "minor-edit": {
-        "label": "Minor edit",
-        "description": "Users who accepted the borrowing terms don't have to accept them again. Only use this for small corrections, like typos. Without this, all users have to accept the changed borrowing terms."
-      },
+      "description": "Users have to accept the borrowing terms of this location once. Leave empty to use the borrowing terms of the instance, if any.",
+      "uses-instance": "This location uses the borrowing terms of the instance, from the {0}. Enter borrowing terms here to use different ones for this location.",
+      "instance-settings": "instance settings",
+      "manage-instance": "Configure borrowing terms for all locations",
       "optional": {
         "label": "Allow accepting later",
         "description": "Users can reserve without accepting the borrowing terms, and accept them later or in the store."
@@ -392,12 +364,10 @@ async function handleSubmit(e: SubmitEvent) {
     },
     "borrow-agreement": {
       "title": "Leihbedingungen",
-      "description": "Nutzer müssen die Leihbedingungen dieses Standorts einmalig akzeptieren. Leer lassen, um keine Leihbedingungen zu verwenden.",
-      "label": "Leihbedingungen",
-      "minor-edit": {
-        "label": "Kleine Änderung",
-        "description": "Nutzer, die die Leihbedingungen akzeptiert haben, müssen sie nicht erneut akzeptieren. Nur für kleine Korrekturen wie Tippfehler verwenden. Ohne diese Option müssen alle Nutzer die geänderten Leihbedingungen erneut akzeptieren."
-      },
+      "description": "Nutzer müssen die Leihbedingungen dieses Standorts einmalig akzeptieren. Leer lassen, um die Leihbedingungen der Instanz zu verwenden, falls vorhanden.",
+      "uses-instance": "Dieser Standort verwendet die Leihbedingungen der Instanz, aus den {0}. Gib hier Leihbedingungen ein, um für diesen Standort andere zu verwenden.",
+      "instance-settings": "Instanz-Einstellungen",
+      "manage-instance": "Leihbedingungen für alle Standorte verwalten",
       "optional": {
         "label": "Später akzeptieren erlauben",
         "description": "Nutzer können reservieren, ohne die Leihbedingungen zu akzeptieren, und sie später oder vor Ort akzeptieren."
