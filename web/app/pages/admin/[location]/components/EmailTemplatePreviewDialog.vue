@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { languageOf } from "@@/lib/locale";
+import { getLanguage } from "@@/lib/locale";
 import Dialog from "@/components/core/Dialog.vue";
 import { useI18n } from "vue-i18n";
 
@@ -46,7 +46,7 @@ async function fetchPreview() {
   try {
     const params = new URLSearchParams({
       templateName: props.templateName,
-      locale: languageOf(locale.value),
+      locale: getLanguage(locale.value),
       customSubject: props.subject,
       customHtml: props.html,
     });

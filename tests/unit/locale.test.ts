@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { formatDate } from "../../web/lib/date";
-import { languageOf } from "../../web/lib/locale";
+import { getLanguage } from "../../web/lib/locale";
 import { requireHook } from "../lib/hooks";
 
 /*
@@ -27,7 +27,7 @@ test.describe("locales with a region", () => {
       ["de-AT", "de"],
       ["DE-ch", "de"],
     ]) {
-      expect(languageOf(locale!)).toBe(language);
+      expect(getLanguage(locale!)).toBe(language);
       expect(pbLocale.getLanguage(locale!)).toBe(language);
     }
   });

@@ -114,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { languageOf } from "@@/lib/locale";
+import { getLanguage } from "@@/lib/locale";
 import type { EmailTemplate } from "@@/models/EmailTemplate";
 import Alert from "@/components/core/Alert.vue";
 import Badge from "@/components/core/Badge.vue";
@@ -190,7 +190,7 @@ async function fetchTemplateSettings() {
   error.value = null;
   try {
     const result = await pb.send(
-      `/api/email-templates/defaults/${languageOf(locale.value)}/${name.value}`,
+      `/api/email-templates/defaults/${getLanguage(locale.value)}/${name.value}`,
       {}
     );
     return {
@@ -219,7 +219,7 @@ async function handleSubmit() {
       subject: subject.value,
       html: html.value,
       enabled: enabled.value,
-      locale: languageOf(locale.value),
+      locale: getLanguage(locale.value),
     };
 
     let result;

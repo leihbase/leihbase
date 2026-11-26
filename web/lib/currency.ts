@@ -1,4 +1,4 @@
-import { languageOf } from "./locale";
+import { getLanguage } from "./locale";
 
 // Formatting of deposits, in the currency set on the leihbase record.
 // Keep in sync with pocketbase/pb_hooks/lib/currency.js, so emails and the
@@ -40,7 +40,7 @@ function formatNumber(amount: number | string | undefined, locale: string) {
     return `${amount ?? ""}`;
   }
   const formatted = Number.isInteger(n) ? `${n}` : n.toFixed(2);
-  return languageOf(locale) === "de" ? formatted.replace(".", ",") : formatted;
+  return getLanguage(locale) === "de" ? formatted.replace(".", ",") : formatted;
 }
 
 /**
@@ -55,7 +55,7 @@ export function formatCurrency(
   const symbol = currencySymbol(currency);
   const separator = /^[a-z]/i.test(symbol) ? " " : "";
   const number = formatNumber(amount, locale);
-  return languageOf(locale) === "de"
+  return getLanguage(locale) === "de"
     ? `${number}${separator}${symbol}`
     : `${symbol}${separator}${number}`;
 }
