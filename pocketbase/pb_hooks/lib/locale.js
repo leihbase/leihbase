@@ -63,9 +63,24 @@ function formatDate(date, locale) {
     .replace("YYYY", `${date.getUTCFullYear()}`);
 }
 
+/**
+ * Get the locale used for emails and date/currency formatting.
+ * @returns {string}
+ */
+function getLocale() {
+  const locale = $os.getenv("CONFIG_LOCALE");
+  if (!locale) return "en";
+  if (isValidLocale(getLanguage(locale))) return locale;
+  console.error(
+    `[locale] CONFIG_LOCALE "${locale}" is not supported, using "en". Use one of ${LOCALES.join(", ")}, optionally with a region, for example "en-GB".`
+  );
+  return "en";
+}
+
 module.exports = {
   LOCALES,
   isValidLocale,
   getLanguage,
+  getLocale,
   formatDate,
 };

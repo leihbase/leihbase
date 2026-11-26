@@ -2,7 +2,7 @@
 /// <reference path="../types.d.ts" />
 
 /** @type {typeof import('./locale')} */
-const { formatDate, getLanguage } = require(`${__hooks}/lib/locale`);
+const { formatDate, getLanguage, getLocale } = require(`${__hooks}/lib/locale`);
 
 const ReservationConfirmationVars = /** @type {const} */ ([
   "APP_URL",
@@ -345,7 +345,7 @@ function getPreviewTemplate(templateName, locale, locationId = null) {
  * @returns {{subject: string, html: string}}
  */
 function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
-  const locale = $os.getenv("CONFIG_LOCALE") || "en";
+  const locale = getLocale();
   const allPreviewVars = generatePreviewVars(locale);
   const templateVars = filterTemplateVars(templateName, allPreviewVars);
 

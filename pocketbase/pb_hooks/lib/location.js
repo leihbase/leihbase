@@ -36,13 +36,13 @@ function sendReminders(location, type) {
   /** @type {typeof import('./email')} */
   const { sendLocationTemplateEmail } = require(`${__hooks}/lib/email`);
   /** @type {typeof import('./locale')} */
-  const { formatDate } = require(`${__hooks}/lib/locale`);
+  const { formatDate, getLocale } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./openingHours')} */
   const { getOpeningHoursDay, parseOpeningHours } = require(
     `${__hooks}/lib/openingHours`
   );
 
-  const locale = $os.getenv("CONFIG_LOCALE") || "en";
+  const locale = getLocale();
 
   // Get reservations starting or ending tomorrow
   const startOfToday = startOfDate(new Date());

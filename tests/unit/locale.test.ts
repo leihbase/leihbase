@@ -13,6 +13,7 @@ import { requireHook } from "../lib/hooks";
 const pbLocale = requireHook<{
   getLanguage: (locale: string) => string;
   formatDate: (date: Date, locale: string) => string;
+  getLocale: () => string;
 }>("lib/locale");
 
 const NOV_16 = new Date(Date.UTC(2026, 10, 16));
@@ -28,6 +29,29 @@ test.describe("locales with a region", () => {
     ]) {
       expect(getLanguage(locale!)).toBe(language);
       expect(pbLocale.getLanguage(locale!)).toBe(language);
+    }
+  });
+
+  test("emails use CONFIG_LOCALE, or en when it is not supported", () => {
+    const globals = globalThis as {
+      $os?: { getenv: (name: string) => string };
+    };
+    const error = console.error;
+    console.error = () => {};
+    try {
+      for (const [configured, expected] of [
+        ["", "en"],
+        ["en-GB", "en-GB"],
+        ["de", "de"],
+        ["fr", "en"],
+        ["en_GB", "en"],
+      ]) {
+        globals.$os = { getenv: () => configured! };
+        expect(pbLocale.getLocale()).toBe(expected);
+      }
+    } finally {
+      delete globals.$os;
+      console.error = error;
     }
   });
 
