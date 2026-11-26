@@ -16,6 +16,9 @@ and this project adheres to
   (defaults to `EUR`).
 - **Instance settings:** admins can change the instance settings on a new
   settings page in the admin overview (`/admin`).
+- **Locales with a region:** `NUXT_PUBLIC_LOCALE` and `CONFIG_LOCALE` now
+  support a region, such as 'en-GB' or 'de-AT'. Texts use only the language for
+  now, dates are formatted for the region.
 
 ### Fixed
 
@@ -23,6 +26,10 @@ and this project adheres to
   emails.
 - The reservation details dialog on the reservations page is titled in the
   user's language, instead of always "Reservierung".
+- English without a region (en) now uses US date formatting in both the web app
+  and emails.
+- An unsupported `CONFIG_LOCALE`, such as 'fr', falls back to English, instead
+  of sending emails without text.
 
 ## [2.7.0] - 2026-11-12
 

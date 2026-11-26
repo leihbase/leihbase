@@ -267,17 +267,18 @@ onRecordUpdateRequest((e) => {
 onRecordCreateRequest((e) => {
   e.next();
 
-  const locale = $os.getenv("CONFIG_LOCALE") || "en";
-
   /** @type {typeof import('./lib/reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail, formatCurrency, formatDate } = require(
+  const { sendLocationTemplateEmail, formatCurrency } = require(
     `${__hooks}/lib/email`
   );
+  /** @type {typeof import('./lib/locale')} */
+  const { formatDate, getLocale } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
+  const locale = getLocale();
   const appUrl = $app.settings().meta.appURL;
 
   const { record } = e;
@@ -371,13 +372,13 @@ onRecordUpdateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
   const { removeSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail, formatDate } = require(
-    `${__hooks}/lib/email`
-  );
+  const { sendLocationTemplateEmail } = require(`${__hooks}/lib/email`);
+  /** @type {typeof import('./lib/locale')} */
+  const { formatDate, getLocale } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
-  const locale = $os.getenv("CONFIG_LOCALE") || "en";
+  const locale = getLocale();
 
   let { record } = e;
   if (!record) {

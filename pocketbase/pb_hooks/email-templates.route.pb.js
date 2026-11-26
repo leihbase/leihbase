@@ -10,7 +10,7 @@ routerAdd(
   "/api/email-templates/defaults/{locale}/{templateName}",
   (e) => {
     /** @type {typeof import('./lib/locale')} */
-    const { isValidLocale } = require(`${__hooks}/lib/locale`);
+    const { isValidLanguage } = require(`${__hooks}/lib/locale`);
     /** @type {typeof import('./lib/email')} */
     const { emailTemplateVars } = require(`${__hooks}/lib/email`);
 
@@ -22,7 +22,7 @@ routerAdd(
     const locale = e.request.pathValue("locale");
 
     // Validate locale to prevent path traversal
-    if (!isValidLocale(locale)) {
+    if (!isValidLanguage(locale)) {
       return e.json(400, { error: "Invalid locale" });
     }
 
@@ -50,7 +50,7 @@ routerAdd(
  */
 routerAdd("GET", "/api/email-templates/preview", (e) => {
   /** @type {typeof import('./lib/locale')} */
-  const { isValidLocale } = require(`${__hooks}/lib/locale`);
+  const { isValidLanguage } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/email')} */
   const { getPreviewTemplate, renderPreviewTemplate } = require(
     `${__hooks}/lib/email`
@@ -67,7 +67,7 @@ routerAdd("GET", "/api/email-templates/preview", (e) => {
   const customHtml = e.request.url?.query().get("customHtml");
 
   // Validate locale to prevent path traversal
-  if (locale && !isValidLocale(locale)) {
+  if (locale && !isValidLanguage(locale)) {
     return e.json(400, { error: "Invalid locale" });
   }
 

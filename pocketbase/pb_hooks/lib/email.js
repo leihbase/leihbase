@@ -1,6 +1,9 @@
 /// <reference path="../../pb_data/types.d.ts" />
 /// <reference path="../types.d.ts" />
 
+/** @type {typeof import('./locale')} */
+const { formatDate, getLanguage, getLocale } = require(`${__hooks}/lib/locale`);
+
 const ReservationConfirmationVars = /** @type {const} */ ([
   "APP_URL",
   "USER_NAME",
@@ -85,20 +88,6 @@ const emailTemplateVars = {
  **/
 
 /**
- * Formats a date for use in email templates
- * @param {Date} date
- * @param {string} locale
- * @returns {string}
- */
-function formatDate(date, locale) {
-  if (!date) return "";
-  if (locale === "de") {
-    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-  }
-  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-}
-
-/**
  * Formats currency for use in email templates
  * @param {number} n
  * @param {string} locale
@@ -120,7 +109,7 @@ function formatCurrency(n, locale) {
 function getDefaultTemplate(templateName, locale) {
   try {
     /** @type {typeof import('./emails.en')} */
-    const templates = require(`${__hooks}/lib/emails.${locale}`);
+    const templates = require(`${__hooks}/lib/emails.${getLanguage(locale)}`);
     if (templates[templateName]) {
       return { ...templates[templateName] };
     }
@@ -192,7 +181,7 @@ function getEmailTemplate(locationId, templateName, locale) {
     {
       locationId,
       templateName,
-      locale,
+      locale: getLanguage(locale),
     }
   );
 
@@ -356,7 +345,7 @@ function getPreviewTemplate(templateName, locale, locationId = null) {
  * @returns {{subject: string, html: string}}
  */
 function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
-  const locale = $os.getenv("CONFIG_LOCALE") || "en";
+  const locale = getLocale();
   const allPreviewVars = generatePreviewVars(locale);
   const templateVars = filterTemplateVars(templateName, allPreviewVars);
 
@@ -369,7 +358,6 @@ function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
 module.exports = {
   sendLocationTemplateEmail,
   getSenderInfo,
-  formatDate,
   formatCurrency,
   getPreviewTemplate,
   renderPreviewTemplate,

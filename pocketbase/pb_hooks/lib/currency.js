@@ -1,6 +1,9 @@
 // Formatting of deposits, in the currency set on the leihbase record.
 // Keep in sync with web/lib/currency.ts, so emails and the website match.
 
+/** @type {typeof import('./locale')} */
+const { getLanguage } = require(`${__hooks}/lib/locale`);
+
 const DEFAULT_CURRENCY = "EUR";
 
 /**
@@ -54,7 +57,7 @@ function formatNumber(amount, locale) {
   const n = Number(amount);
   if (amount === "" || !Number.isFinite(n)) return `${amount}`;
   const formatted = Number.isInteger(n) ? `${n}` : n.toFixed(2);
-  return locale === "de" ? formatted.replace(".", ",") : formatted;
+  return getLanguage(locale) === "de" ? formatted.replace(".", ",") : formatted;
 }
 
 /**
@@ -69,7 +72,7 @@ function formatAmount(amount, locale, currency = getCurrency()) {
   const symbol = currencySymbol(currency);
   const separator = /^[a-z]/i.test(symbol) ? " " : "";
   const number = formatNumber(amount, locale);
-  return locale === "de"
+  return getLanguage(locale) === "de"
     ? `${number}${separator}${symbol}`
     : `${symbol}${separator}${number}`;
 }

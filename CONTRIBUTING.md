@@ -78,6 +78,8 @@ mise run test:e2e:update
 
 ### Test projects
 
+- `tests/unit/`: tests of code without the app, such as the date and currency
+  formatting the back-end and front-end both have a copy of
 - `tests/api/`: API tests
 - `tests/browser/`: browser tests, run on a desktop and a mobile viewport
 - `tests/shared-settings/`: API and browser tests which change the `leihbase`
