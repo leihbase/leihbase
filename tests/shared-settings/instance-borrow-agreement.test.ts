@@ -249,7 +249,7 @@ test.describe("instance-wide borrowing terms", () => {
     await waitForHydration(page);
     // The editor in the "Borrowing terms" section, after the description's
     await page
-      .locator("section")
+      .locator("section.section")
       .filter({
         has: page.getByRole("heading", { name: "Borrowing terms" }),
       })
