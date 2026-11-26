@@ -1,6 +1,9 @@
 /// <reference path="../../pb_data/types.d.ts" />
 /// <reference path="../types.d.ts" />
 
+/** @type {typeof import('./locale')} */
+const { formatDate, getLanguage } = require(`${__hooks}/lib/locale`);
+
 const ReservationConfirmationVars = /** @type {const} */ ([
   "APP_URL",
   "USER_NAME",
@@ -83,29 +86,6 @@ const emailTemplateVars = {
  *  reservation_cancellation_location: (typeof ReservationCancellationLocationVars)[number];
  * }} EmailTemplateVars
  **/
-
-/**
- * Formats a date for use in email templates
- * @param {Date} date
- * @param {string} locale
- * @returns {string}
- */
-function formatDate(date, locale) {
-  /** @type {typeof import('./locale')} */
-  const { formatDate } = require(`${__hooks}/lib/locale`);
-  return formatDate(date, locale);
-}
-
-/**
- * The language of a locale, e.g. "en-GB" -> "en"
- * @param {string} locale
- * @returns {string}
- */
-function getLanguage(locale) {
-  /** @type {typeof import('./locale')} */
-  const { getLanguage } = require(`${__hooks}/lib/locale`);
-  return getLanguage(locale);
-}
 
 /**
  * Formats currency for use in email templates
@@ -378,7 +358,6 @@ function renderPreviewTemplate(templateSubject, templateHtml, templateName) {
 module.exports = {
   sendLocationTemplateEmail,
   getSenderInfo,
-  formatDate,
   formatCurrency,
   getPreviewTemplate,
   renderPreviewTemplate,

@@ -272,9 +272,11 @@ onRecordCreateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail, formatCurrency, formatDate } = require(
+  const { sendLocationTemplateEmail, formatCurrency } = require(
     `${__hooks}/lib/email`
   );
+  /** @type {typeof import('./lib/locale')} */
+  const { formatDate } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 
@@ -371,9 +373,9 @@ onRecordUpdateRequest((e) => {
   /** @type {typeof import('./lib/reservation')} */
   const { removeSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./lib/email')} */
-  const { sendLocationTemplateEmail, formatDate } = require(
-    `${__hooks}/lib/email`
-  );
+  const { sendLocationTemplateEmail } = require(`${__hooks}/lib/email`);
+  /** @type {typeof import('./lib/locale')} */
+  const { formatDate } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./lib/location')} */
   const { getNotificationEmailAddresses } = require(`${__hooks}/lib/location`);
 

@@ -34,9 +34,9 @@ function sendReminders(location, type) {
   /** @type {typeof import('./reservation')} */
   const { saveSentEmail } = require(`${__hooks}/lib/reservation`);
   /** @type {typeof import('./email')} */
-  const { sendLocationTemplateEmail, formatDate } = require(
-    `${__hooks}/lib/email`
-  );
+  const { sendLocationTemplateEmail } = require(`${__hooks}/lib/email`);
+  /** @type {typeof import('./locale')} */
+  const { formatDate } = require(`${__hooks}/lib/locale`);
   /** @type {typeof import('./openingHours')} */
   const { getOpeningHoursDay, parseOpeningHours } = require(
     `${__hooks}/lib/openingHours`
