@@ -3,8 +3,8 @@
     {{
       t("reserved", {
         product: product.name,
-        start: formatDate(reservation.start, "DD.MM.YYYY", formatLocale),
-        end: formatDate(reservation.end, "DD.MM.YYYY", formatLocale),
+        start: formatDate(reservation.start, "DD.MM.YYYY", locale),
+        end: formatDate(reservation.end, "DD.MM.YYYY", locale),
       })
     }}
   </Alert>
@@ -22,8 +22,7 @@ defineProps<{
   reservation: Reservation;
 }>();
 
-const { t } = useI18n({ useScope: "local" });
-const formatLocale = useFormatLocale();
+const { t, locale } = useI18n({ useScope: "local" });
 </script>
 
 <style scoped>

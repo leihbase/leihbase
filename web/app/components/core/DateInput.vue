@@ -9,7 +9,7 @@
         :name="name"
         :required="required"
         :placeholder="placeholder"
-        :value="model ? formatDate(model, 'DD.MM.YYYY', formatLocale) : ''"
+        :value="model ? formatDate(model, 'DD.MM.YYYY', locale) : ''"
         class="lb-input"
         :data-testid="dataTestid"
         :aria-describedby="description ? `${id}-description` : undefined"
@@ -22,7 +22,7 @@
             ref="datepicker"
             :show-outside-days="showOutsideDays"
             :isDateDisallowed="isDateDisallowed"
-            :locale="formatLocale"
+            :locale="locale"
             :data-testid="`${dataTestid}-calendar`"
             @change="handleDateChange"
           >
@@ -46,7 +46,6 @@ import FormLabel from "./FormLabel.vue";
 import Popup from "./Popup.vue";
 
 const { t, locale } = useI18n();
-const formatLocale = useFormatLocale();
 
 const model = defineModel<Date>();
 const emit = defineEmits<{ input: [Date] }>();

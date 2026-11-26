@@ -1,11 +1,10 @@
-import { languageOf } from "../lib/locale";
-
 export default defineI18nConfig(() => {
   const config = useRuntimeConfig();
   return {
     legacy: false,
-    // NUXT_PUBLIC_LOCALE may have a region ("en-GB"), texts use its language
-    locale: languageOf(config.public.locale),
+    // NUXT_PUBLIC_LOCALE may have a region ("en-GB"): dates and numbers use it,
+    // texts fall back to its language ("en")
+    locale: config.public.locale,
     availableLocales: ["en", "de"],
     messages: {
       en: {

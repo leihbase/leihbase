@@ -9,7 +9,7 @@ import {
  * current locale
  */
 export function useCurrency() {
-  const locale = useFormatLocale();
+  const { locale } = useI18n();
   const { leihbase } = storeToRefs(useLeihbase());
   const currency = computed(() => leihbase.value?.currency || DEFAULT_CURRENCY);
 

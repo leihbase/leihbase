@@ -216,10 +216,9 @@ import BorrowAgreementAcceptanceDialog from "./BorrowAgreementAcceptanceDialog.v
 
 const { pb } = usePocketbase();
 const { formatCurrency, symbol: currencySymbol } = useCurrency();
-const { t } = useI18n({
+const { t, locale } = useI18n({
   useScope: "local",
 });
-const formatLocale = useFormatLocale();
 
 const props = defineProps<{
   state: "new" | "edit";
@@ -395,13 +394,7 @@ const acceptanceStatus = computed(() => {
     acceptance.value.recorded_by
       ? "borrow_agreement.accepted_in_store"
       : "borrow_agreement.accepted",
-    {
-      date: formatDate(
-        acceptance.value.created,
-        "DD.MM.YYYY",
-        formatLocale.value
-      ),
-    }
+    { date: formatDate(acceptance.value.created, "DD.MM.YYYY", locale.value) }
   );
 });
 
