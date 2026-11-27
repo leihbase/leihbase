@@ -65,6 +65,16 @@
         </Select>
       </AdminSection>
 
+      <AdminSection
+        :title="t('borrow-agreement.title')"
+        :description="t('borrow-agreement.description')"
+      >
+        <BorrowAgreementEditor
+          ref="borrowAgreementEditor"
+          :borrow-agreement="borrowAgreement"
+        />
+      </AdminSection>
+
       <AdminSection>
         <Alert v-if="success" variant="success">{{ t("success") }}</Alert>
         <Alert
@@ -86,6 +96,7 @@ import { currencySymbol, DEFAULT_CURRENCY, SYMBOLS } from "@@/lib/currency";
 import AdminHeader from "@/components/admin/AdminHeader.vue";
 import AdminOverviewNav from "@/components/admin/AdminOverviewNav.vue";
 import AdminSection from "@/components/admin/AdminSection.vue";
+import BorrowAgreementEditor from "@/components/admin/BorrowAgreementEditor.vue";
 import Alert from "@/components/core/Alert.vue";
 import Button from "@/components/core/Button.vue";
 import Container from "@/components/core/Container.vue";
@@ -94,6 +105,7 @@ import RichTextarea from "@/components/core/RichTextarea.vue";
 import Select from "@/components/core/Select.vue";
 import Textarea from "@/components/core/Textarea.vue";
 import PageAlert from "@/components/page-alert/PageAlert.vue";
+import type { BorrowAgreement } from "~~/models/borrowAgreement";
 
 const { t } = useI18n({ useScope: "local" });
 const { pb, isValid } = usePocketbase();
@@ -117,6 +129,19 @@ useHead({
 });
 
 const success = ref(false);
+
+// Instance-wide borrowing terms, for locations without borrowing terms of their
+// own
+const { data: borrowAgreement } = await useAsyncData(
+  "admin_instance_borrow_agreement",
+  async () =>
+    leihbase.value?.borrow_agreement
+      ? await pb
+          .collection("borrow_agreements")
+          .getOne<BorrowAgreement>(leihbase.value.borrow_agreement)
+      : null
+);
+const borrowAgreementEditor = ref<InstanceType<typeof BorrowAgreementEditor>>();
 // Saved currency, the initial value of the currency select
 const currency = leihbase.value?.currency || DEFAULT_CURRENCY;
 
@@ -138,8 +163,15 @@ function currencyLabel(code: string) {
  */
 async function handleSubmit(e: SubmitEvent) {
   success.value = false;
+  const formData = new FormData(e.target as HTMLFormElement);
   try {
-    await update(leihbase.value.id, new FormData(e.target as HTMLFormElement));
+    // Changed borrowing terms are saved as a new borrow agreement, unless saved
+    // as a minor edit
+    if (borrowAgreementEditor.value) {
+      borrowAgreement.value = await borrowAgreementEditor.value.save();
+    }
+    formData.set("borrow_agreement", borrowAgreement.value?.id || "");
+    await update(leihbase.value.id, formData);
     // Show the new settings across the app
     await leihbaseStore.fetch();
     success.value = true;
@@ -190,6 +222,10 @@ async function handleSubmit(e: SubmitEvent) {
       "description": "Currency of deposits, for all locations, on the website and in emails.",
       "label": "Currency"
     },
+    "borrow-agreement": {
+      "title": "Borrowing terms",
+      "description": "Borrowing terms of all locations, unless a location has borrowing terms of its own. Users accept them once, and again when they change. Leave empty to not use instance-wide borrowing terms."
+    },
     "success": "Settings saved.",
     "error": "The settings could not be saved.",
     "save": "Save"
@@ -221,6 +257,10 @@ async function handleSubmit(e: SubmitEvent) {
       "title": "Währung",
       "description": "Währung der Pfandbeträge, für alle Standorte, auf der Website und in E-Mails.",
       "label": "Währung"
+    },
+    "borrow-agreement": {
+      "title": "Leihbedingungen",
+      "description": "Leihbedingungen aller Standorte, außer ein Standort hat eigene Leihbedingungen. Nutzer akzeptieren sie einmalig, und erneut, wenn sie sich ändern. Leer lassen, um keine instanzweiten Leihbedingungen zu verwenden."
     },
     "success": "Einstellungen gespeichert.",
     "error": "Die Einstellungen konnten nicht gespeichert werden.",

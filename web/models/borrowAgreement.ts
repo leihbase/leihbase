@@ -2,6 +2,7 @@ import type { RecordModel } from "pocketbase";
 
 export type BorrowAgreement = RecordModel & {
   id: string;
+  /** Empty for the instance-wide borrow agreement */
   location: string;
   content: string;
 };

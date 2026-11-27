@@ -11,17 +11,19 @@ onRecordCreateRequest((e) => {
     return;
   }
 
-  // Only the current borrow agreement of a location can be accepted
+  /** @type {typeof import('./lib/borrowAgreement')} */
+  const { isCurrentBorrowAgreement } = require(
+    `${__hooks}/lib/borrowAgreement`
+  );
+
+  // Only the current borrow agreement of a location, or of the instance, can
+  // be accepted
   $app.expandRecord(record, ["borrow_agreement"]);
   const borrowAgreement = record.expandedOne("borrow_agreement");
   if (!borrowAgreement) {
     throw new BadRequestError("Borrow_agreement_not_found.");
   }
-  const location = $app.findRecordById(
-    "location",
-    borrowAgreement.getString("location")
-  );
-  if (location.getString("borrow_agreement") !== borrowAgreement.id) {
+  if (!isCurrentBorrowAgreement(borrowAgreement)) {
     throw new BadRequestError("Borrow_agreement_not_current.");
   }
 

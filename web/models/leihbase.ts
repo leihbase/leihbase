@@ -13,4 +13,9 @@ export type Leihbase = RecordModel & {
   style?: string;
   /** ISO 4217 code of the currency of deposits, "EUR" when empty */
   currency?: string;
+  /**
+   * Instance-wide borrow agreement, for locations without a borrow agreement
+   * of their own
+   */
+  borrow_agreement?: string;
 };

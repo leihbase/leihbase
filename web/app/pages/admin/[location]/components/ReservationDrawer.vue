@@ -49,7 +49,7 @@
 
       <!-- Borrow agreement acceptance status -->
       <div
-        v-if="location.borrow_agreement && userId"
+        v-if="borrowAgreement && userId"
         class="box borrow-agreement"
         data-testid="reservation-drawer-borrow-agreement"
       >
@@ -363,9 +363,8 @@ function handleRemoveDialogCancelClick() {
 }
 
 // Borrow agreement acceptance of the selected user, `undefined` while loading
-const { fetch: fetchAcceptance } = useAdminBorrowAgreementAcceptances(
-  props.location
-);
+const { borrowAgreement, fetch: fetchAcceptance } =
+  useAdminBorrowAgreementAcceptances(props.location);
 const acceptance = ref<BorrowAgreementAcceptance | null>();
 const acceptanceLoadError = ref(false);
 watch([open, userId], async ([isOpen, user]) => {

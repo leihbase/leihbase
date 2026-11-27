@@ -13,6 +13,10 @@ onRecordCreateRequest((e) => {
   } = require(`${__hooks}/lib/user`);
   /** @type {typeof import('./lib/product')} */
   const { hasActiveReservation } = require(`${__hooks}/lib/product`);
+  /** @type {typeof import('./lib/borrowAgreement')} */
+  const { getEffectiveBorrowAgreement } = require(
+    `${__hooks}/lib/borrowAgreement`
+  );
 
   const { record } = e;
   if (!record) {
@@ -132,8 +136,9 @@ onRecordCreateRequest((e) => {
   // Unless optional for the location, the borrow agreement has to be accepted
   // by the user, either before or by sending its id along with this reservation. Keep
   // this check after all other validation: the reservation dialog relies on
-  // this error meaning the reservation is otherwise valid.
-  const borrowAgreement = location.getString("borrow_agreement");
+  // this error meaning the reservation is otherwise valid. Locations without a
+  // borrow agreement of their own use the instance-wide one.
+  const borrowAgreement = getEffectiveBorrowAgreement(location);
   const reservationUser = record.getString("user");
   const isAcceptanceMissing =
     !!borrowAgreement &&
